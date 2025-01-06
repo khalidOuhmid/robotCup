@@ -35,4 +35,61 @@ Règles spécifiques à **PHP**. Il s’agit de **conventions et standards de pr
 - LAUBAL Noah
 - OUHMID Khalid
 
+## 3. Installation et lancement du projet:
 
+> Le site de championnat de robots est réalisé avec les frameworks Symfony et TailwindCSS inclus en tant que composant dans le projet Symfony
+
+### 3.1 Installez les frameworks
+
+> Ces frameworks sont nécessaires pour que le site soit fonctionnel
+
+#### 3.1.1 Symfony
+
+ via `wegt` ou `curl`:
+
+```bash
+wget https://get.symfony.com/cli/installer -O - | bash
+
+curl -sS https://get.symfony.com/cli/installer | bash
+```
+
+#### 3.1.2 TailwindCSS
+
+via `npm`:
+
+```bash
+npm install -D tailwindcss
+```
+
+```bash
+npx tailwindcss init -p
+```
+
+### 3.2 Cloner le projet
+
+
+- Cloner le dépôt Git sur [Gitlab](git@gitlab-ce.iut.u-bordeaux.fr:cbenony/sae3.01_siterobot.git)
+
+- Puis installer les composants manquants du projet symfony:
+
+```bash
+composer install
+```
+
+### 3.3 Lancer le site sur son navigateur
+
+Pour lancer le projet en local avec Symfony lancer la commande suivante:
+
+```bash
+symfony server:start
+```
+
+ou 
+
+```bash
+symfony serve
+```
+
+Le site sera ainsi accessible sur l'addresse locale 127.0.0.1:[port] sur votre navigateur
+
+> Le port est indiqué après le lancement de la commande précèdente
