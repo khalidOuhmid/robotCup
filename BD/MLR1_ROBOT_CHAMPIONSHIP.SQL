@@ -2,14 +2,15 @@
  ----------------------------------------------------------------------------
              Génération d'une base de données pour
                         SQL Server 2005
-                       (6/1/2025 14:57:09)
+                       (6/1/2025 15:23:22)
  ----------------------------------------------------------------------------
      Nom de la base : ROBOT_CHAMPIONSHIP
      Projet : Accueil WinDesign V17
      Auteur : CRIIUT
-     Date de dernière modification : 6/1/2025 14:47:39
+     Date de dernière modification : 6/1/2025 15:23:08
  ----------------------------------------------------------------------------
 */
+use master 
 
 drop database ROBOT_CHAMPIONSHIP
 go
@@ -24,6 +25,16 @@ go
 use ROBOT_CHAMPIONSHIP
 go
 
+CREATE USER [IUTBX\kouhmid]
+CREATE USER [IUTBX\cbenony]
+CREATE USER [IUTBX\nabe]
+CREATE USER [IUTBX\nlaubal]
+CREATE USER [IUTBX\fdebailleul]
+go
+
+grant view definition, select, update, insert, delete
+to [IUTBX\kouhmid], [IUTBX\cbenony], [IUTBX\nabe], [IUTBX\nlaubal], [IUTBX\fdebailleul]
+go
 
 
 /* -----------------------------------------------------------------------------
@@ -157,7 +168,19 @@ alter table PARTICIPATE
 go
 
 
+alter table T_USER_USR 
+	 add constraint UNIQUE_T_USER_USR UNIQUE (USR_MAIL)
+go
 
+
+alter table T_TEAM_TEM 
+	 add constraint UNIQUE_T_TEAM_TEM UNIQUE (TEM_NAME)
+go
+
+
+alter table T_CHAMPIONSHIP_CHP
+	 add constraint UNIQUE_T_CHAMPIONSHIP_CHP UNIQUE (CHP_NAME)
+go
 
 /*
  -----------------------------------------------------------------------------
