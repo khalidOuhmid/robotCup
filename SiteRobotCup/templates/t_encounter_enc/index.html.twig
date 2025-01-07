@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TEncounterEnc index{% endblock %}
+
+{% block body %}
+    <h1>TEncounterEnc index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>ScoreBlue</th>
+                <th>ScoreGreen</th>
+                <th>State</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for t_encounter_enc in t_encounter_encs %}
+            <tr>
+                <td>{{ t_encounter_enc.id }}</td>
+                <td>{{ t_encounter_enc.scoreBlue }}</td>
+                <td>{{ t_encounter_enc.scoreGreen }}</td>
+                <td>{{ t_encounter_enc.state }}</td>
+                <td>
+                    <a href="{{ path('app_t_encounter_enc_show', {'id': t_encounter_enc.id}) }}">show</a>
+                    <a href="{{ path('app_t_encounter_enc_edit', {'id': t_encounter_enc.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_t_encounter_enc_new') }}">Create new</a>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit TEncounterEnc{% endblock %}
+
+{% block body %}
+    <h1>Edit TEncounterEnc</h1>
+
+    {{ include('t_encounter_enc/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_t_encounter_enc_index') }}">back to list</a>
+
+    {{ include('t_encounter_enc/_delete_form.html.twig') }}
+{% endblock %}

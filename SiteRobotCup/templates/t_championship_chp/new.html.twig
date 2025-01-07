@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New TChampionshipChp{% endblock %}
+
+{% block body %}
+    <h1>Create new TChampionshipChp</h1>
+
+    {{ include('t_championship_chp/_form.html.twig') }}
+
+    <a href="{{ path('app_t_championship_chp_index') }}">back to list</a>
+{% endblock %}
