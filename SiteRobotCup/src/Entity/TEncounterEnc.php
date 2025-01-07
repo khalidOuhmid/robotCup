@@ -47,19 +47,25 @@ class TEncounterEnc
     public function setScoreBlue(?int $scoreBlue): self
     {
         $this->scoreBlue = $scoreBlue;
+        if ($this->teamBlue) {
+            $this->teamBlue->updateScore();
+        }
         return $this;
     }
 
-    public function getScoreGreen(): ?int
-    {
-        return $this->scoreGreen;
+    
+public function setScoreGreen(?int $scoreGreen): self
+{
+    $this->scoreGreen = $scoreGreen;
+    if ($this->teamGreen) {
+        $this->teamGreen->updateScore();
     }
-
-    public function setScoreGreen(?int $scoreGreen): self
-    {
-        $this->scoreGreen = $scoreGreen;
-        return $this;
-    }
+    return $this;
+}
+public function getScoreGreen(): ?int
+{
+    return $this->scoreGreen;
+}
 
     public function getState(): ?string
     {
