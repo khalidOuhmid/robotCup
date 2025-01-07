@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\TTeamTemRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -9,28 +10,47 @@ use Symfony\Component\Routing\Attribute\Route;
 class PageTableScoresController extends AbstractController
 {
     #[Route('/scores', name: 'app_page_tableau_scores')]
-    public function index(): Response
+    public function index(TTeamTemRepository $teamRepository): Response
     {
-        // Exemple de données des équipes
-        $teams = [
-            ['name' => 'Équipe A', 'matches_played' => 10, 'matches_won' => 7, 'matches_drawn' => 2, 'points' => 2],
-            ['name' => 'Équipe B', 'matches_played' => 10, 'matches_won' => 6, 'matches_drawn' => 3, 'points' => 21],
-            ['name' => 'Équipe C', 'matches_played' => 10, 'matches_won' => 5, 'matches_drawn' => 4, 'points' => 19],
-            // Ajoutez d'autres équipes si nécessaire
-        ];
+        // Get teams sorted by score
+        $teamsData = $teamRepository->findBy([], ['score' => 'DESC']);
 
-        // Tri des équipes par points dans l'ordre décroissant
-        usort($teams, function ($a, $b) {
-            return $b['points'] <=> $a['points'];
-        });
+        // Transform team entities into array with required data
+        $teams = [];
+        foreach ($teamsData as $index => $team) {
+            // Calculate matches data from encounters
+            $matchesPlayed = count($team->getEncountersAsBlue()) + count($team->getEncountersAsGreen());
+            $matchesWon = 0;
+            $matchesDrawn = 0;
+            
+            // Count wins and draws for blue team encounters
+            foreach ($team->getEncountersAsBlue() as $encounter) {
+                if ($encounter->getScoreBlue() > $encounter->getScoreGreen()) {
+                    $matchesWon++;
+                } elseif ($encounter->getScoreBlue() === $encounter->getScoreGreen()) {
+                    $matchesDrawn++;
+                }
+            }
+            
+            // Count wins and draws for green team encounters
+            foreach ($team->getEncountersAsGreen() as $encounter) {
+                if ($encounter->getScoreGreen() > $encounter->getScoreBlue()) {
+                    $matchesWon++;
+                } elseif ($encounter->getScoreGreen() === $encounter->getScoreBlue()) {
+                    $matchesDrawn++;
+                }
+            }
 
-        // Mise à jour automatique des rangs
-        foreach ($teams as $index => &$team) {
-            $team['rank'] = $index + 1; // Le rang commence à 1
+            $teams[] = [
+                'rank' => $index + 1,
+                'name' => $team->getName(),
+                'matches_played' => $matchesPlayed,
+                'matches_won' => $matchesWon,
+                'matches_drawn' => $matchesDrawn,
+                'points' => $team->getScore()
+            ];
         }
-        unset($team); // Éviter les problèmes de référence après le foreach
 
-        // Passer les données à Twig
         return $this->render('page_tableau_scores/index.html.twig', [
             'teams' => $teams,
         ]);

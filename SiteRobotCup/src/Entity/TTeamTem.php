@@ -159,4 +159,24 @@ class TTeamTem
         }
         return $this;
     }
+    // src/Entity/TTeamTem.php
+
+public function updateScore(): self
+{
+    $totalScore = 0;
+    
+    // Calculer les scores des matchs en tant qu'équipe bleue
+    foreach ($this->encountersAsBlue as $encounter) {
+        $totalScore += $encounter->getScoreBlue() ?? 0;
+    }
+    
+    // Calculer les scores des matchs en tant qu'équipe verte
+    foreach ($this->encountersAsGreen as $encounter) {
+        $totalScore += $encounter->getScoreGreen() ?? 0;
+    }
+    
+    $this->score = $totalScore;
+    return $this;
+}
+
 }
