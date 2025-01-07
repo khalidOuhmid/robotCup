@@ -13,7 +13,7 @@
         <ul class="flex flex-col">
         <li class="p-3 flex flex-row justify-between">
         <input type="text" placeholder="nom de l'équipe à ajouter" class="bg-slate-200 w-100 border-1 p-3 text-gray-500 w-8/12 border-black"/>
-        <input type="submit" value="Enregistrer" class="bg-green-400 border-1 p-3" />
+        <input type="submit" value="Enregistrer" class="bg-green-400 border-1 p-3 hover:cursor-pointer focus:bg-green-500" />
         </li>
         </ul>
     </div>
@@ -31,7 +31,7 @@
                 <input type="text" placeholder="Prénom" class="bg-white w-full border-1 p-3 text-gray-500" />
                 <input type="email" placeholder="Email" class="bg-white w-full border-1 p-3 text-gray-500" />
             </div>
-            <input type="submit" value="Ajouter" class="bg-green-400 border-1 p-3" />
+            <input type="submit" value="Ajouter" class="bg-green-400 border-1 p-3 hover:cursor-pointer focus:bg-green-500" />
         </li>
         {% for member in team %}
         <li class="bg-slate-200 w-100 border-1 border-black p-3 min-h-12 flex flex-row justify-between">
