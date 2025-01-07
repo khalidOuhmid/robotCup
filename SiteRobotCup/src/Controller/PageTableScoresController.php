@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class PageTableauScoresController extends AbstractController
+class PageTableScoresController extends AbstractController
 {
     #[Route('/scores', name: 'app_page_tableau_scores')]
     public function index(): Response
