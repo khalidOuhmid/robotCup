@@ -1,189 +1,103 @@
-/*
- ----------------------------------------------------------------------------
-             Génération d'une base de données pour
-                        SQL Server 2005
-                       (6/1/2025 15:23:22)
- ----------------------------------------------------------------------------
-     Nom de la base : ROBOT_CHAMPIONSHIP
-     Projet : Accueil WinDesign V17
-     Auteur : CRIIUT
-     Date de dernière modification : 6/1/2025 15:23:08
- ----------------------------------------------------------------------------
-*/
-use master 
+/* ----------------------------------------------------------------------------- 
+      
+			Génération d'une base de données pour
+					MySQL
 
-drop database ROBOT_CHAMPIONSHIP
-go
-
-/* -----------------------------------------------------------------------------
-      OUVERTURE DE LA BASE ROBOT_CHAMPIONSHIP
 ----------------------------------------------------------------------------- */
 
-create database ROBOT_CHAMPIONSHIP
-go
+	Projet : SAE S3.01 - Robot Championship
+	Date de dernière modification : 07/01/2025
 
-use ROBOT_CHAMPIONSHIP
-go
+	A copier dans phpMyAdmin - dans sa propre base (ex : etu_ibezie)
 
-CREATE USER [IUTBX\kouhmid]
-CREATE USER [IUTBX\cbenony]
-CREATE USER [IUTBX\nabe]
-CREATE USER [IUTBX\nlaubal]
-CREATE USER [IUTBX\fdebailleul]
-go
-
-grant view definition, select, update, insert, delete
-to [IUTBX\kouhmid], [IUTBX\cbenony], [IUTBX\nabe], [IUTBX\nlaubal], [IUTBX\fdebailleul]
-go
-
-
-/* -----------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------- 
       TABLE : T_CHAMPIONSHIP_CHP
 ----------------------------------------------------------------------------- */
 
-create table T_CHAMPIONSHIP_CHP
-  (
-     CHP_ID int  not null  ,
-     CHP_NAME char(255)  not null  ,
-     CHP_DATE datetime  not null  
-     ,
-     constraint PK_T_CHAMPIONSHIP_CHP primary key (CHP_ID)
-  ) 
-go
+CREATE TABLE T_CHAMPIONSHIP_CHP (
+    CHP_ID SMALLINT AUTO_INCREMENT,
+    CHP_NAME CHAR(255) NOT NULL,
+    CHP_DATE DATETIME NOT NULL,
+    PRIMARY KEY (CHP_ID),
+    UNIQUE KEY UNIQUE_T_CHAMPIONSHIP_CHP_NAME (CHP_NAME)
+) ENGINE=InnoDB;
 
-
-
-/* -----------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------- 
       TABLE : T_TEAM_TEM
 ----------------------------------------------------------------------------- */
 
-create table T_TEAM_TEM
-  (
-     TEM_ID int  not null  ,
-     TEM_NAME char(255)  not null  ,
-     TEM_SCORE int  null  
-     ,
-     constraint PK_T_TEAM_TEM primary key (TEM_ID)
-  ) 
-go
+CREATE TABLE T_TEAM_TEM (
+    TEM_ID SMALLINT AUTO_INCREMENT,
+    USR_ID SMALLINT NOT NULL,
+    TEM_NAME CHAR(255) NOT NULL,
+    TEM_SCORE INT DEFAULT NULL,
+    PRIMARY KEY (TEM_ID),
+    UNIQUE KEY UNIQUE_T_TEAM_TEM_NAME (TEM_NAME)
+) ENGINE=InnoDB;
 
-
-
-/* -----------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------- 
       TABLE : T_USER_USR
 ----------------------------------------------------------------------------- */
 
-create table T_USER_USR
-  (
-     USR_ID int  not null  ,
-     TEM_ID int  null  ,
-     USR_TYPE char(255)  not null  ,
-     USR_MAIL char(255)  not null  ,
-     USR_PASS varchar(128)  not null  ,
-     USR_TEAM char(32)  null  
-     ,
-     constraint PK_T_USER_USR primary key (USR_ID)
-  ) 
-go
+CREATE TABLE T_USER_USR (
+    USR_ID SMALLINT AUTO_INCREMENT,
+    USR_TYPE CHAR(255) NOT NULL,
+    USR_MAIL CHAR(255) NOT NULL,
+    USR_PASS VARCHAR(128) NOT NULL,
+    PRIMARY KEY (USR_ID),
+    UNIQUE KEY UNIQUE_T_USER_USR_MAIL (USR_MAIL),
+    CHECK (USR_TYPE IN ('USER', 'ADMIN'))
+) ENGINE=InnoDB;
 
-
-
-/*      INDEX DE T_USER_USR      */
-
-
-
-/* -----------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------- 
       TABLE : T_ENCOUNTER_ENC
 ----------------------------------------------------------------------------- */
 
-create table T_ENCOUNTER_ENC
-  (
-     ENC_ID int  not null  ,
-     CHP_ID int  not null  ,
-     ENC_SCORE_A int  null  ,
-     ENC_SCORE_B int  null  
-     ,
-     constraint PK_T_ENCOUNTER_ENC primary key (ENC_ID)
-  ) 
-go
+CREATE TABLE T_ENCOUNTER_ENC (
+    ENC_ID SMALLINT AUTO_INCREMENT,
+    TEM_ID_PARTICIPATE_BLUE SMALLINT NOT NULL,
+    TEM_ID_PARTICIPATE_GREEN SMALLINT NOT NULL,
+    CHP_ID SMALLINT NOT NULL,
+    ENC_SCORE_BLUE INT DEFAULT NULL,
+    ENC_SCORE_GREEN INT DEFAULT NULL,
+    ENC_STATE CHAR(255) NOT NULL,
+    PRIMARY KEY (ENC_ID),
+    CHECK (TEM_ID_PARTICIPATE_BLUE <> TEM_ID_PARTICIPATE_GREEN)
+) ENGINE=InnoDB;
 
-
-
-/*      INDEX DE T_ENCOUNTER_ENC      */
-
-
-
-/* -----------------------------------------------------------------------------
-      TABLE : PARTICIPATE
+/* ----------------------------------------------------------------------------- 
+      TABLE : T_MEMBER_MBR
 ----------------------------------------------------------------------------- */
 
-create table PARTICIPATE
-  (
-     TEM_ID int  not null  ,
-     ENC_ID int  not null  
-     ,
-     constraint PK_PARTICIPATE primary key (TEM_ID, ENC_ID)
-  ) 
-go
+CREATE TABLE T_MEMBER_MBR (
+    MBR_ID SMALLINT AUTO_INCREMENT,
+    TEM_ID SMALLINT NOT NULL,
+    MBR_NAME CHAR(255) NOT NULL,
+    MBR_SURNAME CHAR(255) NOT NULL,
+    MBR_MAIL CHAR(255) NOT NULL,
+    PRIMARY KEY (MBR_ID),
+    UNIQUE KEY UNIQUE_T_MEMBER_MBR_MAIL (MBR_MAIL)
+) ENGINE=InnoDB;
 
-
-
-/*      INDEX DE PARTICIPATE      */
-
-
-
-/* -----------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------- 
       REFERENCES SUR LES TABLES
 ----------------------------------------------------------------------------- */
 
+ALTER TABLE T_TEAM_TEM
+    ADD CONSTRAINT FK_T_TEAM_TEM_T_USER_USR FOREIGN KEY (USR_ID)
+    REFERENCES T_USER_USR (USR_ID);
 
+ALTER TABLE T_ENCOUNTER_ENC
+    ADD CONSTRAINT FK_T_ENCOUNTER_ENC_T_TEAM_TEM FOREIGN KEY (TEM_ID_PARTICIPATE_BLUE)
+    REFERENCES T_TEAM_TEM (TEM_ID),
+    ADD CONSTRAINT FK_T_ENCOUNTER_ENC_T_TEAM_TEM1 FOREIGN KEY (TEM_ID_PARTICIPATE_GREEN)
+    REFERENCES T_TEAM_TEM (TEM_ID),
+    ADD CONSTRAINT FK_T_ENCOUNTER_ENC_T_CHAMPIONSHIP_CHP FOREIGN KEY (CHP_ID)
+    REFERENCES T_CHAMPIONSHIP_CHP (CHP_ID);
 
-alter table T_USER_USR 
-     add constraint FK_T_USER_USR_T_TEAM_TEM foreign key (TEM_ID) 
-               references T_TEAM_TEM (TEM_ID)
-go
-
-
-
-
-alter table T_ENCOUNTER_ENC 
-     add constraint FK_T_ENCOUNTER_ENC_T_CHAMPIONSHIP_CHP foreign key (CHP_ID) 
-               references T_CHAMPIONSHIP_CHP (CHP_ID)
-go
-
-
-
-
-alter table PARTICIPATE 
-     add constraint FK_PARTICIPATE_T_TEAM_TEM foreign key (TEM_ID) 
-               references T_TEAM_TEM (TEM_ID)
-go
+ALTER TABLE T_MEMBER_MBR
+    ADD CONSTRAINT FK_T_MEMBER_MBR_T_TEAM_TEM FOREIGN KEY (TEM_ID)
+    REFERENCES T_TEAM_TEM (TEM_ID);
 
 
 
-
-alter table PARTICIPATE 
-     add constraint FK_PARTICIPATE_T_ENCOUNTER_ENC foreign key (ENC_ID) 
-               references T_ENCOUNTER_ENC (ENC_ID)
-go
-
-
-alter table T_USER_USR 
-	 add constraint UNIQUE_T_USER_USR UNIQUE (USR_MAIL)
-go
-
-
-alter table T_TEAM_TEM 
-	 add constraint UNIQUE_T_TEAM_TEM UNIQUE (TEM_NAME)
-go
-
-
-alter table T_CHAMPIONSHIP_CHP
-	 add constraint UNIQUE_T_CHAMPIONSHIP_CHP UNIQUE (CHP_NAME)
-go
-
-/*
- -----------------------------------------------------------------------------
-               FIN DE GENERATION
- -----------------------------------------------------------------------------
-*/
