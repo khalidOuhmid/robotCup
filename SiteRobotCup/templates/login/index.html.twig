@@ -3,38 +3,35 @@
 {% block title %}Hello RegisterController!{% endblock %}
 
 {% block body %}
-<div class="example-wrapper font-mono ">
-    <h1 class="bg-sky-900 text-center p-10 text-white text-4xl font-bold">Robot Championship</h1>
-    <div class="flex justify-center m-2">
-        <img class="h-48 w-auto" src="https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o=" alt="icone utilisateur">
-    </div>
-    <h2 class="text-center text-2xl font-mono font-medium">S'identifier</h2>
-    <div class="flex items-center justify-center m-8">
-        <div class="flex flex-col justify-center items-center w-96">
-            <form method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 ">
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-xs font-bold mb-2" for="username">
-                        Identifiant
-                    </label>
-                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" name="username" placeholder="Adresse mail">
-                </div>
-                <div class="mb-6">
-                    <label class="block text-gray-700 text-xs font-bold mb-2" for="password">
-                        Mot de passe
-                    </label>
-                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" name="password" placeholder="***********">
-                </div>
-                <div class="flex justify-end">
-                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-                        Se connecter
-                    </button>
-                </div>
-            </form>
-            <p class="text-center text-gray-600 text-sm mt-4">
-                Vous n'avez pas de compte ? 
-                <a href="/register" class="text-blue-500 hover:underline">Créer un compte</a>
-            </p>
-        </div>
+<div class="flex justify-center m-2">
+    <img class="h-48 w-auto" src="https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o=" alt="icone utilisateur">
+</div>
+<h2 class="text-center text-2xl font-mono font-medium">S'identifier</h2>
+<div class="flex items-center justify-center m-8">
+    <div class="flex flex-col justify-center items-center w-96">
+        <form method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 ">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-xs font-bold mb-2" for="username">
+                    Identifiant
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" name="username" placeholder="Adresse mail">
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 text-xs font-bold mb-2" for="password">
+                    Mot de passe
+                </label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" name="password" placeholder="***********">
+            </div>
+            <div class="flex justify-end">
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                    Se connecter
+                </button>
+            </div>
+        </form>
+        <p class="text-center text-gray-600 text-sm mt-4">
+            Vous n'avez pas de compte ? 
+            <a href="/register" class="text-blue-500 hover:underline">Créer un compte</a>
+        </p>
     </div>
 </div>
 {% endblock %}

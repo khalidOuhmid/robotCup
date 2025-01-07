@@ -15,17 +15,4 @@ class LoginController extends AbstractController
             'controller_name' => 'LoginController',
         ]);
     }
-        
 }
-
-function test($user, $password)
-{
-    echo 'ceci est un test ! username: '.$user.' password:'.$password;
-}
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST'){
-    if (isset($_POST['username'] ) and $_POST['username'] != "" and isset($_POST['password'])){
-        test($_POST['username'], $_POST['password']);
-    }
-}
-
