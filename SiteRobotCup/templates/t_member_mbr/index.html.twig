@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TMemberMbr index{% endblock %}
+
+{% block body %}
+    <h1>TMemberMbr index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Surname</th>
+                <th>Email</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for t_member_mbr in t_member_mbrs %}
+            <tr>
+                <td>{{ t_member_mbr.id }}</td>
+                <td>{{ t_member_mbr.name }}</td>
+                <td>{{ t_member_mbr.surname }}</td>
+                <td>{{ t_member_mbr.email }}</td>
+                <td>
+                    <a href="{{ path('app_t_member_mbr_show', {'id': t_member_mbr.id}) }}">show</a>
+                    <a href="{{ path('app_t_member_mbr_edit', {'id': t_member_mbr.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_t_member_mbr_new') }}">Create new</a>
+{% endblock %}

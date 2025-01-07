@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TChampionshipChp{% endblock %}
+
+{% block body %}
+    <h1>TChampionshipChp</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ t_championship_chp.id }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ t_championship_chp.name }}</td>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <td>{{ t_championship_chp.date ? t_championship_chp.date|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_t_championship_chp_index') }}">back to list</a>
+
+    <a href="{{ path('app_t_championship_chp_edit', {'id': t_championship_chp.id}) }}">edit</a>
+
+    {{ include('t_championship_chp/_delete_form.html.twig') }}
+{% endblock %}

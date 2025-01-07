@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit TTeamTem{% endblock %}
+
+{% block body %}
+    <h1>Edit TTeamTem</h1>
+
+    {{ include('t_team_tem/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_t_team_tem_index') }}">back to list</a>
+
+    {{ include('t_team_tem/_delete_form.html.twig') }}
+{% endblock %}

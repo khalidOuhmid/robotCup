@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TChampionshipChp index{% endblock %}
+
+{% block body %}
+    <h1>TChampionshipChp index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Date</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for t_championship_chp in t_championship_chps %}
+            <tr>
+                <td>{{ t_championship_chp.id }}</td>
+                <td>{{ t_championship_chp.name }}</td>
+                <td>{{ t_championship_chp.date ? t_championship_chp.date|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_t_championship_chp_show', {'id': t_championship_chp.id}) }}">show</a>
+                    <a href="{{ path('app_t_championship_chp_edit', {'id': t_championship_chp.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_t_championship_chp_new') }}">Create new</a>
+{% endblock %}
