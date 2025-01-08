@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello DefaultController!{% endblock %}
+{% block title %}Accueil{% endblock %}
 
 {% block body %}
 <main>
@@ -8,22 +8,53 @@
         <div class="flex items-center justify-center ">
             <h1 class="text-3xl m-10 font-bold">Bienvenue à la RoboCup</h1>
         </div>
-        <div class="flex justify-around items-center">
+        <div class="flex  space-x-28 items-center">
             <div class="h-30 w-70 m-8 rounded-2xl">
                 <img class="" src={{asset('media/RoboCup_Logo.png')}} alt="">
             </div>
-            <div class="h-90 w-30 m-8 bg-gradient-to-r from-sky-800 to-sky-600 rounded-2xl overflow-hidden">
-                <p class="text-blue-50 p-14">
-                    La RoboCup est une compétition, mais elle est avant tout une communauté, et les participants échangent tout au long de l'événement. <br>
-                    Nombre de technologies développées par les compétiteurs sont ouvertes.<br>
-                    Chaque RoboCup est également l’occasion d’un Symposium International, haut lieu de présentation et de discussion <br> de contributions scientifiques
-                     adressant un large éventail de domaines ayant trait à la recherche et la pédagogie en matière de robotique et d’intelligence artificielle. <br>
-                     Afin d’encourager le plus grand partage possible des connaissances<br>
+            <div class="h-90 w-2/5 m-8 bg-gradient-to-r from-sky-800 to-sky-600 rounded-2xl overflow-hidden">
+                <p class="text-blue-50 p-14  text-wrap">
+                    La RoboCup est une compétition, mais elle est avant tout une communauté, et les participants échangent tout au long de l'événement. 
+                    Nombre de technologies développées par les compétiteurs sont ouvertes.
+                    Chaque RoboCup est également l’occasion d’un Symposium International, haut lieu de présentation et de discussion de contributions scientifiques
+                     adressant un large éventail de domaines ayant trait à la recherche et la pédagogie en matière de robotique et d’intelligence artificielle. 
+                     Afin d’encourager le plus grand partage possible des connaissances
                     sur les aspects aussi bien matériels que logiciels, un axe spécifique du Symposium s’intéresse aux développements « ouverts » (open source).
                 </p>
             </div>
-            
         </div>
+        <div class="container mx-auto mt-10 px-4">
+        <h1 class="text-3xl font-bold text-center mb-8">Classement des équipes</h1>
+
+        <table class="min-w-full table-auto bg-white shadow-lg rounded-lg overflow-hidden">
+            <thead>
+                <tr class="bg-sky-800 text-white">
+                    <th class="px-4 py-2 text-left">Rang</th>
+                    <th class="px-4 py-2 text-left">Nom équipe</th>
+                    <th class="px-4 py-2 text-left">Match Joué</th>
+                    <th class="px-4 py-2 text-left">Match Gagné</th>
+                    <th class="px-4 py-2 text-left">Match Nul</th>
+                    <th class="px-4 py-2 text-left">Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for team in teams %}
+                    <tr class="border-t border-gray-200 hover:bg-gray-50">
+                        <td class="px-4 py-2 text-center">{{ team.rank }}</td>
+                        <td class="px-4 py-2">{{ team.name }}</td>
+                        <td class="px-4 py-2 text-center">{{ team.matches_played }}</td>
+                        <td class="px-4 py-2 text-center">{{ team.matches_won }}</td>
+                        <td class="px-4 py-2 text-center">{{ team.matches_drawn }}</td>
+                        <td class="px-4 py-2 text-center">{{ team.points }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="px-4 py-2 text-center text-gray-500">Aucune équipe disponible.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     </section>
 </main>
 {% endblock %}

@@ -7,12 +7,13 @@
 
     <!-- Desktop Navigation -->
     <div class=" md:flex space-x-4">
-        <a href="{{ path('app_default') }}" class="text-2xl hover:text-gray-400">Accueil</a>
-        <a href="{{ path('app_login') }}" class="text-2xl hover:text-gray-400">Login</a>
+        <a href="{{ path('app_default') }}" class="text-2xl hover:text-sky-300">Accueil</a>
+        <a href="{{ path('app_login') }}" class="text-2xl hover:text-sky-300">Login</a>
       
         {# Afficher le lien "Scores" uniquement si l'utilisateur n'est pas connecté #}
         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-            <a href="{{ path('app_page_tableau_scores') }}" class="text-2xl hover:text-gray-400">Scores</a>
+            <a href="{{ path('app_page_tableau_scores') }}" class="text-2xl hover:text-sky-300">Scores</a>
+            <a href="{{ path('app_encounters') }}" class="text-2xl hover:text-sky-300">Rencontres</a>
         {% endif %}
     </div>
   </nav>
