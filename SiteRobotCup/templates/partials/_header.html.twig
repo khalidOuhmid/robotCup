@@ -7,8 +7,13 @@
 
     <!-- Desktop Navigation -->
     <div class=" md:flex space-x-4">
-        <a href="{{ path('app_default') }}" class="text-2xl hover:text-sky-300">Accueil</a>
-        <a href="{{ path('app_login') }}" class="text-2xl hover:text-sky-300">Login</a>
+        <a href="{{ path('app_default') }}" class="text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">Accueil</a>
+        <a href="{{ path('app_login') }}" class="flex items-center text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">
+            Se connecter
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 ml-2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25" />
+            </svg>
+        </a>
       
         {# Afficher le lien "Scores" uniquement si l'utilisateur n'est pas connecté #}
         {% if is_granted('IS_AUTHENTICATED_FULLY') %}
