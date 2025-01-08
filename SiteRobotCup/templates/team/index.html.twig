@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello TeamController!{% endblock %}
+{% block title %}Gestion de mon équipe{% endblock %}
 
 {% block body %}
 
@@ -12,12 +12,12 @@
     </div>
 
     <!-- Formulaire pour créer une équipe -->
-    {{ form_start(teamForm, { 'attr': { 'class': 'flex flex-col gap-4' } }) }}
+    {{ form_start(form, { 'attr': { 'class': 'flex flex-col gap-4' } }) }}
         <div class="p-3 flex flex-row justify-between">
-            {{ form_widget(teamForm.name, { 'attr': { 'class': 'bg-slate-200 w-100 border-1 p-3 text-gray-500 w-8/12 border-black', 'placeholder': 'Nom de l\'équipe à ajouter' } }) }}
+            {{ form_widget(form.name, { 'attr': { 'class': 'bg-slate-200 w-100 border-1 p-3 text-gray-500 w-8/12 border-black', 'placeholder': 'Nom de l\'équipe à ajouter' } }) }}
             <button type="submit" class="bg-green-400 border-1 p-3 hover:cursor-pointer focus:bg-green-500">Enregistrer</button>
         </div>
-    {{ form_end(teamForm) }}
+    {{ form_end(form) }}
 </div>
 
 {# {% else %} #}
@@ -28,16 +28,16 @@
     </div>
 
     <!-- Formulaire pour ajouter un membre -->
-    {{ form_start(memberForm, { 'attr': { 'class': 'flex flex-col gap-4' } }) }}
+    {{ form_start(form, { 'attr': { 'class': 'flex flex-col gap-4' } }) }}
         <div class="bg-slate-200 w-100 border-1 border-black p-3 gap-4 flex">
             <div class="flex flex-row gap-4">
-                {{ form_widget(memberForm.name, { 'attr': { 'class': 'bg-white w-full border-1 p-3 text-gray-500', 'placeholder': 'Nom' } }) }}
-                {{ form_widget(memberForm.surname, { 'attr': { 'class': 'bg-white w-full border-1 p-3 text-gray-500', 'placeholder': 'Prénom' } }) }}
-                {{ form_widget(memberForm.email, { 'attr': { 'class': 'bg-white w-full border-1 p-3 text-gray-500', 'placeholder': 'Email' } }) }}
+                {{ form_widget(form.user.name, { 'attr': { 'class': 'bg-white w-full border-1 p-3 text-gray-500', 'placeholder': 'Nom' } }) }}
+                {{ form_widget(form.user.surname, { 'attr': { 'class': 'bg-white w-full border-1 p-3 text-gray-500', 'placeholder': 'Prénom' } }) }}
+                {{ form_widget(form.user.email, { 'attr': { 'class': 'bg-white w-full border-1 p-3 text-gray-500', 'placeholder': 'Email' } }) }}
             </div>
             <button type="submit" class="bg-green-400 border-1 p-3 hover:cursor-pointer focus:bg-green-500">Ajouter</button>
         </div>
-    {{ form_end(memberForm) }}
+    {{ form_end (form)}}
 
     <!-- Liste des membres existants -->
     <ul class="flex flex-col">
