@@ -17,12 +17,13 @@
                 {{ form_row(form.surname, { 'attr': { 'class': 'bg-white w-full border-1 p-3 text-gray-500', 'placeholder': 'Prénom' } }) }}
                 {{ form_row(form.email, { 'attr': { 'class': 'bg-white w-full border-1 p-3 text-gray-500', 'placeholder': 'Email' } }) }}
             </div>
-            <button type="submit" class="bg-green-400 border-1 p-3 hover:cursor-pointer focus:bg-green-500">Ajouter</button>
+            <button type="submit" class="bg-green-400 border-1 p-3 hover:cursor-pointer focus:bg-green-500 px-4 py-0">Ajouter</button>
         </div>
     {{ form_end(form) }}
 
     <!-- Table des membres existants -->
     <div class="mt-5">
+    {% if team.members|length > 0 %}
         <table class="table-auto border-collapse border border-gray-300 w-full">
             <thead>
                 <tr class="bg-gray-100">
@@ -32,19 +33,20 @@
                 </tr>
             </thead>
             <tbody>
-                {% for member in team %}
+                {% for member in members %}
                     <tr class="bg-white hover:bg-gray-50">
                         <td class="border border-gray-300 p-2">{{ member.name }}</td>
                         <td class="border border-gray-300 p-2">{{ member.surname }}</td>
                         <td class="border border-gray-300 p-2">{{ member.email }}</td>
                     </tr>
+                {% endfor %}
                 {% else %}
                     <tr>
                         <td colspan="3" class="border border-gray-300 p-2 text-center text-gray-500">
                             Aucun membre dans cette équipe.
                         </td>
                     </tr>
-                {% endfor %}
+                {% endif %}
             </tbody>
         </table>
     </div>

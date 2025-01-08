@@ -48,20 +48,24 @@ class TeamController extends AbstractController
             return $this->redirectToRoute('app_team_show', ['id' => $user->getId()]);
         }
 
-        // Récupération de l'utilisateur qui à créé l'équipe
-        $user = $team->getUser();
-
         if ($form->isSubmitted() && $form->isValid()) {
-            // Associer le membre à l'équipe
-            $member->setTeam($team);
-            $team->addMember($member);
-            
-            // Sauvegarder en base de données
-            $entityManager->persist($member);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Membre ajouté avec succès !');
-            return $this->redirectToRoute('app_team_show', ['id' => $user->getId()]);
+            // Vérifier si un membre avec la même adresse e-mail existe déjà dans cette équipe
+            $existingMember = $entityManager->getRepository(TMemberMbr::class)
+                ->findOneBy(['email' => $member->getEmail(), 'team' => $team]);
+    
+            if ($existingMember) {
+                $this->addFlash('danger', 'Un membre avec cette adresse e-mail existe déjà dans l\'équipe.');
+            } else {
+                $member->setTeam($team);
+                $team->addMember($member);
+    
+                $entityManager->persist($member);
+                $entityManager->flush();
+                $entityManager->refresh($team);
+    
+                $this->addFlash('success', 'Membre ajouté avec succès !');
+                return $this->redirectToRoute('app_team_show', ['id' => $user->getId()]);
+            }
         }
 
         return $this->render('team/add.html.twig', [
@@ -86,15 +90,20 @@ class TeamController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Associer le membre à l'équipe
-            $team->setUser($user);
-            
-            // Sauvegarder en base de données
-            $entityManager->persist($team);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Membre ajouté avec succès !');
-            return $this->redirectToRoute('app_team_show', ['id' => $user->getId()]);
+            // Vérifier si une équipe avec le même nom existe déjà
+            $existingTeam = $entityManager->getRepository(TTeamTem::class)
+                ->findOneBy(['name' => $team->getName(), 'user' => $user]);
+    
+            if ($existingTeam) {
+                $this->addFlash('danger', 'Une équipe avec ce nom existe déjà.');
+            } else {
+                $team->setUser($user);
+                $entityManager->persist($team);
+                $entityManager->flush();
+    
+                $this->addFlash('success', 'Équipe créée avec succès !');
+                return $this->redirectToRoute('app_team_show', ['id' => $user->getId()]);
+            }
         }
 
         $teams = $user->getTeams();
