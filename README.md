@@ -45,7 +45,7 @@ wget https://get.symfony.com/cli/installer -O - | bash
 curl -sS https://get.symfony.com/cli/installer | bash
 ```
 
-#### 3.1.2 TailwindCSS:
+#### 2.1.2 TailwindCSS:
 
 via `compser` et `php`:
 
@@ -78,7 +78,7 @@ npx tailwindcss init -p
 composer install
 ```
 
-### 3.3 Lancer le site sur son navigateur:
+### 2.3 Lancer le site sur son navigateur:
 
 Pour lancer le projet en local lancer la commande suivante:
 
@@ -90,6 +90,23 @@ Cette commande lance deux terminaux distinct, un pour lancer tailwind et le deux
 Le **site sera accessible** sur l'addresse locale `127.0.0.1:8000` sur votre navigateur.
 
 Le **port** est **indiqué après le lancement** de la commande précèdente.
+
+## 3. Préparer la Base de Données :
+
+### 3.1 Lancer le script de création dans phpMyAdmin
+- Copier et executer le code du fichier script MLR1_ROBOT_CHAMPIONSHIP.SQL dans l'onglet SQL sur phpMyAdmin.net, dans votre base personelle.
+
+### 3.2 Tester la base
+#### 3.2.1 Installer les Frameworks
+```bash
+pip install pandas, sqlalchemy
+```
+#### 3.2.2 Lancer les tests
+- Lancer le fichier testDatabase.py 
+
+
+### 3.3 Remplir la base 
+- Copier et executer le code du fichier script script-remplissage.sql dans l'onglet SQL sur phpMyAdmin.net, dans votre base personelle.
 
 <hr>
 
