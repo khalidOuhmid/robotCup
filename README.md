@@ -99,7 +99,8 @@ Le **port** est **indiqué après le lancement** de la commande précèdente.
 ### 3.2 Tester la base
 #### 3.2.1 Installer les Frameworks
 ```bash
-pip install pandas, sqlalchemy
+pip install pandas
+pip install sqlalchemy
 ```
 #### 3.2.2 Lancer les tests
 - Lancer le fichier testDatabase.py 
