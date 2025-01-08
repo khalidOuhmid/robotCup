@@ -3,31 +3,30 @@
 {% block title %}Mes équipes{% endblock %}
 
 {% block body %}
-<div class="flex flex-col w-full p-20">
-    <h1 class="text-xl font-bold text-white border-1 border-black bg-sky-400 p-2">Mes équipes</h1>
+<div class="flex flex-col w-full p-20 shadow-lg rounded-lg">
+    <h1 class="text-xl text-white bg-sky-800 p-2">Mon équipe</h1>
 
     <!-- Formulaire de création d'équipe -->
     {{ form_start(form) }}
-        <div class="flex items-center justify-between gap-4 bg-gray-50 border-black border-1 px-4 p-4">
-            {{ form_widget(form.name, { 'attr': { 'placeholder': 'Nom de l\'équipe', 'class': 'bg-gray-200 w-5/12 py-2' } }) }}
-            <button type="submit" class="bg-green-400 border-1 p-3 hover:cursor-pointer focus:bg-green-500 px-4 py-2">Créer une équipe</button>
+        <div class="flex items-center justify-between gap-4 bg-slate-200 px-4 p-4">
+            {{ form_widget(form.name, { 'attr': { 'placeholder': 'Nom de l\'équipe', 'class': 'bg-white w-5/12 py-2 p-3' } }) }}
+            <button type="submit" class="bg-green-400 p-3 hover:cursor-pointer focus:bg-green-500 px-4 py-2">Créer une équipe</button>
         </div>
     {{ form_end(form) }}
 
     <!-- Liste des équipes -->
-    <div class="mt-10">
-        <table class="table-auto w-full border-collapse border border-gray-300">
+        <table class="min-w-full table-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10">
             <thead>
                 <tr class="bg-gray-100">
-                    <th class="border border-gray-300 p-2">Nom de l'équipe</th>
-                    <th class="border border-gray-300 p-2">Actions</th>
-                </tr>
+                    <th class="p-2">Nom de l'équipe</th>
+                    <th class="p-2">Actions</th>
+                </tr>   
             </thead>
             <tbody>
                 {% for team in teams %}
-                    <tr>
-                        <td class="border border-gray-300 p-2 bg-gray-200">{{ team.name }}</td>
-                        <td class="border border-gray-300 p-2 bg-gray-200">
+                    <tr class="bg-gray-200 hover:bg-gray-300">
+                        <td class="p-2 ">{{ team.name }}</td>
+                        <td class="p-2 ">
                             <a href="{{ path('app_team_add_member', { userId: app.user ? app.user.id : 0, teamId: team.id }) }}" class="text-blue-500">Ajouter des membres</a>
                         </td>
                     </tr>
@@ -40,6 +39,5 @@
                 {% endfor %}
             </tbody>
         </table>
-    </div>
 </div>
 {% endblock %}
