@@ -47,7 +47,17 @@ curl -sS https://get.symfony.com/cli/installer | bash
 
 #### 3.1.2 TailwindCSS:
 
-via `npm`:
+via `compser` et `php`:
+
+```bash
+composer require symfonycasts/tailwind-bundle
+```
+```bash
+php bin/console tailwind:init
+```
+
+
+ou via `npm`:
 
 ```bash
 npm install -D tailwindcss

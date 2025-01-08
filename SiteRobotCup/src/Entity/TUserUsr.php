@@ -1,14 +1,15 @@
-<?php
-
+<?php 
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity]
 #[ORM\Table(name: "T_USER_USR")]
-class TUserUsr
+class TUserUsr implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -16,7 +17,7 @@ class TUserUsr
     private ?int $id = null;
 
     #[ORM\Column(name: "USR_TYPE", type: "string", length: 255)]
-    private ?string $type = null;
+    private ?string $type = 'USER';
 
     #[ORM\Column(name: "USR_MAIL", type: "string", length: 255, unique: true)]
     private ?string $email = null;
@@ -95,5 +96,23 @@ class TUserUsr
             }
         }
         return $this;
+    }
+
+    // Implémentations de UserInterface
+
+    public function getRoles(): array
+    {
+        // Retourne le rôle basé sur le type de l'utilisateur
+        return [$this->type ?? 'ROLE_USER'];
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email ?? '';
+    }
+
+    public function eraseCredentials(): void
+    {
+        // Méthode requise par UserInterface, peut rester vide
     }
 }
