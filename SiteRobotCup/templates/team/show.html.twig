@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes équipes{% endblock %}
+
+{% block body %}
+<div class="flex flex-col w-full p-20">
+    <h1 class="text-xl font-bold mb-5">Mes équipes</h1>
+
+    <!-- Formulaire de création d'équipe -->
+    {{ form_start(form) }}
+        <div class="flex items-center gap-4">
+            {{ form_widget(form.name, { 'attr': { 'placeholder': 'Nom de l\'équipe' } }) }}
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Créer une équipe</button>
+        </div>
+    {{ form_end(form) }}
+
+    <!-- Liste des équipes -->
+    <div class="mt-10">
+        <table class="table-auto w-full border-collapse border border-gray-300">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="border border-gray-300 p-2">Nom de l'équipe</th>
+                    <th class="border border-gray-300 p-2">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for team in teams %}
+                    <tr>
+                        <td class="border border-gray-300 p-2">{{ team.name }}</td>
+                        <td class="border border-gray-300 p-2">
+                            <a href="{{ path('app_team_add_member', { userId: app.user ? app.user.id : 0, teamId: team.id }) }}" class="text-blue-500">Ajouter des membres</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="2" class="border border-gray-300 p-2 text-center text-gray-500">
+                            Aucune équipe créée.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
