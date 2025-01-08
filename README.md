@@ -89,6 +89,12 @@ composer install
 
 ### 3.3 Lancer le site sur son navigateur
 
+Vous devez lancer cette commande afin de lien tailwind avec l'application symfony
+
+```bash
+./premiereConnexion.sh²
+```
+
 Pour lancer le projet en local lancer la commande suivante:
 
 ```bash
