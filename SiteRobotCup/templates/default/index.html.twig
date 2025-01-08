@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello DefaultController!{% endblock %}
+{% block title %}Accueil{% endblock %}
 
 {% block body %}
 <main>
@@ -22,8 +22,39 @@
                     sur les aspects aussi bien matériels que logiciels, un axe spécifique du Symposium s’intéresse aux développements « ouverts » (open source).
                 </p>
             </div>
-            
         </div>
+        <div class="container mx-auto mt-10 px-4">
+        <h1 class="text-3xl font-bold text-center mb-8">Classement des équipes</h1>
+
+        <table class="min-w-full table-auto bg-white shadow-lg rounded-lg overflow-hidden">
+            <thead>
+                <tr class="bg-sky-800 text-white">
+                    <th class="px-4 py-2 text-left">Rang</th>
+                    <th class="px-4 py-2 text-left">Nom équipe</th>
+                    <th class="px-4 py-2 text-left">Match Joué</th>
+                    <th class="px-4 py-2 text-left">Match Gagné</th>
+                    <th class="px-4 py-2 text-left">Match Nul</th>
+                    <th class="px-4 py-2 text-left">Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for team in teams %}
+                    <tr class="border-t border-gray-200 hover:bg-gray-50">
+                        <td class="px-4 py-2 text-center">{{ team.rank }}</td>
+                        <td class="px-4 py-2">{{ team.name }}</td>
+                        <td class="px-4 py-2 text-center">{{ team.matches_played }}</td>
+                        <td class="px-4 py-2 text-center">{{ team.matches_won }}</td>
+                        <td class="px-4 py-2 text-center">{{ team.matches_drawn }}</td>
+                        <td class="px-4 py-2 text-center">{{ team.points }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="px-4 py-2 text-center text-gray-500">Aucune équipe disponible.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     </section>
 </main>
 {% endblock %}
