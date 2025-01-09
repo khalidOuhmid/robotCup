@@ -13,7 +13,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Annotation\Route;  // Change this import
+use Symfony\Component\Routing\Attribute\Route;
 
 
 class RegistrationController extends AbstractController
@@ -32,12 +32,6 @@ class RegistrationController extends AbstractController
 
 
        if ($form->isSubmitted() && $form->isValid()) {
-           // Validate CSRF token
-           if (!$this->isCsrfTokenValid('register', $request->request->get('_csrf_token'))) {
-               $this->addFlash('error', 'Invalid CSRF token');
-               return $this->redirectToRoute('register');
-           }
-
            /** @var string $plainPassword */
            $plainPassword = $form->get('plainPassword')->getData();
 
