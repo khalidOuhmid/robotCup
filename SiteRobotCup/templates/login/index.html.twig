@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello RegisterController!{% endblock %}
+{% block title %}Login{% endblock %}
 
 {% block body %}
 <div class="flex justify-center m-2">
@@ -9,28 +9,30 @@
 <h2 class="text-center text-2xl font-mono font-medium">S'identifier</h2>
 <div class="flex items-center justify-center m-8">
     <div class="flex flex-col justify-center items-center w-96">
-        <form method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 ">
+        <form method="post" action="{{ path('app_login') }}" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+    
+            {% if error %}
+                <div class="text-red-500 text-xs italic">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+
             <div class="mb-4">
-                <label class="block text-gray-700 text-xs font-bold mb-2" for="username">
-                    Identifiant
-                </label>
-                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" name="username" placeholder="Adresse mail">
+                <label class="block text-gray-700 text-xs font-bold mb-2" for="email">Email</label>
+                <input id="email" type="email" name="email" value="{{ last_username }}" required autofocus class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
+    
             <div class="mb-6">
-                <label class="block text-gray-700 text-xs font-bold mb-2" for="password">
-                    Mot de passe
-                </label>
-                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" name="password" placeholder="***********">
+                <label class="block text-gray-700 text-xs font-bold mb-2" for="password">Mot de passe</label>
+                <input id="password" type="password" name="password" placeholder="***********" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
+    
             <div class="flex justify-end">
-                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-                    Se connecter
-                </button>
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Se connecter</button>
             </div>
         </form>
         <p class="text-center text-gray-600 text-sm mt-4">
             Vous n'avez pas de compte ? 
-            <a href="/register" class="text-blue-500 hover:underline">Créer un compte</a>
+            <a href="{{ path('register') }}" class="text-blue-500 hover:underline">Créer un compte</a>
         </p>
     </div>
 </div>
