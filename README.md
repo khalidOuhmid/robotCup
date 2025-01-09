@@ -29,11 +29,11 @@ Règles spécifiques à **PHP**. Il s’agit de **conventions et standards de pr
 
 ## 2. Installation et lancement du projet:
 
-> Le site de championnat de robots est réalisé avec les frameworks Symfony et TailwindCSS inclus en tant que composant dans le projet Symfony
+Le site de championnat de robots est réalisé avec les frameworks Symfony et TailwindCSS inclus en tant que composant dans le projet Symfony.
 
 ### 2.1 Installez les frameworks:
 
-> Ces frameworks sont nécessaires pour que le site soit fonctionnel
+`Ces frameworks sont nécessaires pour que le site soit fonctionnel`
 
 #### 2.1.1 Symfony:
 
@@ -45,9 +45,19 @@ wget https://get.symfony.com/cli/installer -O - | bash
 curl -sS https://get.symfony.com/cli/installer | bash
 ```
 
-#### 3.1.2 TailwindCSS:
+#### 2.1.2 TailwindCSS:
 
-via `npm`:
+via `compser` et `php`:
+
+```bash
+composer require symfonycasts/tailwind-bundle
+```
+```bash
+php bin/console tailwind:init
+```
+
+
+ou via `npm`:
 
 ```bash
 npm install -D tailwindcss
@@ -68,23 +78,42 @@ npx tailwindcss init -p
 composer install
 ```
 
-### 3.3 Lancer le site sur son navigateur:
+### 2.3 Lancer le site sur son navigateur:
 
-Pour lancer le projet en local avec Symfony lancer la commande suivante:
-
-```bash
-symfony server:start
-```
-
-ou 
+Vous devez lancer cette commande afin de lien tailwind avec l'application symfony
 
 ```bash
-symfony serve
+./premiereConnexion.sh²
 ```
 
-Le site sera ainsi accessible sur l'addresse locale 127.0.0.1:[port] sur votre navigateur
+Pour lancer le projet en local lancer la commande suivante:
 
-> Le port est indiqué après le lancement de la commande précèdente
+```bash
+./lancementAppli.sh
+```
+Cette commande lance deux terminaux distinct, un pour lancer tailwind et le deuxième pour lancer le serveur symfony.
+
+Le **site sera accessible** sur l'addresse locale `127.0.0.1:8000` sur votre navigateur.
+
+Le **port** est **indiqué après le lancement** de la commande précèdente.
+
+## 3. Préparer la Base de Données :
+
+### 3.1 Lancer le script de création dans phpMyAdmin
+- Copier et executer le code du fichier script MLR1_ROBOT_CHAMPIONSHIP.SQL dans l'onglet SQL sur phpMyAdmin.net, dans votre base personelle.
+
+### 3.2 Tester la base
+#### 3.2.1 Installer les Frameworks
+```bash
+pip install pandas
+pip install sqlalchemy
+```
+#### 3.2.2 Lancer les tests
+- Lancer le fichier testDatabase.py 
+
+
+### 3.3 Remplir la base 
+- Copier et executer le code du fichier script script-remplissage.sql dans l'onglet SQL sur phpMyAdmin.net, dans votre base personelle.
 
 <hr>
 
