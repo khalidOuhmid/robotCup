@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion de mon équipe
+{% endblock %}
+
+{% block body %}
+	<div class="flex flex-col w-full p-20">
+		<h1 class="text-xl text-white bg-sky-800 p-2 rounded-t-lg">Création de l'équipe</h1>
+
+		<!-- Formulaire de création d'équipe -->
+		{{ form_start(form) }}
+		<div class="flex items-center justify-between gap-4 bg-slate-200 px-4 p-4 rounded-b-lg">
+			{{ form_widget(form.name, { 'attr': { 'placeholder': 'Nom de l\'équipe', 'class': 'bg-white w-5/12 py-2 p-3 rounded-lg' } }) }}
+            <button type="submit" class="bg-green-400 p-3 hover:cursor-pointer focus:bg-green-500 px-4 py-2 rounded-lg">Créer une équipe</button>
+        </div>
+    {{ form_end(form) }}
+
+    <!-- Liste des équipes -->
+        <table class="min-w-full table-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10">
+            <thead>
+                <tr class="bg-sky-800 text-white">
+                    <th class="p-2">Nom de l'équipe</th>
+                    <th class="p-2">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for team in teams %}
+                    <tr class="bg-white hover:bg-gray-50 border-t border-gray-200 text-center">
+                        <td class="p-2">{{ team.name }}</td>
+                        <td class="p-2 space-y-2 flex flex-col items-center">
+                            <!-- Lien pour ajouter des membres -->
+                            <a href="{{ path('app_team_add_member', { userId: user.id, teamId: team.id }) }}" class="text-blue-500 hover:underline">
+                                Ajouter des membres
+                            </a>
+
+                            <!-- Lien pour afficher ou masquer les membres -->
+                            {% if teamToShow and teamToShow.id == team.id %}
+                                <a href="{{ path('app_team_show', { id: user.id }) }}" class="text-red-500 hover:underline">
+                                    Masquer les membres
+                                </a>
+                            {% else %}
+                                <a href="{{ path('app_team_show', { id: user.id, teamId: team.id }) }}" class="text-blue-500 hover:underline">
+                                    Voir les membres
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <!-- Liste des membres -->
+                    {% if teamToShow and teamToShow.id == team.id %}
+                        <tr class="bg-gray-50">
+                            <td colspan="2" class="p-2">
+                                <ul class="member-list space-y-2">
+                                    {% for member in teamToShow.members %}
+                                        <li class="bg-slate-200 p-2 rounded text-center">{{ member.name }}</li>
+                                    {% else %}
+                                        <li class="text-gray-500 text-center">Aucun membre pour cette équipe.</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% else %}
+                    <tr>
+                        <td colspan="2" class="border border-gray-300 p-2 text-center text-gray-500">
+                            Aucune équipe créée.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

@@ -10,6 +10,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class PageTableScoresController extends AbstractController
 {
     #[Route('/scores', name: 'app_page_tableau_scores')]
+    #[Route('/', name: 'app_default')]
     public function index(TTeamTemRepository $teamRepository): Response
     {
         // Get teams sorted by score
@@ -22,22 +23,27 @@ class PageTableScoresController extends AbstractController
             $matchesPlayed = count($team->getEncountersAsBlue()) + count($team->getEncountersAsGreen());
             $matchesWon = 0;
             $matchesDrawn = 0;
+            $matchesLost = 0; // Nouveau compteur pour les matchs perdus
             
-            // Count wins and draws for blue team encounters
+            // Count wins, draws, and losses for blue team encounters
             foreach ($team->getEncountersAsBlue() as $encounter) {
                 if ($encounter->getScoreBlue() > $encounter->getScoreGreen()) {
                     $matchesWon++;
                 } elseif ($encounter->getScoreBlue() === $encounter->getScoreGreen()) {
                     $matchesDrawn++;
+                } else {
+                    $matchesLost++;
                 }
             }
             
-            // Count wins and draws for green team encounters
+            // Count wins, draws, and losses for green team encounters
             foreach ($team->getEncountersAsGreen() as $encounter) {
                 if ($encounter->getScoreGreen() > $encounter->getScoreBlue()) {
                     $matchesWon++;
                 } elseif ($encounter->getScoreGreen() === $encounter->getScoreBlue()) {
                     $matchesDrawn++;
+                } else {
+                    $matchesLost++;
                 }
             }
 
@@ -47,12 +53,22 @@ class PageTableScoresController extends AbstractController
                 'matches_played' => $matchesPlayed,
                 'matches_won' => $matchesWon,
                 'matches_drawn' => $matchesDrawn,
-                'points' => $team->getScore()
+                'matches_lost' => $matchesLost, // Ajout des matchs perdus dans le tableau
+                'points' => $team->getScore(),
             ];
         }
 
-        return $this->render('page_tableau_scores/index.html.twig', [
-            'teams' => $teams,
-        ]);
+        // Condition pour déterminer quel template rendre
+        if ($_SERVER['REQUEST_URI'] === '/scores') {
+            // Rendre le template 'page_tableau_scores/index.html.twig'
+            return $this->render('page_tableau_scores/index.html.twig', [
+                'teams' => $teams,
+            ]);
+        } else {
+            // Rendre le template 'default/index.html.twig'
+            return $this->render('default/index.html.twig', [
+                'teams' => $teams,
+            ]);
+        } 
     }
 }
