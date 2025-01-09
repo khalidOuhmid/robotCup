@@ -75,8 +75,14 @@ class TUserUsr implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        // Convert type to role (e.g., 'ADMIN' becomes 'ROLE_ADMIN')
-        return ['ROLE_' . strtoupper($this->type ?? 'USER')];
+        $roles = ['ROLE_USER']; // Tous les utilisateurs ont au moins ROLE_USER
+        
+        // Ajoute le rôle basé sur le type
+        if ($this->type) {
+            $roles[] = 'ROLE_' . strtoupper($this->type);
+        }
+        
+        return array_unique($roles);
     }
 
     // Remove setRoles method since we're using type
