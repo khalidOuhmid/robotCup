@@ -22,7 +22,6 @@
 
         <!-- Table des membres existants -->
         <div class="mt-10">
-        {% if team.members|length > 0 %}
             <table class="min-w-full table-auto bg-white shadow-lg rounded-lg overflow-hidden">
                 <thead>
                     <tr class="bg-sky-800 text-white">
@@ -32,17 +31,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for member in members %}
-                        <tr class="bg-white hover:bg-gray-50 border-t border-gray-200 text-center">
-                            <td class="p-2 ">{{ member.name }}</td>
-                            <td class="p-2 ">{{ member.surname }}</td>
-                            <td class="p-2 ">{{ member.email }}</td>
-                        </tr>
-                    {% endfor %}
+                    {% if members|length > 0 %}
+                        {% for member in members %}
+                            <tr class="bg-white hover:bg-gray-50 border-t border-gray-200 text-center">
+                                <td class="p-2 ">{{ member.name }}</td>
+                                <td class="p-2 ">{{ member.surname }}</td>
+                                <td class="p-2 ">{{ member.email }}</td>
+                            </tr>
+                        {% endfor %}
                     {% else %}
                         <tr>
                             <td colspan="3" class="border border-gray-300 p-2 text-center text-gray-500">
-                                Aucun membre dans cette équipe.
+                                Aucun membre ajouté pour cette équipe.
                             </td>
                         </tr>
                     {% endif %}
@@ -50,5 +50,4 @@
             </table>
         </div>
     </div>
-
 {% endblock %}
