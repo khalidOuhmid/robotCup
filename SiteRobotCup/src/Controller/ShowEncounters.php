@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse; 
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class ShowEncounters extends AbstractController
 {
@@ -42,11 +43,14 @@ class ShowEncounters extends AbstractController
     public function exportEncounters(EntityManagerInterface $entityManager): JsonResponse
     {
         $repository = $entityManager->getRepository(TEncounterEnc::class);
+
+        // Récupérer toutes les rencontres
         $encounters = $repository->findAll();
 
-        // Construire un tableau de données pour le JSON
-        $data = array_map(function ($encounter) {
-            return [
+        // Préparer les données pour l'export
+        $data = [];
+        foreach ($encounters as $index => $encounter) {
+            $data[] = [
                 'championshipId' => $encounter->getChampionship()->getId(),
                 'teamBlue' => $encounter->getTeamBlue()->getName(),
                 'scoreBlue' => $encounter->getScoreBlue(),
@@ -54,8 +58,21 @@ class ShowEncounters extends AbstractController
                 'teamGreen' => $encounter->getTeamGreen()->getName(),
                 'state' => $encounter->getState(),
             ];
-        }, $encounters);
+        }
 
-        return new JsonResponse($data);
+        // Encodage des données en JSON
+        $jsonData = json_encode($data, JSON_PRETTY_PRINT);
+
+        // Créer une réponse JSON
+        $response = new JsonResponse($jsonData, 200, [], true);
+
+        // Configurer l'en-tête pour le téléchargement
+        $disposition = $response->headers->makeDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            'rencontres.json'
+        );
+        $response->headers->set('Content-Disposition', $disposition);
+
+        return $response;
     }
 }
