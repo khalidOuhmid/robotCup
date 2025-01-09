@@ -27,7 +27,7 @@
                     <tr class="bg-gray-200 hover:bg-gray-300">
                         <td class="p-2 ">{{ team.name }}</td>
                         <td class="p-2 ">
-                            <a href="{{ path('app_team_add_member', { userId: app.user ? app.user.id : 0, teamId: team.id }) }}" class="text-blue-500">Ajouter des membres</a>
+                            <a href="{{ path('app_team_add_member', { userId: user.id, teamId: team.id }) }}" class="text-blue-500">Ajouter des membres</a>
                         </td>
                     </tr>
                 {% else %}
