@@ -75,13 +75,13 @@ class TeamController extends AbstractController
         ]);
     }
 
-    #[Route('/team/{id}', name: 'app_team_show')]
+    #[Route('/team/{id}/{teamId?}', name: 'app_team_show')]
     public function show(
         TUserUsr $user,
         Request $request,
-        EntityManagerInterface $entityManager
-        ): Response
-    {
+        EntityManagerInterface $entityManager,
+        int $teamId = null
+    ): Response {
         // Créer une nouveau équipe
         $team = new TTeamTem();
 
@@ -93,14 +93,14 @@ class TeamController extends AbstractController
             // Vérifier si une équipe avec le même nom existe déjà
             $existingTeam = $entityManager->getRepository(TTeamTem::class)
                 ->findOneBy(['name' => $team->getName(), 'user' => $user]);
-    
+
             if ($existingTeam) {
                 $this->addFlash('danger', 'Une équipe avec ce nom existe déjà.');
             } else {
                 $team->setUser($user);
                 $entityManager->persist($team);
                 $entityManager->flush();
-    
+
                 $this->addFlash('success', 'Équipe créée avec succès !');
                 return $this->redirectToRoute('app_team_show', ['id' => $user->getId()]);
             }
@@ -108,12 +108,15 @@ class TeamController extends AbstractController
 
         $teams = $user->getTeams();
 
+        // Si un teamId est fourni, récupérer les membres associés
+        $teamToShow = $teamId ? $entityManager->getRepository(TTeamTem::class)->find($teamId) : null;
+
         return $this->render('team/show.html.twig', [
             'form' => $form->createView(),
             'team' => $team,
             'teams' => $teams,
+            'teamToShow' => $teamToShow, // Équipe dont les membres doivent être affichés
             'user' => $user
-
         ]);
     }
 
