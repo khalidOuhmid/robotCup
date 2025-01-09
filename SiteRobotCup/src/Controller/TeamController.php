@@ -64,7 +64,7 @@ class TeamController extends AbstractController
                 $entityManager->refresh($team);
     
                 $this->addFlash('success', 'Membre ajouté avec succès !');
-                return $this->redirectToRoute('app_team_show', ['id' => $user->getId()]);
+                return $this->redirectToRoute('app_team_add_member', ['userId' => $user->getId(), 'teamId' => $teamId]);
             }
         }
 
@@ -111,7 +111,8 @@ class TeamController extends AbstractController
         return $this->render('team/show.html.twig', [
             'form' => $form->createView(),
             'team' => $team,
-            'teams' => $teams
+            'teams' => $teams,
+            'user' => $user
 
         ]);
     }
