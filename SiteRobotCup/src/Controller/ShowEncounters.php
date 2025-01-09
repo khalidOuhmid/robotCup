@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse; 
 
 class ShowEncounters extends AbstractController
 {
@@ -36,5 +37,23 @@ class ShowEncounters extends AbstractController
             'totalPages' => $totalPages,
         ]);
     }
-}
 
+    #[Route('/encounters/export', name: 'app_encounters_export')]
+    public function exportEncounters(EntityManagerInterface $entityManager): JsonResponse
+    {
+        $repository = $entityManager->getRepository(TEncounterEnc::class);
+        $encounters = $repository->findAll();
+
+        // Construire un tableau de données pour le JSON
+        $data = array_map(function ($encounter) {
+            return [
+                'teamBlue' => $encounter->getTeamBlue()->getName(),
+                'scoreBlue' => $encounter->getScoreBlue(),
+                'scoreGreen' => $encounter->getScoreGreen(),
+                'teamGreen' => $encounter->getTeamGreen()->getName(),
+            ];
+        }, $encounters);
+
+        return new JsonResponse($data);
+    }
+}
