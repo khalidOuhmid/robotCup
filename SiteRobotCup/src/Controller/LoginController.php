@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class LoginController extends AbstractController
 {
     #[Route('/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils): Response
+    public function login(AuthenticationUtils $authenticationUtils, Request $request): Response
     {
         if ($this->getUser()) {
             return $this->redirectToRoute('app_page_tableau_scores');
@@ -21,6 +21,16 @@ class LoginController extends AbstractController
 
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
+
+        // if ($request->isMethod('POST')) {
+        //     $submittedToken = $request->request->get('_csrf_token');
+        //     if (!$this->isCsrfTokenValid('authenticate', $submittedToken)) {
+        //         return $this->render('login/index.html.twig', [
+        //             'last_username' => $lastUsername,
+        //             'error' => 'Invalid CSRF token',
+        //         ]);
+        //     }
+        // }
 
         return $this->render('login/index.html.twig', [
             'last_username' => $lastUsername,

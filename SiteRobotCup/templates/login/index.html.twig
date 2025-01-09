@@ -10,8 +10,8 @@
 <div class="flex items-center justify-center m-8">
     <div class="flex flex-col justify-center items-center w-96">
         <form method="post" action="{{ path('app_login') }}" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-    
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('auth') }}">
+
             {% if error %}
                 <div class="text-red-500 text-xs italic">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
             {% endif %}

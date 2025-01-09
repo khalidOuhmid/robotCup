@@ -16,6 +16,8 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
+use Symfony\Component\Security\Csrf\SameOriginCsrfTokenManager;
+use Symfony\Component\Security\Http\EventListener\CsrfProtectionListener;
 
 class LoginAuthenticator extends AbstractLoginFormAuthenticator
 {
@@ -39,7 +41,7 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
             new UserBadge($email),
             new PasswordCredentials($password),
             [
-                new CsrfTokenBadge('authenticate', $csrfToken),
+                new CsrfTokenBadge('auth', $csrfToken),
             ]
         );
     }
