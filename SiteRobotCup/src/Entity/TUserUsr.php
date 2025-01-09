@@ -25,6 +25,8 @@ class TUserUsr implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: "USR_PASS", type: "string", length: 128)]
     private ?string $password = null;
 
+    // Remove USR_ROLES column since we're using USR_TYPE
+
     #[ORM\OneToMany(mappedBy: "user", targetEntity: TTeamTem::class)]
     private Collection $teams;
 
@@ -71,6 +73,14 @@ class TUserUsr implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getRoles(): array
+    {
+        // Convert type to role (e.g., 'ADMIN' becomes 'ROLE_ADMIN')
+        return ['ROLE_' . strtoupper($this->type ?? 'USER')];
+    }
+
+    // Remove setRoles method since we're using type
+
     /**
      * @return Collection<int, TTeamTem>
      */
@@ -99,12 +109,6 @@ class TUserUsr implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     // Implémentations de UserInterface
-
-    public function getRoles(): array
-    {
-        // Retourne le rôle basé sur le type de l'utilisateur
-        return [$this->type ?? 'ROLE_USER'];
-    }
 
     public function getUserIdentifier(): string
     {
