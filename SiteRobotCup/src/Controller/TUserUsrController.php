@@ -9,10 +9,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[Route('/t/user/usr')]
 final class TUserUsrController extends AbstractController
 {
+    public function __construct(
+        private UserPasswordHasherInterface $passwordHasher
+    ) {}
+
     #[Route(name: 'app_t_user_usr_index', methods: ['GET'])]
     public function index(EntityManagerInterface $entityManager): Response
     {
@@ -33,10 +38,18 @@ final class TUserUsrController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Hash the password before saving
+            $hashedPassword = $this->passwordHasher->hashPassword(
+                $tUserUsr,
+                $tUserUsr->getPassword()
+            );
+            $tUserUsr->setPassword($hashedPassword);
+            
             $entityManager->persist($tUserUsr);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_t_user_usr_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Utilisateur créé avec succès');
+            return $this->redirectToRoute('app_admin_users', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('t_user_usr/new.html.twig', [
@@ -60,6 +73,15 @@ final class TUserUsrController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Only hash the password if it has been modified
+            if ($form->get('password')->getData()) {
+                $hashedPassword = $this->passwordHasher->hashPassword(
+                    $tUserUsr,
+                    $form->get('password')->getData()
+                );
+                $tUserUsr->setPassword($hashedPassword);
+            }
+            
             $entityManager->flush();
 
             return $this->redirectToRoute('app_t_user_usr_index', [], Response::HTTP_SEE_OTHER);

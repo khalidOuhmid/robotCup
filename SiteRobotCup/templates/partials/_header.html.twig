@@ -14,6 +14,11 @@
             <a href="{{ path('app_encounters') }}" class="text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">Rencontres</a>
             <a href="{{ path('app_team_show', { id: app.user.id }) }}" class="text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">Equipes</a>
         {% endif %}
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_admin_users') }}" class="text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">
+                Administration
+            </a>
+        {% endif %}
         <a href="{% if is_granted('IS_AUTHENTICATED_FULLY') %}{{ path('app_logout') }}{% else %}{{ path('app_login') }}{% endif %}" 
            class="flex items-center text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">
             {% if is_granted('IS_AUTHENTICATED_FULLY') %}Se déconnecter{% else %}Se connecter{% endif %}
