@@ -48,8 +48,11 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        // Redirige vers /scores après une connexion réussie
-        return new RedirectResponse($this->urlGenerator->generate('app_page_tableau_scores')); // Remplace 'scores' par le nom de ta route pour la page de scores
+        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
+            return new RedirectResponse($targetPath);
+        }
+
+        return new RedirectResponse($this->urlGenerator->generate('app_default'));
     }
 
     public function supports(Request $request): bool
