@@ -47,10 +47,12 @@ class ShowEncounters extends AbstractController
         // Construire un tableau de données pour le JSON
         $data = array_map(function ($encounter) {
             return [
+                'championshipId' => $encounter->getChampionship()->getId(),
                 'teamBlue' => $encounter->getTeamBlue()->getName(),
                 'scoreBlue' => $encounter->getScoreBlue(),
                 'scoreGreen' => $encounter->getScoreGreen(),
                 'teamGreen' => $encounter->getTeamGreen()->getName(),
+                'state' => $encounter->getState(),
             ];
         }, $encounters);
 
