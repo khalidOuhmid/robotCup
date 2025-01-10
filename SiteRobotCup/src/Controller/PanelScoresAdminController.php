@@ -77,5 +77,3 @@ class PanelScoresAdminController extends AbstractController
         ]);
     }
 }
-
-
