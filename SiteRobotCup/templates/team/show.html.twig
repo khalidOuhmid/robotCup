@@ -10,17 +10,17 @@
     
 		<!-- Formulaire de création d'équipe -->
 		{{ form_start(form) }}
-		<div class="flex items-center justify-between gap-4 bg-slate-200 px-4 p-4 rounded-b-lg">
-            <div class="flex flex-row gap-4">
-                {{ form_widget(form.name, { 'attr': { 'placeholder': 'Nom', 'class': 'bg-white w-5/12 py-2 p-3 rounded-lg' } }) }}
-                <input type="text" placeholder="Structure" class="bg-white w-5/12 py-2 p-3 text-gray-500 rounded-lg"/>
+		<div class="flex md:flex-row sm:w-full flex-col items-center justify-between gap-4 bg-slate-200 px-4 p-4 rounded-b-lg">
+            <div class="flex flex-col sm:flex-row items-center justify-around gap-4 w-full sm:w-10/12 md:w-8/12 lg:w-6/12 xl:w-5/12">
+                {{ form_widget(form.name, { 'attr': { 'placeholder': 'Nom', 'class': 'bg-white w-full py-2 p-3 text-gray-500 rounded-lg' } }) }}
+                <input type="text" placeholder="Structure" class="bg-white w-full py-2 p-3 text-gray-500 rounded-lg"/>
             </div>
-            <button type="submit" class="bg-green-400 p-3 hover:cursor-pointer focus:bg-green-500 px-4 py-2 rounded-lg">Créer une équipe</button>
+            <button type="submit" class="bg-green-400 py-2 px-4 w-full sm:w-8/12 md:w-6/12 lg:w-4/12 xl:w-2/12 max-w-md hover:cursor-pointer focus:bg-green-500 rounded-lg">Créer une équipe</button>
         </div>
     {{ form_end(form) }}
 
     <!-- Liste des équipes -->
-        <div class="mt-10">
+        <div class="mt-10 flex justify-center items-center">
             <table class="min-w-full table-auto bg-white shadow-lg rounded-lg overflow-hidden">
                 <thead>
                     <tr class="bg-sky-800 text-white">
