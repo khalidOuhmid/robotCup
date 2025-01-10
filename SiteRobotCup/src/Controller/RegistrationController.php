@@ -13,24 +13,30 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;  // Change this import
 
 
 class RegistrationController extends AbstractController
 {
-   #[Route('/register', name: 'app_register')]
+   #[Route('/register', name: 'register')]  // Changed from 'app_register' to 'register'
    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, Security $security, EntityManagerInterface $entityManager): Response
    {
+       // Redirect if user is already logged in
+       if ($this->getUser()) {
+           return $this->redirectToRoute('app_page_tableau_scores');
+       }
+
        $user = new TUserUsr();
        $form = $this->createForm(RegistrationFormType::class, $user);
        $form->handleRequest($request);
 
 
        if ($form->isSubmitted() && $form->isValid()) {
+
            /** @var string $plainPassword */
            $plainPassword = $form->get('plainPassword')->getData();
 
-
+           $user->setType('USER'); // Set default type for new users
            // encode the plain password
            $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
 
@@ -38,12 +44,8 @@ class RegistrationController extends AbstractController
            $entityManager->persist($user);
            $entityManager->flush();
 
-
-           // do anything else you need here, like send an email
-
-
-           return $this->redirectToRoute('app_page_tableau_scores');
-           //return $security->login($user, LoginAuthenticator::class, 'main');
+           // Simplify by just redirecting to login
+           return $this->redirectToRoute('app_login');
        }
 
 
