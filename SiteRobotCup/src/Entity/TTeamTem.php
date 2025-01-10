@@ -34,11 +34,16 @@ class TTeamTem
     #[ORM\OneToMany(mappedBy: "teamGreen", targetEntity: TEncounterEnc::class)]
     private Collection $encountersAsGreen;
 
+    #[ORM\ManyToMany(targetEntity: TChampionshipChp::class, inversedBy: "teams")]
+    #[ORM\JoinTable(name: "TJ_TEAM_CHAMPIONSHIP")]
+    private Collection $championships;
+
     public function __construct()
     {
         $this->members = new ArrayCollection();
         $this->encountersAsBlue = new ArrayCollection();
         $this->encountersAsGreen = new ArrayCollection();
+        $this->championships = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -159,24 +164,47 @@ class TTeamTem
         }
         return $this;
     }
+
+    /**
+     * @return Collection<int, TChampionshipChp>
+     */
+    public function getChampionships(): Collection
+    {
+        return $this->championships;
+    }
+
+    public function addChampionship(TChampionshipChp $championship): self
+    {
+        if (!$this->championships->contains($championship)) {
+            $this->championships[] = $championship;
+        }
+        return $this;
+    }
+
+    public function removeChampionship(TChampionshipChp $championship): self
+    {
+        $this->championships->removeElement($championship);
+        return $this;
+    }
+
     // src/Entity/TTeamTem.php
 
-public function updateScore(): self
-{
-    $totalScore = 0;
-    
-    // Calculer les scores des matchs en tant qu'équipe bleue
-    foreach ($this->encountersAsBlue as $encounter) {
-        $totalScore += $encounter->getScoreBlue() ?? 0;
+    public function updateScore(): self
+    {
+        $totalScore = 0;
+        
+        // Calculer les scores des matchs en tant qu'équipe bleue
+        foreach ($this->encountersAsBlue as $encounter) {
+            $totalScore += $encounter->getScoreBlue() ?? 0;
+        }
+        
+        // Calculer les scores des matchs en tant qu'équipe verte
+        foreach ($this->encountersAsGreen as $encounter) {
+            $totalScore += $encounter->getScoreGreen() ?? 0;
+        }
+        
+        $this->score = $totalScore;
+        return $this;
     }
-    
-    // Calculer les scores des matchs en tant qu'équipe verte
-    foreach ($this->encountersAsGreen as $encounter) {
-        $totalScore += $encounter->getScoreGreen() ?? 0;
-    }
-    
-    $this->score = $totalScore;
-    return $this;
-}
 
 }

@@ -5,7 +5,8 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-
+use App\Entity\TTeamTem;
+use App\Entity\TTeamTeam;
 #[ORM\Entity]
 #[ORM\Table(name: "T_CHAMPIONSHIP_CHP")]
 class TChampionshipChp
@@ -24,9 +25,13 @@ class TChampionshipChp
     #[ORM\OneToMany(mappedBy: "championship", targetEntity: TEncounterEnc::class)]
     private Collection $encounters;
 
+    #[ORM\ManyToMany(targetEntity: TTeamTem::class, mappedBy: "championships")]
+    private Collection $teams;
+
     public function __construct()
     {
         $this->encounters = new ArrayCollection();
+        $this->teams = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -76,9 +81,35 @@ class TChampionshipChp
     public function removeEncounter(TEncounterEnc $encounter): self
     {
         if ($this->encounters->removeElement($encounter)) {
+            // Set the owning side to null (unless already changed)
             if ($encounter->getChampionship() === $this) {
                 $encounter->setChampionship(null);
             }
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TTeamTem>
+     */
+    public function getTeams(): Collection
+    {
+        return $this->teams;
+    }
+
+    public function addTeam(TTeamTem $team): self
+    {
+        if (!$this->teams->contains($team)) {
+            $this->teams[] = $team;
+            $team->addChampionship($this);
+        }
+        return $this;
+    }
+
+    public function removeTeam(TTeamTem $team): self
+    {
+        if ($this->teams->removeElement($team)) {
+            $team->removeChampionship($this);
         }
         return $this;
     }
