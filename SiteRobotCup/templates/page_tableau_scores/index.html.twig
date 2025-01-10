@@ -8,35 +8,43 @@
     <div class="container mx-auto px-4">
         <h1 class="text-3xl font-bold text-center mb-8 p-10">Classement des équipes</h1>
 
-        <table class="min-w-full table-auto bg-white shadow-lg rounded-lg overflow-hidden">
-            <thead>
-                <tr class="bg-sky-800 text-white">
-                    <th class="px-4 py-2 text-center">Rang</th>
-                    <th class="px-4 py-2 text-center">Nom équipe</th>
-                    <th class="px-4 py-2 text-center">Rencontre Joué</th>
-                    <th class="px-4 py-2 text-center">Rencontre Gagné</th>
-                    <th class="px-4 py-2 text-center">Rencontre Nul</th>
-                    <th class="px-4 py-2 text-center">Points</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for team in teams %}
-                    <tr class="border-t border-gray-200 hover:bg-gray-50">
-                        <td class="px-4 py-2 text-center">{{ team.rank }}</td>
-                        <td class="px-4 py-2 text-center">{{ team.name }}</td>
-                        <td class="px-4 py-2 text-center">{{ team.matches_played }}</td>
-                        <td class="px-4 py-2 text-center">{{ team.matches_won }}</td>
-                        <td class="px-4 py-2 text-center">{{ team.matches_drawn }}</td>
-                        <td class="px-4 py-2 text-center">{{ team.points }}</td>
+        <!-- Message d'avertissement pour les petits écrans -->
+        <div class="text-center mb-4 text-red-600 sm:hidden">
+            <p>Pour voir toutes les informations, veuillez passer en mode paysage ou agrandir la fenêtre sur un ordinateur.</p>
+        </div>
+
+        <div class="overflow-x-auto max-w-full">
+            <table class="min-w-full table-auto bg-white shadow-lg rounded-lg overflow-hidden">
+                <thead>
+                    <tr class="bg-sky-800 text-white">
+                        <th class="px-2 py-2 text-center text-sm sm:text-base">Rang</th>
+                        <th class="px-2 py-2 text-center text-sm sm:text-base">Nom équipe</th>
+                        <th class="px-2 py-2 text-center text-sm sm:text-base">Rencontre Joué</th>
+                        <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">Rencontre Gagné</th>
+                        <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">Rencontre Nul</th>
+                        <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">Points</th>
                     </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="6" class="px-4 py-2 text-center text-gray-500">Aucune équipe disponible.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for team in teams %}
+                        <tr class="border-t border-gray-200 hover:bg-gray-50">
+                            <td class="px-2 py-2 text-center text-sm sm:text-base">{{ team.rank }}</td>
+                            <td class="px-2 py-2 text-center text-sm sm:text-base">{{ team.name }}</td>
+                            <td class="px-2 py-2 text-center text-sm sm:text-base">{{ team.matches_played }}</td>
+                            <td class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{ team.matches_won }}</td>
+                            <td class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{ team.matches_drawn }}</td>
+                            <td class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{ team.points }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="px-4 py-2 text-center text-gray-500">Aucune équipe disponible.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </section>
 
 {% endblock %}
+
