@@ -10,30 +10,37 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class LoginController extends AbstractController
 {
     #[Route('/login', name: 'app_login')]
-    public function login(Request $request, AuthenticationUtils $authenticationUtils): Response
+    public function login(AuthenticationUtils $authenticationUtils, Request $request): Response
     {
-        // Récupération de l'erreur de connexion si elle existe
-        $error = $authenticationUtils->getLastAuthenticationError();
-        
-        // Récupération du dernier nom d'utilisateur saisi
-        $lastUsername = $authenticationUtils->getLastUsername();
-
-        // Traitement du formulaire de connexion
-        if ($this->getUser()) {  // Vérifie si l'utilisateur est connecté
-            return $this->redirectToRoute('app_page_tableau_scores');  // Redirection vers la page tableau de scores
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_page_tableau_scores');
         }
 
-        // Rendu du formulaire de connexion avec les informations nécessaires
-        return $this->render('security/login.html.twig', [
+        // get the login error if there is one
+        $error = $authenticationUtils->getLastAuthenticationError();
+
+        // last username entered by the user
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        // if ($request->isMethod('POST')) {
+        //     $submittedToken = $request->request->get('_csrf_token');
+        //     if (!$this->isCsrfTokenValid('authenticate', $submittedToken)) {
+        //         return $this->render('login/index.html.twig', [
+        //             'last_username' => $lastUsername,
+        //             'error' => 'Invalid CSRF token',
+        //         ]);
+        //     }
+        // }
+
+        return $this->render('login/index.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
         ]);
     }
 
-    #[Route(path: '/logout', name: 'app_logout')]
+    #[Route('/logout', name: 'app_logout')]
     public function logout(): void
     {
-        // Cette méthode peut rester vide, elle sera interceptée par Symfony
-        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+        // This method can be empty - it will be intercepted by the logout key on your firewall
     }
 }

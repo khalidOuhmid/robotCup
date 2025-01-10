@@ -7,6 +7,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse; 
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class ShowEncounters extends AbstractController
 {
@@ -36,5 +38,41 @@ class ShowEncounters extends AbstractController
             'totalPages' => $totalPages,
         ]);
     }
-}
 
+    #[Route('/encounters/export', name: 'app_encounters_export')]
+    public function exportEncounters(EntityManagerInterface $entityManager): JsonResponse
+    {
+        $repository = $entityManager->getRepository(TEncounterEnc::class);
+
+        // Récupérer toutes les rencontres
+        $encounters = $repository->findAll();
+
+        // Préparer les données pour l'export
+        $data = [];
+        foreach ($encounters as $index => $encounter) {
+            $data[] = [
+                'championshipId' => $encounter->getChampionship()->getId(),
+                'teamBlue' => $encounter->getTeamBlue()->getName(),
+                'scoreBlue' => $encounter->getScoreBlue(),
+                'scoreGreen' => $encounter->getScoreGreen(),
+                'teamGreen' => $encounter->getTeamGreen()->getName(),
+                'state' => $encounter->getState(),
+            ];
+        }
+
+        // Encodage des données en JSON
+        $jsonData = json_encode($data, JSON_PRETTY_PRINT);
+
+        // Créer une réponse JSON
+        $response = new JsonResponse($jsonData, 200, [], true);
+
+        // Configurer l'en-tête pour le téléchargement
+        $disposition = $response->headers->makeDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            'rencontres.json'
+        );
+        $response->headers->set('Content-Disposition', $disposition);
+
+        return $response;
+    }
+}
