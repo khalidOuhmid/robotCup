@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de la compétition{% endblock %}
+
+{% block body %}
+    <h1>Détails de la compétition</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Nom</th>
+                <td>{{ competition.name }}</td>
+            </tr>
+            <tr>
+                <th>Adresse</th>
+                <td>{{ competition.address }}</td>
+            </tr>
+            <tr>
+                <th>Date de début</th>
+                <td>{{ competition.dateBegin ? competition.dateBegin|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Date de fin</th>
+                <td>{{ competition.dateEnd ? competition.dateEnd|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ competition.description }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_competition_index') }}" class="btn btn-secondary">Retour à la liste</a>
+    <a href="{{ path('app_competition_edit', {'id': competition.id}) }}" class="btn btn-warning">Modifier</a>
+
+    <form method="post" action="{{ path('app_competition_delete', {'id': competition.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette compétition ?');" style="display: inline-block">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ competition.id) }}">
+        <button class="btn btn-danger">Supprimer</button>
+    </form>
+{% endblock %}

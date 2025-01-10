@@ -14,68 +14,30 @@ class PageTableScoresController extends AbstractController
     #[Route('/', name: 'app_default')]
     public function index(Request $request, TTeamTemRepository $teamRepository): Response
     {
-        // Nombre d'éléments par page
-        $itemsPerPage = 1;
+        // Get teams stats directly from the view
+        $teamsData = $teamRepository->findByOrderedByScore();
 
-        // Récupérer la page actuelle, défaut à 1 si non définie
-        $page = $request->query->getInt('page', 1);
-
-        // Récupérer les équipes, paginer les résultats
-        $teamsData = $teamRepository->findBy([], ['score' => 'DESC'], $itemsPerPage, ($page - 1) * $itemsPerPage);
-
-        // Total des équipes pour la pagination
-        $totalTeams = count($teamRepository->findAll());
-        
-        // Calcul du nombre total de pages
-        $totalPages = ceil($totalTeams / $itemsPerPage);
-
-        // Transformez les équipes en un tableau de données à afficher
-        $teams = [];
-        foreach ($teamsData as $index => $team) {
-            // Calcul des matchs joués, gagnés, nuls, perdus (logique identique à votre code précédent)
-            $matchesPlayed = count($team->getEncountersAsBlue()) + count($team->getEncountersAsGreen());
-            $matchesWon = 0;
-            $matchesDrawn = 0;
-            $matchesLost = 0;
-
-            // Compter les victoires, nuls, et défaites des rencontres en tant que bleu et vert
-            foreach ($team->getEncountersAsBlue() as $encounter) {
-                if ($encounter->getScoreBlue() > $encounter->getScoreGreen()) {
-                    $matchesWon++;
-                } elseif ($encounter->getScoreBlue() === $encounter->getScoreGreen()) {
-                    $matchesDrawn++;
-                } else {
-                    $matchesLost++;
-                }
-            }
-
-            foreach ($team->getEncountersAsGreen() as $encounter) {
-                if ($encounter->getScoreGreen() > $encounter->getScoreBlue()) {
-                    $matchesWon++;
-                } elseif ($encounter->getScoreGreen() === $encounter->getScoreBlue()) {
-                    $matchesDrawn++;
-                } else {
-                    $matchesLost++;
-                }
-            }
-
-            $teams[] = [
-                'rank' => ($page - 1) * $itemsPerPage + $index + 1, // Calculer le rang en fonction de la page
-                'name' => $team->getName(),
-                'matches_played' => $matchesPlayed,
-                'matches_won' => $matchesWon,
-                'matches_drawn' => $matchesDrawn,
-                'matches_lost' => $matchesLost, 
-                'points' => $team->getScore(),
-                'user_id' => $team->getUser() ? $team->getUser()->getId() : null,
+        // Transform the data for the template
+        $teams = array_map(function($data, $index) {
+            return [
+                'rank' => $index + 1,
+                'name' => $data['TEM_NAME'],
+                'matches_played' => $data['matches_played'],
+                'matches_won' => $data['matches_won'],
+                'matches_drawn' => $data['matches_drawn'],
+                'matches_lost' => $data['matches_lost'],
+                'goals' => $data['total_goals'],
+                'points' => $data['total_points'],  // Changed from championship_points to total_points
             ];
-        }
+        }, $teamsData, array_keys($teamsData));
 
-        // Retourner le template avec les informations de pagination et les équipes
-        return $this->render('page_tableau_scores/index.html.twig', [
+        // Choose template based on route
+        $template = ($_SERVER['REQUEST_URI'] === '/scores') 
+            ? 'page_tableau_scores/index.html.twig'
+            : 'default/index.html.twig';
+
+        return $this->render($template, [
             'teams' => $teams,
-            'page' => $page,
-            'totalPages' => $totalPages,
         ]);
     }
 }

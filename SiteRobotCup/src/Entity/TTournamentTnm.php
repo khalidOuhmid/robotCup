@@ -2,26 +2,25 @@
 
 namespace App\Entity;
 
-use App\Repository\TChampionshipChpRepository;
+use App\Repository\TTournamentTnmRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: TChampionshipChpRepository::class)]
-#[ORM\Table(name: 'T_CHAMPIONSHIP_CHP')]
-class TChampionshipChp
+#[ORM\Entity(repositoryClass: TTournamentTnmRepository::class)]
+#[ORM\Table(name: 'T_TOURNAMENT_TNM')]
+class TTournamentTnm
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'CHP_ID', type: Types::SMALLINT)]
+    #[ORM\Column(name: 'TNM_ID', type: 'smallint')]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: TCompetitionCmp::class, inversedBy: 'championships')]
+    #[ORM\ManyToOne(targetEntity: TCompetitionCmp::class)]
     #[ORM\JoinColumn(name: 'CMP_ID', referencedColumnName: 'CMP_ID', nullable: false)]
     private ?TCompetitionCmp $competition = null;
 
-    #[ORM\OneToMany(mappedBy: 'championship', targetEntity: TEncounterEnc::class)]
+    #[ORM\OneToMany(mappedBy: 'tournament', targetEntity: TEncounterEnc::class)]
     private Collection $encounters;
 
     public function __construct()
@@ -57,7 +56,7 @@ class TChampionshipChp
     {
         if (!$this->encounters->contains($encounter)) {
             $this->encounters->add($encounter);
-            $encounter->setChampionship($this);
+            $encounter->setTournament($this);
         }
         return $this;
     }
@@ -65,8 +64,8 @@ class TChampionshipChp
     public function removeEncounter(TEncounterEnc $encounter): self
     {
         if ($this->encounters->removeElement($encounter)) {
-            if ($encounter->getChampionship() === $this) {
-                $encounter->setChampionship(null);
+            if ($encounter->getTournament() === $this) {
+                $encounter->setTournament(null);
             }
         }
         return $this;
@@ -74,6 +73,6 @@ class TChampionshipChp
 
     public function __toString(): string
     {
-        return $this->getCompetition()->getCmpName() . ' - Championship ' . $this->getId();
+        return $this->getCompetition()->getCmpName() . ' - Tournament ' . $this->getId();
     }
 }

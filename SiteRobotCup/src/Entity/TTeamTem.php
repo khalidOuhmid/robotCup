@@ -2,48 +2,91 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
+use App\Repository\TTeamTemRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
-#[ORM\Entity]
-#[ORM\Table(name: "T_TEAM_TEM")]
+#[ORM\Entity(repositoryClass: TTeamTemRepository::class)]
+#[ORM\Table(name: 'T_TEAM_TEM')]
+#[UniqueEntity(
+    fields: ['user', 'competition'],
+    message: 'Cet utilisateur a déjà une équipe dans cette compétition'
+)]
+#[UniqueEntity(
+    fields: ['name', 'competition'],
+    message: 'Ce nom d\'équipe est déjà utilisé dans cette compétition'
+)]
 class TTeamTem
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: "TEM_ID", type: "smallint")]
+    #[ORM\Column(name: 'TEM_ID', type: 'smallint')]
     private ?int $id = null;
 
-    #[ORM\Column(name: "TEM_NAME", type: "string", length: 255, unique: true)]
-    private ?string $name = null;
-
-    #[ORM\Column(name: "TEM_SCORE", type: "integer", nullable: true)]
-    private ?int $score = null;
-
-    #[ORM\ManyToOne(targetEntity: TUserUsr::class, inversedBy: "teams")]
-    #[ORM\JoinColumn(name: "USR_ID", referencedColumnName: "USR_ID", nullable: false)]
+    #[ORM\ManyToOne(targetEntity: TUserUsr::class, inversedBy: 'teams')]
+    #[ORM\JoinColumn(name: 'USR_ID', referencedColumnName: 'USR_ID', nullable: false)]
     private ?TUserUsr $user = null;
 
-    #[ORM\OneToMany(mappedBy: "team", targetEntity: TMemberMbr::class)]
+    #[ORM\ManyToOne(targetEntity: TCompetitionCmp::class, inversedBy: 'teams')]
+    #[ORM\JoinColumn(name: 'CMP_ID', referencedColumnName: 'CMP_ID', nullable: false)]
+    private ?TCompetitionCmp $competition = null;
+
+    #[ORM\Column(name: 'TEM_NAME', type: 'string', length: 32)]
+    private ?string $name = null;
+
+    #[ORM\Column(name: 'TEM_STRUCT', type: 'string', length: 32, nullable: true)]
+    private ?string $structure = null;
+
+    #[ORM\Column(name: 'TEM_CREATION_DATE', type: Types::DATETIME_MUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
+    private ?\DateTimeInterface $creationDate;
+
+    #[ORM\OneToMany(mappedBy: 'team', targetEntity: TMemberMbr::class)]
     private Collection $members;
 
-    #[ORM\OneToMany(mappedBy: "teamBlue", targetEntity: TEncounterEnc::class)]
+    #[ORM\OneToMany(mappedBy: 'teamBlue', targetEntity: TEncounterEnc::class)]
     private Collection $encountersAsBlue;
 
-    #[ORM\OneToMany(mappedBy: "teamGreen", targetEntity: TEncounterEnc::class)]
+    #[ORM\OneToMany(mappedBy: 'teamGreen', targetEntity: TEncounterEnc::class)]
     private Collection $encountersAsGreen;
+
+    private $statistics = null;
 
     public function __construct()
     {
         $this->members = new ArrayCollection();
         $this->encountersAsBlue = new ArrayCollection();
         $this->encountersAsGreen = new ArrayCollection();
+        $this->creationDate = new \DateTime();
     }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getUser(): ?TUserUsr
+    {
+        return $this->user;
+    }
+
+    public function setUser(?TUserUsr $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    public function getCompetition(): ?TCompetitionCmp
+    {
+        return $this->competition;
+    }
+
+    public function setCompetition(?TCompetitionCmp $competition): self
+    {
+        $this->competition = $competition;
+        return $this;
     }
 
     public function getName(): ?string
@@ -57,25 +100,25 @@ class TTeamTem
         return $this;
     }
 
-    public function getScore(): ?int
+    public function getStructure(): ?string
     {
-        return $this->score;
+        return $this->structure;
     }
 
-    public function setScore(?int $score): self
+    public function setStructure(?string $structure): self
     {
-        $this->score = $score;
+        $this->structure = $structure;
         return $this;
     }
 
-    public function getUser(): ?TUserUsr
+    public function getCreationDate(): ?\DateTimeInterface
     {
-        return $this->user;
+        return $this->creationDate;
     }
 
-    public function setUser(?TUserUsr $user): self
+    public function setCreationDate(\DateTimeInterface $creationDate): self
     {
-        $this->user = $user;
+        $this->creationDate = $creationDate;
         return $this;
     }
 
@@ -90,7 +133,7 @@ class TTeamTem
     public function addMember(TMemberMbr $member): self
     {
         if (!$this->members->contains($member)) {
-            $this->members[] = $member;
+            $this->members->add($member);
             $member->setTeam($this);
         }
         return $this;
@@ -114,25 +157,6 @@ class TTeamTem
         return $this->encountersAsBlue;
     }
 
-    public function addEncounterAsBlue(TEncounterEnc $encounter): self
-    {
-        if (!$this->encountersAsBlue->contains($encounter)) {
-            $this->encountersAsBlue[] = $encounter;
-            $encounter->setTeamBlue($this);
-        }
-        return $this;
-    }
-
-    public function removeEncounterAsBlue(TEncounterEnc $encounter): self
-    {
-        if ($this->encountersAsBlue->removeElement($encounter)) {
-            if ($encounter->getTeamBlue() === $this) {
-                $encounter->setTeamBlue(null);
-            }
-        }
-        return $this;
-    }
-
     /**
      * @return Collection<int, TEncounterEnc>
      */
@@ -141,42 +165,46 @@ class TTeamTem
         return $this->encountersAsGreen;
     }
 
-    public function addEncounterAsGreen(TEncounterEnc $encounter): self
+    /**
+     * Get team statistics from database view
+     * Must be called through repository with custom query
+     */
+    public function setStatistics($statistics): self
     {
-        if (!$this->encountersAsGreen->contains($encounter)) {
-            $this->encountersAsGreen[] = $encounter;
-            $encounter->setTeamGreen($this);
-        }
+        $this->statistics = $statistics;
         return $this;
     }
 
-    public function removeEncounterAsGreen(TEncounterEnc $encounter): self
+    public function getStatistics()
     {
-        if ($this->encountersAsGreen->removeElement($encounter)) {
-            if ($encounter->getTeamGreen() === $this) {
-                $encounter->setTeamGreen(null);
+        return $this->statistics;
+    }
+
+    /**
+     * Get championships through encounters
+     * @return array<TChampionshipChp>
+     */
+    public function getChampionships(): array
+    {
+        $championships = [];
+        
+        foreach ($this->encountersAsBlue as $encounter) {
+            if ($encounter->getChampionship() !== null) {
+                $championships[] = $encounter->getChampionship();
             }
         }
-        return $this;
+        
+        foreach ($this->encountersAsGreen as $encounter) {
+            if ($encounter->getChampionship() !== null) {
+                $championships[] = $encounter->getChampionship();
+            }
+        }
+        
+        return array_unique($championships);
     }
-    // src/Entity/TTeamTem.php
 
-public function updateScore(): self
-{
-    $totalScore = 0;
-    
-    // Calculer les scores des matchs en tant qu'équipe bleue
-    foreach ($this->encountersAsBlue as $encounter) {
-        $totalScore += $encounter->getScoreBlue() ?? 0;
+    public function __toString(): string
+    {
+        return $this->name;
     }
-    
-    // Calculer les scores des matchs en tant qu'équipe verte
-    foreach ($this->encountersAsGreen as $encounter) {
-        $totalScore += $encounter->getScoreGreen() ?? 0;
-    }
-    
-    $this->score = $totalScore;
-    return $this;
-}
-
 }
