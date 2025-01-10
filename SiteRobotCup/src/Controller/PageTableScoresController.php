@@ -65,8 +65,9 @@ class PageTableScoresController extends AbstractController
                 'matches_played' => $matchesPlayed,
                 'matches_won' => $matchesWon,
                 'matches_drawn' => $matchesDrawn,
-                'matches_lost' => $matchesLost,
+                'matches_lost' => $matchesLost, 
                 'points' => $team->getScore(),
+                'user_id' => $team->getUser() ? $team->getUser()->getId() : null,
             ];
         }
 
