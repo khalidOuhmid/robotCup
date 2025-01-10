@@ -14,73 +14,66 @@ class PanelScoresAdminController extends AbstractController
     #[Route('/admin/panel-scores/{page}', name: 'app_panel_scores_admin', requirements: ['page' => '\d+'], defaults: ['page' => 1])]
     public function index(Request $request, EntityManagerInterface $entityManager, int $page = 1): Response
     {
-        $limit = 10; // Nombre de matchs par page
-        $repository = $entityManager->getRepository(TEncounterEnc::class); // Utilisation de TEncounterEnc
+        $repository = $entityManager->getRepository(TEncounterEnc::class);
+        
+        // Construction de la requête avec les jointures
+        $qb = $repository->createQueryBuilder('e')
+            ->leftJoin('e.teamBlue', 'tb')
+            ->leftJoin('e.teamGreen', 'tg')
+            ->addSelect('tb', 'tg');
 
-        // Total des rencontres
-        $totalMatches = $repository->count([]);
-
-        // Calcul du nombre total de pages
-        $totalPages = (int) ceil($totalMatches / $limit);
-
-        // Validation de la page demandée
+        // Pagination
+        $limit = 10;
+        $totalMatches = count($qb->getQuery()->getResult());
+        $totalPages = max(1, ceil($totalMatches / $limit));
         $page = max(1, min($page, $totalPages));
-
-        // Récupération des matchs pour la page actuelle
         $offset = ($page - 1) * $limit;
-        $matches = $repository->findBy([], null, $limit, $offset);
 
-        // Gestion des scores soumis via le formulaire
+        $matches = $qb->setFirstResult($offset)
+                     ->setMaxResults($limit)
+                     ->getQuery()
+                     ->getResult();
+
+        // Gestion des scores soumis
         if ($request->isMethod('POST')) {
-            $scores = $request->request->get('scores', []);
-
-            $valid = true;
-            if (is_array($scores)) {
-                foreach ($scores as $matchId => $score) {
-                    $match = $repository->find($matchId);
-                    if ($match) {
-                        // Vérification que les deux scores sont présents et non négatifs
-                        if (isset($score['blue'], $score['green'])) {
-                            $blueScore = (int) $score['blue'];
-                            $greenScore = (int) $score['green'];
-
-                            if ($blueScore < 0 || $greenScore < 0) {
-                                $this->addFlash('error', 'Les scores ne peuvent pas être négatifs.');
-                                $valid = false;
-                                break;
-                            }
-
-                            // Si tout est valide, on met à jour les scores
-                            $match->setScoreBlue($blueScore);
-                            $match->setScoreGreen($greenScore);
-                            $entityManager->persist($match);
-                        } else {
-                            $this->addFlash('error', 'Les deux scores doivent être remplis.');
-                            $valid = false;
-                            break;
+            try {
+                // Récupération des scores depuis la requête
+                $scores = $request->request->all('scores');
+                
+                if (is_array($scores)) {
+                    foreach ($scores as $matchId => $score) {
+                        // Recherche du match par son ID
+                        $match = $repository->find($matchId);
+                        
+                        // Vérification que le match existe et que les scores sont valides
+                        if ($match && is_array($score) && 
+                            isset($score['blue'], $score['green']) && 
+                            is_numeric($score['blue']) && 
+                            is_numeric($score['green'])) {
+                            
+                            // Mise à jour des scores
+                            $match->setScoreBlue((int)$score['blue']);
+                            $match->setScoreGreen((int)$score['green']);
                         }
                     }
                 }
-
-                if ($valid) {
-                    $entityManager->flush();
-
-                    // Message de succès
-                    $this->addFlash('success', 'Les scores ont été enregistrés avec succès.');
-
-                    // Redirection pour éviter la double soumission du formulaire
-                    return $this->redirectToRoute('app_panel_scores_admin', ['page' => $page]);
-                }
-            } else {
-                $this->addFlash('error', 'Les données envoyées ne sont pas valides.');
+                
+                // Sauvegarde des modifications
+                $entityManager->flush();
+                $this->addFlash('success', 'Les scores ont été mis à jour avec succès');
+            } catch (\Exception $e) {
+                // Gestion des erreurs
+                $this->addFlash('error', 'Une erreur est survenue lors de la mise à jour des scores : ' . $e->getMessage());
             }
+
+            // Redirection vers la route d'administration des scores
+            return $this->redirectToRoute('app_panel_scores_admin', ['page' => $page]);
         }
 
-        // Rendu de la vue
         return $this->render('panel_scores_admin/index.html.twig', [
             'matches' => $matches,
             'page' => $page,
-            'totalPages' => $totalPages,
+            'totalPages' => $totalPages
         ]);
     }
 }
