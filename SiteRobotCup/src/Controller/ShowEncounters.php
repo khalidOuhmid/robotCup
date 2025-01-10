@@ -15,7 +15,7 @@ class ShowEncounters extends AbstractController
     #[Route('/encounters/{page}', name: 'app_encounters', requirements: ['page' => '\d+'], defaults: ['page' => 1])]
     public function showEncounters(int $page, EntityManagerInterface $entityManager): Response
     {
-        $limit = 1; // Nombre d'éléments par page
+        $limit = 10; // Nombre d'éléments par page
         $repository = $entityManager->getRepository(TEncounterEnc::class);
 
         // Total des rencontres
