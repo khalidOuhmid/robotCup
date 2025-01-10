@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des compétitions{% endblock %}
+
+{% block body %}
+    <h1>Liste des compétitions</h1>
+
+    <a href="{{ path('app_competition_new') }}" class="btn btn-primary mb-3">Créer une nouvelle compétition</a>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Adresse</th>
+                <th>Date de début</th>
+                <th>Date de fin</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for competition in competitions %}
+            <tr>
+                <td>{{ competition.cmpName }}</td>
+                <td>{{ competition.cmpAddress }}</td>
+                <td>{{ competition.cmpDateBegin ? competition.cmpDateBegin|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ competition.cmpDateEnd ? competition.cmpDateEnd|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_competition_show', {'id': competition.id}) }}" class="btn btn-info btn-sm">Voir</a>
+                    <a href="{{ path('app_competition_edit', {'id': competition.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">Aucune compétition trouvée</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

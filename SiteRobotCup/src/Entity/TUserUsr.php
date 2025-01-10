@@ -1,14 +1,19 @@
 <?php 
 namespace App\Entity;
 
+use App\Repository\TUserUsrRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: TUserUsrRepository::class)]
 #[ORM\Table(name: "T_USER_USR")]
+#[UniqueEntity(fields: ['email'], message: 'Cet email existe déjà')]
 class TUserUsr implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -16,16 +21,19 @@ class TUserUsr implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: "USR_ID", type: "smallint")]
     private ?int $id = null;
 
+    #[Assert\Choice(choices: ['ADMIN', 'USER'])]
     #[ORM\Column(name: "USR_TYPE", type: "string", length: 255)]
     private ?string $type = 'USER';
 
+    #[Assert\Email]
     #[ORM\Column(name: "USR_MAIL", type: "string", length: 255, unique: true)]
     private ?string $email = null;
 
     #[ORM\Column(name: "USR_PASS", type: "string", length: 128)]
     private ?string $password = null;
 
-    // Remove USR_ROLES column since we're using USR_TYPE
+    #[ORM\Column(name: 'USR_CREATION_DATE', type: Types::DATETIME_MUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
+    private ?\DateTimeInterface $creationDate;
 
     #[ORM\OneToMany(mappedBy: "user", targetEntity: TTeamTem::class)]
     private Collection $teams;
@@ -33,6 +41,7 @@ class TUserUsr implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->teams = new ArrayCollection();
+        $this->creationDate = new \DateTime();
     }
 
     public function getId(): ?int
@@ -73,6 +82,17 @@ class TUserUsr implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getCreationDate(): ?\DateTimeInterface
+    {
+        return $this->creationDate;
+    }
+
+    public function setCreationDate(\DateTimeInterface $creationDate): self
+    {
+        $this->creationDate = $creationDate;
+        return $this;
+    }
+
     public function getRoles(): array
     {
         $roles = ['ROLE_USER']; // Tous les utilisateurs ont au moins ROLE_USER
@@ -84,8 +104,6 @@ class TUserUsr implements UserInterface, PasswordAuthenticatedUserInterface
         
         return array_unique($roles);
     }
-
-    // Remove setRoles method since we're using type
 
     /**
      * @return Collection<int, TTeamTem>
@@ -124,5 +142,10 @@ class TUserUsr implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials(): void
     {
         // Méthode requise par UserInterface, peut rester vide
+    }
+
+    public function __toString(): string
+    {
+        return $this->email;
     }
 }

@@ -13,62 +13,30 @@ class PageTableScoresController extends AbstractController
     #[Route('/', name: 'app_default')]
     public function index(TTeamTemRepository $teamRepository): Response
     {
-        // Get teams sorted by score
-        $teamsData = $teamRepository->findBy([], ['score' => 'DESC']);
+        // Get teams stats directly from the view
+        $teamsData = $teamRepository->findByOrderedByScore();
 
-        // Transform team entities into array with required data
-        $teams = [];
-        foreach ($teamsData as $index => $team) {
-            // Calculate matches data from encounters
-            $matchesPlayed = count($team->getEncountersAsBlue()) + count($team->getEncountersAsGreen());
-            $matchesWon = 0;
-            $matchesDrawn = 0;
-            $matchesLost = 0; // Nouveau compteur pour les matchs perdus
-            
-            // Count wins, draws, and losses for blue team encounters
-            foreach ($team->getEncountersAsBlue() as $encounter) {
-                if ($encounter->getScoreBlue() > $encounter->getScoreGreen()) {
-                    $matchesWon++;
-                } elseif ($encounter->getScoreBlue() === $encounter->getScoreGreen()) {
-                    $matchesDrawn++;
-                } else {
-                    $matchesLost++;
-                }
-            }
-            
-            // Count wins, draws, and losses for green team encounters
-            foreach ($team->getEncountersAsGreen() as $encounter) {
-                if ($encounter->getScoreGreen() > $encounter->getScoreBlue()) {
-                    $matchesWon++;
-                } elseif ($encounter->getScoreGreen() === $encounter->getScoreBlue()) {
-                    $matchesDrawn++;
-                } else {
-                    $matchesLost++;
-                }
-            }
-
-            $teams[] = [
+        // Transform the data for the template
+        $teams = array_map(function($data, $index) {
+            return [
                 'rank' => $index + 1,
-                'name' => $team->getName(),
-                'matches_played' => $matchesPlayed,
-                'matches_won' => $matchesWon,
-                'matches_drawn' => $matchesDrawn,
-                'matches_lost' => $matchesLost, // Ajout des matchs perdus dans le tableau
-                'points' => $team->getScore(),
+                'name' => $data['TEM_NAME'],
+                'matches_played' => $data['matches_played'],
+                'matches_won' => $data['matches_won'],
+                'matches_drawn' => $data['matches_drawn'],
+                'matches_lost' => $data['matches_lost'],
+                'goals' => $data['total_goals'],
+                'points' => $data['total_points'],  // Changed from championship_points to total_points
             ];
-        }
+        }, $teamsData, array_keys($teamsData));
 
-        // Condition pour déterminer quel template rendre
-        if ($_SERVER['REQUEST_URI'] === '/scores') {
-            // Rendre le template 'page_tableau_scores/index.html.twig'
-            return $this->render('page_tableau_scores/index.html.twig', [
-                'teams' => $teams,
-            ]);
-        } else {
-            // Rendre le template 'default/index.html.twig'
-            return $this->render('default/index.html.twig', [
-                'teams' => $teams,
-            ]);
-        } 
+        // Choose template based on route
+        $template = ($_SERVER['REQUEST_URI'] === '/scores') 
+            ? 'page_tableau_scores/index.html.twig'
+            : 'default/index.html.twig';
+
+        return $this->render($template, [
+            'teams' => $teams,
+        ]);
     }
 }

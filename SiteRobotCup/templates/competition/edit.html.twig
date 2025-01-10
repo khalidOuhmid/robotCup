@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier la compétition{% endblock %}
+
+{% block body %}
+    <h1>Modifier la compétition</h1>
+
+    {{ include('competition/_form.html.twig') }}
+
+    <a href="{{ path('app_competition_index') }}" class="btn btn-secondary">Retour à la liste</a>
+
+    <form method="post" action="{{ path('app_competition_delete', {'id': competition.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette compétition ?');" style="display: inline-block">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ competition.id) }}">
+        <button class="btn btn-danger">Supprimer</button>
+    </form>
+{% endblock %}

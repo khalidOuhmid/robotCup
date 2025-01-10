@@ -2,79 +2,107 @@
 
 namespace App\Entity;
 
+use App\Repository\TEncounterEncRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
-#[ORM\Entity]
-#[ORM\Table(name: "T_ENCOUNTER_ENC")]
+#[ORM\Entity(repositoryClass: TEncounterEncRepository::class)]
+#[ORM\Table(name: 'T_ENCOUNTER_ENC')]
+#[UniqueEntity(
+    fields: ['teamBlue', 'teamGreen', 'dateBegin', 'dateEnd'],
+    message: 'Cette rencontre existe déjà pour ces équipes et ces dates'
+)]
+#[UniqueEntity(
+    fields: ['dateBegin', 'dateEnd', 'field'],
+    message: 'Ce terrain est déjà occupé pour ces dates'
+)]
 class TEncounterEnc
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: "ENC_ID", type: "smallint")]
+    #[ORM\Column(name: 'ENC_ID', type: 'smallint')]
     private ?int $id = null;
 
-    #[ORM\Column(name: "ENC_SCORE_BLUE", type: "integer", nullable: true)]
-    private ?int $scoreBlue = null;
+    #[ORM\ManyToOne(targetEntity: TTournamentTnm::class, inversedBy: 'encounters')]
+    #[ORM\JoinColumn(name: 'TNM_ID', referencedColumnName: 'TNM_ID', nullable: true)]
+    private ?TTournamentTnm $tournament = null;
 
-    #[ORM\Column(name: "ENC_SCORE_GREEN", type: "integer", nullable: true)]
-    private ?int $scoreGreen = null;
-
-    #[ORM\Column(name: "ENC_STATE", type: "string", length: 255)]
-    private ?string $state = null;
-
-    #[ORM\ManyToOne(targetEntity: TTeamTem::class, inversedBy: "encountersAsBlue")]
-    #[ORM\JoinColumn(name: "TEM_ID_PARTICIPATE_BLUE", referencedColumnName: "TEM_ID", nullable: false)]
-    private ?TTeamTem $teamBlue = null;
-
-    #[ORM\ManyToOne(targetEntity: TTeamTem::class, inversedBy: "encountersAsGreen")]
-    #[ORM\JoinColumn(name: "TEM_ID_PARTICIPATE_GREEN", referencedColumnName: "TEM_ID", nullable: false)]
-    private ?TTeamTem $teamGreen = null;
-
-    #[ORM\ManyToOne(targetEntity: TChampionshipChp::class, inversedBy: "encounters")]
-    #[ORM\JoinColumn(name: "CHP_ID", referencedColumnName: "CHP_ID", nullable: false)]
+    #[ORM\ManyToOne(targetEntity: TChampionshipChp::class, inversedBy: 'encounters')]
+    #[ORM\JoinColumn(name: 'CHP_ID', referencedColumnName: 'CHP_ID', nullable: true)]
     private ?TChampionshipChp $championship = null;
 
+    #[ORM\ManyToOne(targetEntity: TFieldFld::class, inversedBy: 'encounters')]
+    #[ORM\JoinColumn(name: 'FLD_ID', referencedColumnName: 'FLD_ID', nullable: false)]
+    private ?TFieldFld $field = null;
+
+    #[Assert\NotEqualTo(propertyPath: "teamGreen", message: "Les équipes bleue et verte doivent être différentes")]
+    #[ORM\ManyToOne(targetEntity: TTeamTem::class, inversedBy: 'encountersAsBlue')]
+    #[ORM\JoinColumn(name: 'TEM_ID_BLUE', referencedColumnName: 'TEM_ID', nullable: false)]
+    private ?TTeamTem $teamBlue = null;
+
+    #[ORM\ManyToOne(targetEntity: TTeamTem::class, inversedBy: 'encountersAsGreen')]
+    #[ORM\JoinColumn(name: 'TEM_ID_GREEN', referencedColumnName: 'TEM_ID', nullable: false)]
+    private ?TTeamTem $teamGreen = null;
+
+    #[Assert\Choice(choices: ['PROGRAMMEE', 'CONCLUE', 'EN COURS', 'ANNULEE'])]
+    #[ORM\Column(name: 'ENC_STATE', type: 'string', length: 255)]
+    private ?string $state = null;
+
+    #[Assert\Expression(
+        "this.getState() != 'CONCLUE' or (this.getScoreBlue() !== null and this.getScoreGreen() !== null)",
+        message: "Les scores doivent être définis lorsque l'état est CONCLUE"
+    )]
+    #[Assert\LessThan(propertyPath: "dateEnd", message: "La date de début doit être antérieure à la date de fin")]
+    #[ORM\Column(name: 'ENC_DATE_BEGIN', type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $dateBegin = null;
+
+    #[ORM\Column(name: 'ENC_DATE_END', type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $dateEnd = null;
+
+    #[ORM\Column(name: 'ENC_SCORE_BLUE', type: 'smallint', nullable: true)]
+    private ?int $scoreBlue = null;
+
+    #[ORM\Column(name: 'ENC_SCORE_GREEN', type: 'smallint', nullable: true)]
+    private ?int $scoreGreen = null;
+
+    // Getters and setters
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getScoreBlue(): ?int
+    public function getTournament(): ?TTournamentTnm
     {
-        return $this->scoreBlue;
+        return $this->tournament;
     }
 
-    public function setScoreBlue(?int $scoreBlue): self
+    public function setTournament(?TTournamentTnm $tournament): self
     {
-        $this->scoreBlue = $scoreBlue;
-        if ($this->teamBlue) {
-            $this->teamBlue->updateScore();
-        }
+        $this->tournament = $tournament;
         return $this;
     }
 
-    
-public function setScoreGreen(?int $scoreGreen): self
-{
-    $this->scoreGreen = $scoreGreen;
-    if ($this->teamGreen) {
-        $this->teamGreen->updateScore();
-    }
-    return $this;
-}
-public function getScoreGreen(): ?int
-{
-    return $this->scoreGreen;
-}
-
-    public function getState(): ?string
+    public function getChampionship(): ?TChampionshipChp
     {
-        return $this->state;
+        return $this->championship;
     }
 
-    public function setState(string $state): self
+    public function setChampionship(?TChampionshipChp $championship): self
     {
-        $this->state = $state;
+        $this->championship = $championship;
+        return $this;
+    }
+
+    public function getField(): ?TFieldFld
+    {
+        return $this->field;
+    }
+
+    public function setField(?TFieldFld $field): self
+    {
+        $this->field = $field;
         return $this;
     }
 
@@ -100,14 +128,58 @@ public function getScoreGreen(): ?int
         return $this;
     }
 
-    public function getChampionship(): ?TChampionshipChp
+    public function getState(): ?string
     {
-        return $this->championship;
+        return $this->state;
     }
 
-    public function setChampionship(?TChampionshipChp $championship): self
+    public function setState(string $state): self
     {
-        $this->championship = $championship;
+        $this->state = $state;
+        return $this;
+    }
+
+    public function getDateBegin(): ?\DateTimeInterface
+    {
+        return $this->dateBegin;
+    }
+
+    public function setDateBegin(\DateTimeInterface $dateBegin): self
+    {
+        $this->dateBegin = $dateBegin;
+        return $this;
+    }
+
+    public function getDateEnd(): ?\DateTimeInterface
+    {
+        return $this->dateEnd;
+    }
+
+    public function setDateEnd(\DateTimeInterface $dateEnd): self
+    {
+        $this->dateEnd = $dateEnd;
+        return $this;
+    }
+
+    public function getScoreBlue(): ?int
+    {
+        return $this->scoreBlue;
+    }
+
+    public function setScoreBlue(?int $scoreBlue): self
+    {
+        $this->scoreBlue = $scoreBlue;
+        return $this;
+    }
+
+    public function getScoreGreen(): ?int
+    {
+        return $this->scoreGreen;
+    }
+
+    public function setScoreGreen(?int $scoreGreen): self
+    {
+        $this->scoreGreen = $scoreGreen;
         return $this;
     }
 }
