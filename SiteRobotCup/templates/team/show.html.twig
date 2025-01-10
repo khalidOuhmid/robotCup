@@ -10,8 +10,8 @@
     
 		<!-- Formulaire de création d'équipe -->
 		{{ form_start(form) }}
-		<div class="flex items-center justify-between gap-4 bg-slate-200 px-4 p-4 rounded-b-lg">
-            <div class="flex flex-row gap-4">
+		<div class="flex sm:flex-row sm:w-full flex-col items-center justify-between gap-4 bg-slate-200 px-4 p-4 rounded-b-lg">
+            <div class="flex sm:flex-row flex-col w-screen items-center justify-around gap-4">
                 {{ form_widget(form.name, { 'attr': { 'placeholder': 'Nom', 'class': 'bg-white w-5/12 py-2 p-3 rounded-lg' } }) }}
                 <input type="text" placeholder="Structure" class="bg-white w-5/12 py-2 p-3 text-gray-500 rounded-lg"/>
             </div>
@@ -20,7 +20,7 @@
     {{ form_end(form) }}
 
     <!-- Liste des équipes -->
-        <div class="mt-10">
+        <div class="mt-10 flex justify-center items-center">
             <table class="min-w-full table-auto bg-white shadow-lg rounded-lg overflow-hidden">
                 <thead>
                     <tr class="bg-sky-800 text-white">
