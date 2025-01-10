@@ -4,16 +4,22 @@
 
 {% block body %}
 <main>
-    <section class="h-screen w-screen bg-blue-100">
+    <section class="min-h-screen w-full bg-blue-100">
+        <!-- Titre principal -->
         <div class="flex items-center justify-center">
-            <h1 class="text-3xl m-10 font-bold">Bienvenue à la RoboCup</h1>
+            <h1 class="text-3xl md:text-4xl font-bold text-center m-10">Bienvenue à la RoboCup</h1>
         </div>
-        <div class="flex space-x-28 items-center">
-            <div class="h-30 w-70 m-8 rounded-2xl">
-                <img class="" src={{ asset('media/RoboCup_Logo.png') }} alt="">
+
+        <!-- Section de présentation -->
+        <div class="flex flex-col lg:flex-row items-center justify-center space-y-10 lg:space-y-0 lg:space-x-10 px-4 lg:px-10">
+            <!-- Logo -->
+            <div class="w-3/4 sm:w-2/3 lg:w-1/3 aspect-square rounded-2xl overflow-hidden flex justify-center items-center">
+                <img class="max-w-full max-h-full object-contain" src="{{ asset('media/RoboCup_Logo.png') }}" alt="RoboCup Logo">
             </div>
-            <div class="h-90 w-2/5 m-8 bg-gradient-to-r from-sky-800 to-sky-600 rounded-2xl overflow-hidden">
-                <p class="text-blue-50 p-14 text-wrap">
+
+            <!-- Texte de présentation -->
+            <div class="w-full sm:w-3/4 lg:w-2/5 bg-gradient-to-r from-sky-800 to-sky-600 rounded-2xl overflow-hidden p-6 sm:p-8 lg:p-10 shadow-lg">
+                <p class="text-blue-50 text-base lg:text-lg leading-relaxed">
                     La RoboCup est une compétition, mais elle est avant tout une communauté, et les participants échangent tout au long de l'événement. 
                     Nombre de technologies développées par les compétiteurs sont ouvertes.
                     Chaque RoboCup est également l’occasion d’un Symposium International, haut lieu de présentation et de discussion de contributions scientifiques
@@ -23,39 +29,52 @@
                 </p>
             </div>
         </div>
+
+        <!-- Classement des équipes -->
         <div class="container mx-auto mt-10 px-4">
             <h1 class="text-3xl font-bold text-center mb-8">Classement des équipes</h1>
 
-            <table class="min-w-full table-auto bg-white shadow-lg rounded-lg overflow-hidden">
-                <thead>
-                    <tr class="bg-sky-800 text-white">
-                        <th class="px-4 py-2 text-center">Rang</th>
-                        <th class="px-4 py-2 text-center">Nom équipe</th>
-                        <th class="px-4 py-2 text-center">Rencontre Joué</th>
-                        <th class="px-4 py-2 text-center">Rencontre Gagné</th>
-                        <th class="px-4 py-2 text-center">Rencontre Nul</th>
-                        <th class="px-4 py-2 text-center">Rencontre Perdu</th>
-                        <th class="px-4 py-2 text-center">Points</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for team in teams|slice(0,5) %}
-                        <tr class="border-t border-gray-200 hover:bg-gray-50">
-                            <td class="px-4 py-2 text-center">{{ team.rank }}</td>
-                            <td class="px-4 py-2 text-center">{{ team.name }}</td>
-                            <td class="px-4 py-2 text-center">{{ team.matches_played }}</td>
-                            <td class="px-4 py-2 text-center">{{ team.matches_won }}</td>
-                            <td class="px-4 py-2 text-center">{{ team.matches_drawn }}</td>
-                            <td class="px-4 py-2 text-center">{{ team.matches_lost }}</td>
-                            <td class="px-4 py-2 text-center">{{ team.points }}</td>
+            <!-- Message d'avertissement sur les petits écrans -->
+            <div class="text-center mb-4 text-red-600 sm:hidden">
+                <p>Pour voir toutes les colonnes, veuillez passer en mode paysage ou agrandir la fenêtre sur un ordinateur.</p>
+            </div>
+
+            <div class="overflow-x-auto max-w-full">
+                <table class="min-w-full table-auto bg-white shadow-lg rounded-lg overflow-hidden">
+                    <thead>
+                        <tr class="bg-sky-800 text-white">
+                            <th class="px-2 py-2 text-center text-sm sm:text-base">Rang</th>
+                            <th class="px-2 py-2 text-center text-sm sm:text-base">Nom équipe</th>
+                            <th class="px-2 py-2 text-center text-sm sm:text-base">Rencontre Joué</th>
+                            <!-- Masquer ces colonnes sur petits écrans -->
+                            <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">Rencontre Gagné</th>
+                            <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">Rencontre Nul</th>
+                            <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">Rencontre Perdu</th>
+                            <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">Points</th>
                         </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="7" class="px-4 py-2 text-center text-gray-500">Aucune équipe disponible.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {% for team in teams|slice(0,5) %}
+                            <tr class="border-t border-gray-200 hover:bg-gray-50">
+                                <td class="px-2 py-2 text-center text-sm sm:text-base">{{ team.rank }}</td>
+                                <td class="px-2 py-2 text-center text-sm sm:text-base">{{ team.name }}</td>
+                                <td class="px-2 py-2 text-center text-sm sm:text-base">{{ team.matches_played }}</td>
+                                <!-- Masquer ces colonnes sur petits écrans -->
+                                <td class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{ team.matches_won }}</td>
+                                <td class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{ team.matches_drawn }}</td>
+                                <td class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{ team.matches_lost }}</td>
+                                <td class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{ team.points }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="px-4 py-2 text-center text-gray-500 text-sm sm:text-base">
+                                    Aucune équipe disponible.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </section>
 </main>

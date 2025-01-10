@@ -5,13 +5,14 @@ namespace App\Controller;
 use App\Repository\TTeamTemRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 class PageTableScoresController extends AbstractController
 {
     #[Route('/scores', name: 'app_page_tableau_scores')]
     #[Route('/', name: 'app_default')]
-    public function index(TTeamTemRepository $teamRepository): Response
+    public function index(Request $request, TTeamTemRepository $teamRepository): Response
     {
         // Get teams stats directly from the view
         $teamsData = $teamRepository->findByOrderedByScore();
