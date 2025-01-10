@@ -21,7 +21,7 @@
             </thead>
             <tbody>
                 {% for team in teams %}
-                    <tr class="border-t border-gray-200 hover:bg-gray-50">
+                    <tr class="border-t border-gray-200 hover:bg-gray-50 {% if team.user_id == app.user.id %}bg-yellow-200  hover:bg-amber-200{% endif %}">
                         <td class="px-4 py-2 text-center">{{ team.rank }}</td>
                         <td class="px-4 py-2 text-center">{{ team.name }}</td>
                         <td class="px-4 py-2 text-center">{{ team.matches_played }}</td>
