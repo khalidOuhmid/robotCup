@@ -36,7 +36,7 @@ class TeamController extends AbstractController
         if (!$this->isGranted('ROLE_ADMIN') && $team->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException('Vous n\'avez pas les droits pour modifier cette équipe');
         }
-
+    
         // Vérifier que l'utilisateur existe
         if (!$user) {
             throw $this->createNotFoundException('Utilisateur non trouvé.');
