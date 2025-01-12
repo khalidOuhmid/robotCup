@@ -2,19 +2,28 @@
 
 namespace App\Controller;
 
+use App\Entity\Championship;
+use App\Entity\Encounter;
+use App\Entity\Team;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\TEncounterEnc;
-use App\Entity\TTeamTem;
-use App\Entity\TChampionshipChp;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Controller for managing game scores and encounters.
+ */
 class ScoreController extends AbstractController
 {
+    /**
+     * Displays the score management interface.
+     *
+     * @return Response
+     */
     #[Route('/score', name: 'app_score')]
     public function index(): Response
     {
@@ -23,70 +32,170 @@ class ScoreController extends AbstractController
         ]);
     }
 
-    public function importScores(Request $request, EntityManagerInterface $em): JsonResponse|RedirectResponse
-    {
-        // Ensure only ADMIN users can access this route
-        //$this->denyAccessUnlessGranted('ROLE_ADMIN');
-
-        // Get JSON data from the request
+    /**
+     * Imports scores from a JSON file.
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $entityManager
+     * @return JsonResponse|RedirectResponse
+     */
+    #[Route('/score/import', name: 'app_score_import', methods: ['POST'])]
+    public function importScores(
+        Request $request, 
+        EntityManagerInterface $entityManager
+    ): JsonResponse|RedirectResponse {
         $file = $request->files->get('scores_file');
-    
-        if (!$file) {
-            return new JsonResponse(['error' => 'Invalid file type, only JSON is allowed'], 400);
+
+        if (!$this->isValidFile($file)) {
+            return new JsonResponse(
+                ['error' => 'Invalid file type, only JSON is allowed'],
+                Response::HTTP_BAD_REQUEST
+            );
         }
-    
-        // Check if the file is a valid JSON file
-        if ($file->getClientMimeType() !== 'application/json') {
-            return new JsonResponse(['error' => 'Invalid file type, only JSON is allowed'], 400);
+
+        $data = $this->parseJsonFile($file);
+        
+        if ($data === null) {
+            return new JsonResponse(
+                ['error' => 'Invalid JSON data'],
+                Response::HTTP_BAD_REQUEST
+            );
         }
-    
+
+        if (!$this->isValidDataStructure($data)) {
+            return new JsonResponse(
+                ['error' => 'Invalid JSON format'],
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
+        try {
+            $this->processEncounters($data['encounters'], $entityManager);
+            $entityManager->flush();
+            
+            return $this->redirectToRoute('app_score');
+        } catch (\Exception $e) {
+            return new JsonResponse(
+                ['error' => 'Database error: ' . $e->getMessage()],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    /**
+     * Validates the uploaded file.
+     *
+     * @param UploadedFile|null $file
+     * @return bool
+     */
+    private function isValidFile(?UploadedFile $file): bool
+    {
+        return $file !== null && $file->getClientMimeType() === 'application/json';
+    }
+
+    /**
+     * Parses JSON file content.
+     *
+     * @param UploadedFile $file
+     * @return array|null
+     */
+    private function parseJsonFile(UploadedFile $file): ?array
+    {
         $jsonContent = file_get_contents($file->getRealPath());
-        $data = json_decode($jsonContent, true);
+        return json_decode($jsonContent, true);
+    }
 
-        if($data === null){
-            return new JsonResponse(['error' => 'data = null '], 400);
-        }
+    /**
+     * Validates the JSON data structure.
+     *
+     * @param array|null $data
+     * @return bool
+     */
+    private function isValidDataStructure(?array $data): bool
+    {
+        return isset($data['encounters']) && is_array($data['encounters']);
+    }
 
-        // Validate JSON structure
-        if (!isset($data['encounters']) || !is_array($data['encounters'])) {
-            return new JsonResponse(['error' => 'Invalid JSON format'], 400);
-        }
-
-        foreach ($data['encounters'] as $encounterData) {
-            // Basic validation for required fields
-            if (!isset($encounterData['team_blue'], $encounterData['team_green'], $encounterData['score_blue'], $encounterData['score_green'], $encounterData['state'], $encounterData['championship'])) {
+    /**
+     * Processes encounter data and creates new encounters.
+     *
+     * @param array $encounters
+     * @param EntityManagerInterface $entityManager
+     * @throws \Exception
+     */
+    private function processEncounters(
+        array $encounters,
+        EntityManagerInterface $entityManager
+    ): void {
+        foreach ($encounters as $encounterData) {
+            if (!$this->isValidEncounterData($encounterData)) {
                 continue;
             }
 
-            $teamBlue = $em->getRepository(TTeamTem::class)->findOneBy(['name' => $encounterData['team_blue']]);
-            $teamGreen = $em->getRepository(TTeamTem::class)->findOneBy(['name' => $encounterData['team_green']]);
+            $teamBlue = $entityManager->getRepository(Team::class)
+                ->findOneBy(['name' => $encounterData['team_blue']]);
+            $teamGreen = $entityManager->getRepository(Team::class)
+                ->findOneBy(['name' => $encounterData['team_green']]);
 
-            
             if (!$teamBlue || !$teamGreen) {
-                return new JsonResponse(['error' => 'One or both teams not found'], 404);
+                throw new \Exception('One or both teams not found');
             }
 
-            $championship = $em->getRepository(TChampionshipChp::class)->findOneBy(['name' => $encounterData['championship']]);
-            // Create new Encounter entity
-            $encounter = new TEncounterEnc();
-            $encounter->setTeamBlue($teamBlue);
-            $encounter->setTeamGreen($teamGreen);
-            $encounter->setScoreBlue($encounterData['score_blue']);
-            $encounter->setScoreGreen($encounterData['score_green']);
-            $encounter->setState($encounterData['state']);
-            $encounter->setChampionship($championship);
+            $championship = $entityManager->getRepository(Championship::class)
+                ->findOneBy(['name' => $encounterData['championship']]);
 
-            // Persist to database
-            try{
-                $em->persist($encounter);
-            } catch (\Exception $e) {
-                return new JsonResponse(['error' => 'Database error: ' . $e->getMessage()], 500);
-            }
+            $encounter = $this->createEncounter(
+                $encounterData,
+                $teamBlue,
+                $teamGreen,
+                $championship
+            );
+            
+            $entityManager->persist($encounter);
         }
+    }
 
-        // Flush all changes to the database
-        $em->flush();
+    /**
+     * Validates encounter data structure.
+     *
+     * @param array $encounterData
+     * @return bool
+     */
+    private function isValidEncounterData(array $encounterData): bool
+    {
+        return isset(
+            $encounterData['team_blue'],
+            $encounterData['team_green'],
+            $encounterData['score_blue'],
+            $encounterData['score_green'],
+            $encounterData['state'],
+            $encounterData['championship']
+        );
+    }
 
-        return $this->redirectToRoute('app_score');
+    /**
+     * Creates a new Encounter entity from data.
+     *
+     * @param array $data
+     * @param Team $teamBlue
+     * @param Team $teamGreen
+     * @param Championship $championship
+     * @return Encounter
+     */
+    private function createEncounter(
+        array $data,
+        Team $teamBlue,
+        Team $teamGreen,
+        Championship $championship
+    ): Encounter {
+        $encounter = new Encounter();
+        $encounter->setTeamBlue($teamBlue)
+            ->setTeamGreen($teamGreen)
+            ->setScoreBlue($data['score_blue'])
+            ->setScoreGreen($data['score_green'])
+            ->setState($data['state'])
+            ->setChampionship($championship);
+
+        return $encounter;
     }
 }
