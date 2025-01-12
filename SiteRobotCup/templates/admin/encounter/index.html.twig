@@ -1,0 +1,47 @@
+{# templates/admin/encounter/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6">Gestion des rencontres</h1>
+        
+        <div class="grid gap-4">
+            {% for encounter in encounters %}
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="font-bold text-lg mb-2">
+                        {{ encounter.dateBegin|date('d/m/Y H:i') }} - {{ encounter.dateEnd|date('H:i') }}
+                    </div>
+                    <div class="text-gray-600 mb-2">
+                        {{ encounter.teamBlue.name }} vs {{ encounter.teamGreen.name }}
+                    </div>
+                    <div class="text-gray-500 text-sm mb-4">
+                        Terrain : {{ encounter.field.name }}
+                    </div>
+                    <div class="flex gap-2">
+                        <a href="{{ path('app_admin_encounter_edit', {'id': encounter.id}) }}" 
+                           class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                            Modifier
+                        </a>
+                        <form method="post" action="{{ path('app_admin_encounter_delete', {'id': encounter.id}) }}" 
+                              class="inline-block"
+                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette rencontre ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ encounter.id) }}">
+                            <button class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                                Supprimer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-gray-500">Aucune rencontre programmée.</p>
+            {% endfor %}
+        </div>
+
+        <a href="{{ path('app_admin_encounter_new') }}" 
+           class="fixed bottom-8 right-8 w-14 h-14 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+        </a>
+    </div>
+{% endblock %}
