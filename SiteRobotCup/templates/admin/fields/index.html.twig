@@ -1,0 +1,102 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des terrains{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-8">
+    {# Formulaire de création #}
+    <div class="mb-8 bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Nouveau terrain</h2>
+        <form method="post" action="{{ path('app_admin_fields_new') }}" class="flex gap-4">
+            <div class="flex-1">
+                <input type="text" name="name" required placeholder="Nom du terrain"
+                       class="w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500">
+            </div>
+            <div class="flex-1">
+                <select name="competition" required
+                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500">
+                    <option value="">Sélectionner une compétition</option>
+                    {% for competition in competitions %}
+                        <option value="{{ competition.id }}">{{ competition.cmpName }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="bg-sky-600 text-white px-6 py-2 rounded hover:bg-sky-700">
+                Créer
+            </button>
+        </form>
+    </div>
+
+    {# Liste des terrains #}
+    <div class="bg-white rounded-lg shadow">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Compétition</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rencontres</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200" x-data="{ editingId: null }">
+                {% for field in fields %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div x-show="editingId !== {{ field.id }}">{{ field.name }}</div>
+                            <input x-show="editingId === {{ field.id }}"
+                                   type="text"
+                                   name="name"
+                                   value="{{ field.name }}"
+                                   class="rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500">
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div x-show="editingId !== {{ field.id }}">{{ field.competition.cmpName }}</div>
+                            <select x-show="editingId === {{ field.id }}"
+                                    name="competition"
+                                    class="rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500">
+                                {% for competition in competitions %}
+                                    <option value="{{ competition.id }}"
+                                            {% if field.competition.id == competition.id %}selected{% endif %}>
+                                        {{ competition.cmpName }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <a href="{{ path('app_admin_encounters', {'field': field.id}) }}" 
+                               class="text-sky-600 hover:text-sky-900">
+                                {{ field.encounters|length }} rencontre(s)
+                                <span class="text-xs ml-1">(voir)</span>
+                            </a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div x-show="editingId !== {{ field.id }}">
+                                <button @click="editingId = {{ field.id }}"
+                                        class="text-sky-600 hover:text-sky-900 mr-4">Modifier</button>
+                                <form method="post" action="{{ path('app_admin_fields_delete', {'id': field.id}) }}" 
+                                      class="inline-block">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ field.id) }}">
+                                    <button type="submit" 
+                                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce terrain ?')"
+                                            class="text-red-600 hover:text-red-900">Supprimer</button>
+                                </form>
+                            </div>
+                            <div x-show="editingId === {{ field.id }}" class="space-x-2">
+                                <button @click="editingId = null" 
+                                        class="text-gray-600 hover:text-gray-900">Annuler</button>
+                                <button @click="document.getElementById('edit-form-{{ field.id }}').submit()"
+                                        class="text-sky-600 hover:text-sky-900">Enregistrer</button>
+                                <form id="edit-form-{{ field.id }}" 
+                                      method="post" 
+                                      action="{{ path('app_admin_fields_edit', {'id': field.id}) }}" 
+                                      class="hidden">
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

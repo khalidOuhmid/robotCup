@@ -2,8 +2,8 @@
 
 namespace App\Form;
 
-use App\Entity\TTeamTem;
-use App\Entity\TCompetitionCmp;
+use App\Entity\Team;
+use App\Entity\Competition;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -23,8 +23,12 @@ class TeamType extends AbstractType
                 'required' => false
             ])
             ->add('competition', EntityType::class, [
-                'class' => TCompetitionCmp::class,
-                'choice_label' => 'cmpName',
+                'class' => Competition::class,
+                'choice_label' => function (Competition $competition) {
+                    return sprintf('%s',
+                        $competition->getCmpName(),
+                    );
+                },
                 'required' => true,
                 'label' => 'Compétition'
             ])
@@ -34,7 +38,7 @@ class TeamType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => TTeamTem::class,
+            'data_class' => Team::class,
         ]);
     }
 }
