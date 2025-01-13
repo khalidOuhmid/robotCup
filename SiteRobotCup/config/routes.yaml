@@ -7,3 +7,12 @@ controllers:
 import_scores:
     path: /import-scores
     controller: App\Controller\ScoreController::importScores
+
+_locale:
+    path: /{_locale}/
+    requirements:
+        _locale: 'fr|en'
+    defaults:
+        _locale: 'fr'
+    options:
+        expose: true
