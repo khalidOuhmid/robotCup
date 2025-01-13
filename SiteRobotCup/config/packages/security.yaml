@@ -44,6 +44,8 @@ security:
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/, roles: ROLE_USER }
+        - { path: ^/tableau-scores, roles: [ROLE_USER, ROLE_ADMIN] }
+        - { path: ^/score, roles: [ROLE_USER, ROLE_ADMIN] }
 
     role_hierarchy:
         ROLE_ADMIN: [ROLE_USER, ROLE_ALLOWED_TO_SWITCH]
