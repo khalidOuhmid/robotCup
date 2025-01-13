@@ -169,7 +169,7 @@ class TeamController extends AbstractController
                 // On s'assure qu'une competition est sélectionnée
                 if (!$team->getCompetition()) {
                     $this->addFlash('error', 'Vous devez sélectionner une compétition');
-                    return $this->render('team/new.html.twig', ['form' => $form->createView()]);
+                    return $this->render('admin/teams/index.html.twig', ['form' => $form->createView()]);
                 }
 
                 $team->setUser($this->getUser());
@@ -186,7 +186,7 @@ class TeamController extends AbstractController
             }
         }
 
-        return $this->render('team/new.html.twig', [
+        return $this->render('admin/teams/edit.html.twig', [
             'form' => $form->createView(),
         ]);
     }
