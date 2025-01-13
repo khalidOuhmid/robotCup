@@ -1,64 +1,85 @@
 # SAE3.01_SiteRobot
 
-# Le projet
-L'objectif est de développer une application full-stack permettant
-d’organiser des compétitions de football … de robots !
-Cette application couvre le processus : de l’inscription des
-équipes à la publication des résultats de la compétition, en
-passant par l’organisation des rencontres.
+
+# The Project
+The objective is to develop a full-stack application that organizes football... robot competitions!
+This application covers the entire process: from team registration to publishing the competition results, including organizing the matches.
+
 
 <hr>
 
-## 1. Convention de codage  
+
+# Table of Contents 
+
+
+1. [Coding Convention](#1)
+2. [Deployment Guide](#2)
+3. [Database](#3)
+
+
+<hr>
+
+
+## 1. Coding Convention <a id="1"></a>
+
 
 ### 1.1 PSR (PHP Standards Recommendation)
-Règles spécifiques à **PHP**. Il s’agit de **conventions et standards de programmation** permettant de réunir les différentes méthodes de codage pouvant exister à travers les **frameworks** utilisés sous PHP, **Symfony version 5.10.4.** dans notre cas.  
-
-**Voici les versions des PSR utilisées dans cette application:**
-
-- psr/cache (PSR-16) : Version 3.0.0 (utilisé pour la gestion du cache).
--  psr/clock : Version 1.0.0 (interface pour la gestion du temps).
-- psr/container (PSR-11) : Version 2.0.2 (interface du container).
-- psr/event-dispatcher (PSR-14) : Version 1.0.0 (pour la gestion des événements).
-- psr/link (PSR-13) : Version 2.0.1 (interface pour la gestion des liens HTTP).
-- psr/log (PSR-3) : Version 3.0.2 (interface de journalisation).
-
-### 1.2 Vérification de l'application de la convention
-
-Installer PHP_CodeSniffer, outil qui vérifie les conventions PSR  
-`composer require --dev squizlabs/php_codesniffer` 
-
-Et par exemple une commande qui vérifie  le PSR-16 :  
-`vendor/bin/phpcs --standard=PSR16 ~/SaeRobocup/sae3.01_siterobot/SiteRobotcup` 
+Specific rules for **PHP**. These are **conventions and programming standards** aimed at unifying the different coding methods that may exist across various **frameworks** used in PHP, **Symfony version 7.2** in our case.
 
 
+**Here are the PSR versions used in this application:**
+- **psr/basic-coding-standard (PSR-1)**: Version 1.0.0 (basic coding standard, including file structure and class naming with CamelCase).
+- **psr/coding-style-guide (PSR-2)**: Version 1.0.0 (coding style guide for consistent formatting of PHP code).
+- **psr/log (PSR-3)**: Version 1.1.0 (logging interface).
+- **psr/autoloading (PSR-4)**: Version 1.0.0 (autoloader standard for PHP classes based on namespaces).
+- **psr/cache (PSR-6)**: Version 3.0.0 (interface for cache management).
+- **psr/http-message (PSR-7**): Version 1.0.1 (interface for HTTP messages, including requests and responses).
+- **psr/container (PSR-11)**: Version 1.1.0 (dependency container interface).
+- **psr/http-factory (PSR-17)**: Version 1.0.0 (interfaces for creating HTTP objects such as Request, Response, Uri).
 
 
+### 1.2 Verification of Convention Application
 
 
-## 2. Installation et lancement du projet
+Install PHP_CodeSniffer, a tool that checks PSR conventions 
+`composer require --dev squizlabs/php_codesniffer`
 
-Le site de championnat de robots est réalisé avec les frameworks Symfony et TailwindCSS inclus en tant que composant dans le projet Symfony.
 
-### 2.1 Installation des frameworks
+For example, a command to verify PSR-17: 
+`vendor/bin/phpcs --standard=PSR17 ~/SaeRobocup/sae3.01_siterobot/SiteRobotcup` 
 
-`Ces frameworks sont nécessaires pour que le site soit fonctionnel`
+
+## 2. Installation and Launching the Project <a id="2"></a>
+
+
+The robot championship website is built with the Symfony and TailwindCSS frameworks, included as components within the Symfony project.
+
+
+### 2.1 Installing the Frameworks
+
+
+**These frameworks are required for the site to function properly.**
+
 
 #### 2.1.1 Symfony
 
- via `wegt` ou `curl`:
+
+via `wget` or `curl`:
+
 
 ```bash
 wget https://get.symfony.com/cli/installer -O - | bash
 
+
 curl -sS https://get.symfony.com/cli/installer | bash
 ```
+#### 2.1.2 TailwindCSS
 
-#### 3.1.2 TailwindCSS
 
-via `compser` et `php`:
+via `compser` and `php`:
 
-```bash
+
+``bash
 composer require symfonycasts/tailwind-bundle
 ```
 ```bash
@@ -66,58 +87,123 @@ php bin/console tailwind:init
 ```
 
 
-ou via `npm`:
 
-```bash
+or via `npm`:
+
+
+``bash
 npm install -D tailwindcss
 ```
+
 
 ```bash
 npx tailwindcss init -p
 ```
 
-### 2.2 Cloner le projet
+
+### 2.2 Cloning the project
 
 
-- Cloner le dépôt Git sur [GitLab](git@gitlab-ce.iut.u-bordeaux.fr:cbenony/sae3.01_siterobot.git)
 
-- Puis installer les composants manquants du projet symfony:
+
+- Clone the Git repository on [GitLab](git@gitlab-ce.iut.u-bordeaux.fr:cbenony/sae3.01_siterobot.git)
+
+
+
+- Then install the missing components of the symfony project:
+
 
 ```bash
 composer install
 ```
 
-### 3.3 Lancer le site sur son navigateur
 
-Vous devez lancer cette commande afin de lien tailwind avec l'application symfony
+### 2.3 Launching the site on your browser
 
-```bash
-./premiereConnexion.sh²
+
+You need to run this command to link tailwind with the symfony application
+
+
+``bash
+./firstConnection.sh²
 ```
 
-Vous devez lancer cette commande afin de lien tailwind avec l'application symfony
+
+You need to run this command to link tailwind with the symfony application
+
 
 ```bash
-./premiereConnexion.sh²
+./firstConnection.sh²
 ```
 
-Pour lancer le projet en local lancer la commande suivante:
+
+To launch the project locally, run the following command:
+
 
 ```bash
-./lancementAppli.sh
+./launchAppli.sh
 ```
-Cette commande lance deux terminaux distinct, un pour lancer Tailwind et le deuxième pour lancer le serveur symfony.
+This command launches two separate terminals, one to launch Tailwind and the second to launch the symfony server.
 
-Le **site sera accessible** sur l'adresse locale `127.0.0.1:8000` sur votre navigateur.
 
-Le **port** est **indiqué après le lancement** de la commande précédente.
+The **site will be accessible** on the local address `127.0.0.1:8000` on your browser.
+
+
+The **port** is **indicated after the launch** of the previous command.
+
+
+
+## 3 Database <a id="3"></a>
+
+
+### 3.1 Creating and connecting to the database
+
+
+**The creation script:**
+~/sae3.01_siterobot/BD/MLR1_ROBOT_CHAMPIONSHIP.SQL
+Then import the file into your database management software.
+
+
+**Connection in the .env file :**
+~/sae3.01_siterobot/SiteRobotCup/.env 
+Then add/change the line :
+```
+DATABASE_URL="mysql://etu_user:K6pggasB@info-titania/etu_user’
+```
+With your software identifiers
+
+
+### 3.2 Creating an admin account
+**Option 1:** add the following lines at the end of the fill script
+```
+INSERT INTO T_USER_USR (USR_TYPE, USR_MAIL, USR_PASS)
+VALUES (‘ADMIN’, ‘admin@example.com’, ‘XXXXXXX’);
+```
+By replacing the email and the XXXXXXX (6 digits or more) with an email of your choice and a password of your choice.
+
+
+**Option 2:** directly in your database management software (in our case PhpMyAdmin)
+- Select the T_USER_USR table
+- Insert as type : ADMIN
+- Enter the email address of your admin account
+- Enter your password (6 digits or more) 
+
+
+**Login:**
+Go to log in/login in the top right-hand corner and enter your email address as your username and the password you have chosen above.
+
 
 <hr>
 
-## Liste des membres:
+## Members list:
 - ABE Naoki
 - BENONY Clément
 - BEZIE Isadora
 - DEBAILLEUL François
 - LAUBAL Noah
 - OUHMID Khalid
+
+
+
+
+
