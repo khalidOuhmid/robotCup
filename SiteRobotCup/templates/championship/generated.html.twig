@@ -6,38 +6,44 @@
 
 <section class="h-screen w-screen bg-blue-100">
     <main class="flex justify-center items-center min-h-screen bg-gray-50">
-        <div class="w-4/5 bg-white rounded-lg shadow-lg p-6 flex flex-col">
+        <div class="w-full max-w-6xl bg-white rounded-lg shadow-lg p-6">
             <h1 class="text-2xl font-semibold text-center mb-6">Planning des Rencontres</h1>
 
-            <div class="overflow-x-auto mb-4">
-                <table class="w-full border-collapse border border-gray-300">
+            <!-- Message d'avertissement pour petits écrans -->
+            <div class="text-center mb-4 text-red-600 sm:hidden">
+                <p>Pour voir toutes les colonnes, veuillez passer en mode paysage ou agrandir la fenêtre sur un ordinateur.</p>
+            </div>
+
+            <!-- Table responsive -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full border-collapse border border-gray-300">
                     <thead>
                         <tr class="bg-blue-100">
-                            <th class="border border-gray-300 px-4 py-2 text-center">n° rencontre</th>
-                            <th class="border border-gray-300 px-4 py-2 text-center bg-sky-800 text-white">équipe bleu</th>
-                            <th class="border border-gray-300 px-4 py-2 text-center bg-green-800 text-white">équipe vert</th>
-                            <th class="border border-gray-300 px-4 py-2 text-center">Score Bleu</th>
-                            <th class="border border-gray-300 px-4 py-2 text-center">Score Vert</th>
+                            <th class="border border-gray-300 px-3 py-2 text-center text-sm sm:text-base">n° rencontre</th>
+                            <th class="border border-gray-300 px-3 py-2 text-center bg-sky-800 text-white text-sm sm:text-base">équipe bleu</th>
+                            <th class="border border-gray-300 px-3 py-2 text-center bg-green-800 text-white text-sm sm:text-base">équipe vert</th>
+                            <th class="border border-gray-300 px-3 py-2 text-center text-sm sm:text-base hidden sm:table-cell">Score Bleu</th>
+                            <th class="border border-gray-300 px-3 py-2 text-center text-sm sm:text-base hidden sm:table-cell">Score Vert</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for match in matches %}
                             <tr class="border-t border-gray-200 hover:bg-gray-50">
-                                <td class="border border-gray-300 px-4 py-2 text-center">{{ match.enc_id }}</td>
-                                <td class="border border-gray-300 px-4 py-2 text-blue-600 text-center">{{ match.blue_team_name }}</td>
-                                <td class="border border-gray-300 px-4 py-2 text-green-600 text-center">{{ match.green_team_name }}</td>
-                                <td class="border border-gray-300 px-4 py-2 text-center">{{ match.score_blue ?? 'NULL' }}</td>
-                                <td class="border border-gray-300 px-4 py-2 text-center">{{ match.score_green ?? 'NULL' }}</td>
+                                <td class="border border-gray-300 px-3 py-2 text-center text-sm sm:text-base">{{ match.enc_id }}</td>
+                                <td class="border border-gray-300 px-3 py-2 text-blue-600 text-center text-sm sm:text-base">{{ match.blue_team_name }}</td>
+                                <td class="border border-gray-300 px-3 py-2 text-green-600 text-center text-sm sm:text-base">{{ match.green_team_name }}</td>
+                                <!-- Colonnes masquées sur petits écrans -->
+                                <td class="border border-gray-300 px-3 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{ match.score_blue ?? 'NULL' }}</td>
+                                <td class="border border-gray-300 px-3 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{ match.score_green ?? 'NULL' }}</td>
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="5" class="px-4 py-2 text-center text-gray-500">
+                                <td colspan="5" class="px-3 py-2 text-center text-gray-500 text-sm sm:text-base">
                                     Aucune rencontre n'est programmée pour le moment.
                                 </td>
                             </tr>
                         {% endfor %}
                     </tbody>
-
                 </table>
             </div>
         </div>
