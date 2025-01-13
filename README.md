@@ -48,6 +48,11 @@ Install PHP_CodeSniffer, a tool that checks PSR conventions
 For example, a command to verify PSR-17: 
 `vendor/bin/phpcs --standard=PSR17 ~/SaeRobocup/sae3.01_siterobot/SiteRobotcup` 
 
+### 1.3 All versions
+- Symfony version 7.2  
+- Tailwindcss 3.4.17  
+- Python 3.12.3  
+- PhpMyAdmin 5.2.1deb1  
 
 ## 2. Installation and Launching the Project <a id="2"></a>
 
