@@ -290,7 +290,7 @@ END;
 DELIMITER ;
 
 -- vue pour les données du classement
-CREATE or REPLACE VIEW team_stats AS
+CREATE OR REPLACE VIEW team_stats_with_forfeit AS
 SELECT 
     base.team_id,
     base.team_name,
@@ -348,7 +348,9 @@ FROM
             END
         ) AS average_score
     FROM T_TEAM_TEM T
-    LEFT JOIN T_ENCOUNTER_ENC E ON T.TEM_ID = E.TEM_ID_BLUE OR T.TEM_ID = E.TEM_ID_GREEN
+    LEFT JOIN T_ENCOUNTER_ENC E 
+        ON T.TEM_ID = E.TEM_ID_BLUE OR T.TEM_ID = E.TEM_ID_GREEN
     GROUP BY T.TEM_ID, T.TEM_NAME
     ) AS base;
+
 
