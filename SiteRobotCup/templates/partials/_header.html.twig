@@ -89,33 +89,39 @@ document.addEventListener('DOMContentLoaded', function() {
 // Réinitialise le menu burger
 function resetMenu() {
     const mobileMenu = document.getElementById('mobileMenu');
+    const burgerIcon = document.getElementById('burgerIcon');
     const burgerPath = document.getElementById('burgerPath');
-    
-    // Fermeture du menu burger
-    mobileMenu.classList.add('max-h-0');
-    mobileMenu.classList.add('opacity-0');
-    mobileMenu.classList.remove('max-h-screen');
-    mobileMenu.classList.remove('opacity-100');
-    
-    // Réinitialise l'icône burger en burger
+
+    mobileMenu.classList.add('max-h-0', 'opacity-0');
+    mobileMenu.classList.remove('max-h-screen', 'opacity-100');
+
     burgerPath.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
+    burgerIcon.classList.remove('animate-spin');
 }
 
-// Gestion du menu burger
+// Gestion du menu burger avec rotation
 document.getElementById('burgerMenuButton').addEventListener('click', function() {
     const mobileMenu = document.getElementById('mobileMenu');
+    const burgerIcon = document.getElementById('burgerIcon');
     const burgerPath = document.getElementById('burgerPath');
-    
+
     mobileMenu.classList.toggle('max-h-0');
     mobileMenu.classList.toggle('opacity-0');
     mobileMenu.classList.toggle('max-h-screen');
     mobileMenu.classList.toggle('opacity-100');
-    
-    // Toggle burger/croix icon
+
+    // Passage de burger à croix avec rotation
     if (burgerPath.getAttribute('d') === 'M4 6h16M4 12h16M4 18h16') {
         burgerPath.setAttribute('d', 'M6 18L18 6M6 6l12 12');
+        burgerIcon.classList.add('animate-spin');
+
+        // Arrêter la rotation 
+        setTimeout(() => {
+            burgerIcon.classList.remove('animate-spin');
+        }, 300);
     } else {
         burgerPath.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
     }
 });
+
 </script>
