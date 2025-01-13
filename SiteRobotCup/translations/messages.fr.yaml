@@ -13,11 +13,12 @@ header:
   scores: "Scores"
   encounters:
     title: "Rencontres"
-    manage: "Gestion des rencontres"
+    manage_encounters: "Gestion des rencontres"
   teams:
     title: "Équipes"
     my_team: "Mon équipe"
     create_team: "Créer une équipe"
+    manage_teams: "Gestion des équipes"
   admin: "Administration"
   users:
     title: "Utilisateurs"
