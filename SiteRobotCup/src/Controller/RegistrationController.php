@@ -102,6 +102,7 @@ class RegistrationController extends AbstractController
         $user->setPassword(
             $passwordHasher->hashPassword($user, $plainPassword)
         );
+        // Remove setCreationDate call since it's handled by database default
 
         $entityManager->persist($user);
         $entityManager->flush();

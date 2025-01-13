@@ -2,33 +2,33 @@
 
 namespace App\Repository;
 
-use App\Entity\Team;
+use App\Entity\TTeamTem;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Team>
+ * @extends ServiceEntityRepository<TTeamTem>
  */
-class TeamRepository extends ServiceEntityRepository
+class TTeamTemRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Team::class);
+        parent::__construct($registry, TTeamTem::class);
     }
 
     public function findByOrderedByScore(): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = 'SELECT * FROM team_stats_with_forfeit ORDER BY total_points DESC, total_wins DESC';
+        $sql = 'SELECT * FROM v_team_statistics ORDER BY total_points DESC, matches_won DESC, total_goals DESC';
         
         return $conn->executeQuery($sql)->fetchAllAssociative();
     }
 
-    public function findWithStatistics(Team $team): ?Team
+    public function findWithStatistics(TTeamTem $team): ?TTeamTem
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = '
-            SELECT * FROM team_stats_with_forfeit 
+            SELECT * FROM team_statistics 
             WHERE team_id = :teamId
         ';
         
@@ -44,7 +44,7 @@ class TeamRepository extends ServiceEntityRepository
     }
 
     //    /**
-    //     * @return Team[] Returns an array of Team objects
+    //     * @return TTeamTem[] Returns an array of TTeamTem objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -58,7 +58,7 @@ class TeamRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Team
+    //    public function findOneBySomeField($value): ?TTeamTem
     //    {
     //        return $this->createQueryBuilder('t')
     //            ->andWhere('t.exampleField = :val')

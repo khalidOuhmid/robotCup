@@ -1,13 +1,13 @@
 /* ----------------------------------------------------------------------------- 
       
-			Génération d'une base de données pour
+			Generation d'une base de donnees pour
 					MySQL
 
 
 
 	Projet : SAE S3.01 - Robot Championship
-	Date de dernière modification : 10/01/2025
-	Auteur : Isadora Bézie
+	Date de derniere modification : 10/01/2025
+	Auteur : Isadora Bezie
 
 	A copier dans phpMyAdmin - dans sa propre base (ex : etu_ibezie)
 
@@ -28,7 +28,7 @@ CREATE TABLE T_TEAM_TEM (
     CMP_ID SMALLINT NOT NULL,
     TEM_NAME CHAR(32) NOT NULL,
     TEM_STRUCT CHAR(32) NULL,
-    TEM_CREATION_DATE DATETIME NOT NULL,
+    TEM_CREATION_DATE DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (TEM_ID)
 );
 
@@ -64,7 +64,7 @@ CREATE TABLE T_USER_USR (
     USR_TYPE CHAR(255) NOT NULL,
     USR_MAIL CHAR(255) NOT NULL,
     USR_PASS VARCHAR(128) NOT NULL,
-    USR_CREATION_DATE DATETIME NOT NULL,
+    USR_CREATION_DATE DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (USR_ID)
 );
 
@@ -288,5 +288,69 @@ END;
 //
 
 DELIMITER ;
+
+-- vue pour les donnÃ©es du classement
+CREATE OR REPLACE VIEW team_stats_with_forfeit AS
+SELECT 
+    base.team_id,
+    base.team_name,
+    IFNULL(base.total_matches, 0) AS total_matches,
+    IFNULL(base.total_wins, 0) AS total_wins,
+    IFNULL(base.total_draws, 0) AS total_draws,
+    IFNULL(base.total_losses, 0) AS total_losses,
+    IFNULL(base.total_points, 0) AS total_points,
+    IFNULL(base.average_score, 0) AS average_score,
+    RANK() OVER (ORDER BY IFNULL(base.total_points, 0) DESC, IFNULL(base.average_score, 0) DESC) AS rank
+FROM 
+    (SELECT 
+        T.TEM_ID AS team_id,
+        T.TEM_NAME AS team_name,
+        COUNT(E.ENC_ID) AS total_matches,
+        SUM(
+            CASE 
+                WHEN (E.TEM_ID_BLUE = T.TEM_ID AND E.ENC_SCORE_BLUE > E.ENC_SCORE_GREEN) OR 
+                     (E.TEM_ID_GREEN = T.TEM_ID AND E.ENC_SCORE_GREEN > E.ENC_SCORE_BLUE) 
+                THEN 1 ELSE 0 
+            END
+        ) AS total_wins,
+        SUM(
+            CASE 
+                WHEN E.ENC_SCORE_BLUE = E.ENC_SCORE_GREEN THEN 1 ELSE 0 
+            END
+        ) AS total_draws,
+        SUM(
+            CASE 
+                WHEN (E.TEM_ID_BLUE = T.TEM_ID AND E.ENC_SCORE_BLUE < E.ENC_SCORE_GREEN) OR 
+                     (E.TEM_ID_GREEN = T.TEM_ID AND E.ENC_SCORE_GREEN < E.ENC_SCORE_BLUE) 
+                THEN 1 ELSE 0 
+            END
+        ) AS total_losses,
+        SUM(
+            CASE 
+                WHEN (E.TEM_ID_BLUE = T.TEM_ID AND E.ENC_SCORE_BLUE = -1) OR 
+                     (E.TEM_ID_GREEN = T.TEM_ID AND E.ENC_SCORE_GREEN = -1) 
+                THEN -1
+                ELSE 
+                    CASE 
+                        WHEN (E.TEM_ID_BLUE = T.TEM_ID AND E.ENC_SCORE_BLUE > E.ENC_SCORE_GREEN) OR 
+                             (E.TEM_ID_GREEN = T.TEM_ID AND E.ENC_SCORE_GREEN > E.ENC_SCORE_BLUE) 
+                        THEN 3
+                        WHEN E.ENC_SCORE_BLUE = E.ENC_SCORE_GREEN THEN 1
+                        ELSE 0
+                    END
+            END
+        ) AS total_points,
+        AVG(
+            CASE 
+                WHEN E.TEM_ID_BLUE = T.TEM_ID THEN E.ENC_SCORE_BLUE
+                WHEN E.TEM_ID_GREEN = T.TEM_ID THEN E.ENC_SCORE_GREEN
+                ELSE NULL
+            END
+        ) AS average_score
+    FROM T_TEAM_TEM T
+    LEFT JOIN T_ENCOUNTER_ENC E 
+        ON T.TEM_ID = E.TEM_ID_BLUE OR T.TEM_ID = E.TEM_ID_GREEN
+    GROUP BY T.TEM_ID, T.TEM_NAME
+    ) AS base;
 
 

@@ -37,22 +37,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string|null The type of user (ADMIN or USER)
      */
-    #[Assert\Choice(choices: self::USER_TYPES, message: 'Type utilisateur invalide')]
     #[ORM\Column(name: "USR_TYPE", type: "string", length: 255)]
-    private ?string $type = self::DEFAULT_TYPE;
+    #[Assert\Choice(choices: ['ADMIN', 'USER'], message: 'Type utilisateur invalide')]
+    private ?string $type = 'USER';
 
     /**
      * @var string|null The email address of the user
      */
-    #[Assert\Email(message: 'L\'adresse email {{ value }} n\'est pas valide')]
-    #[Assert\NotBlank(message: 'L\'email est requis')]
     #[ORM\Column(name: "USR_MAIL", type: "string", length: 255, unique: true)]
+    #[Assert\NotBlank(message: 'L\'email est requis')]
+    #[Assert\Email(message: 'L\'adresse email {{ value }} n\'est pas valide')]
     private ?string $email = null;
 
     /**
      * @var string|null The hashed password
      */
-    #[Assert\NotBlank(message: 'Le mot de passe est requis')]
     #[ORM\Column(name: "USR_PASS", type: "string", length: 128)]
     private ?string $password = null;
 
@@ -60,7 +59,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var \DateTimeInterface|null The creation date of the user account
      */
     #[ORM\Column(name: 'USR_CREATION_DATE', type: Types::DATETIME_MUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
-    private ?\DateTimeInterface $creationDate;
+    private ?\DateTimeInterface $creationDate = null;
 
     /**
      * @var Collection<int, Team> Collection of teams owned by the user
@@ -69,12 +68,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $teams;
 
     /**
-     * Constructor initializes collections and sets default values.
+     * Constructor initializes collections
      */
     public function __construct()
     {
         $this->teams = new ArrayCollection();
-        $this->creationDate = new \DateTime();
     }
 
     /**
@@ -169,7 +167,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @param \DateTimeInterface $creationDate
      * @return self
      */
-    public function setCreationDate(\DateTimeInterface $creationDate): self
+    public function setCreationDate(?\DateTimeInterface $creationDate): self
     {
         $this->creationDate = $creationDate;
         return $this;
