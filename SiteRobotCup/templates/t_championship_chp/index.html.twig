@@ -18,8 +18,8 @@
         {% for t_championship_chp in t_championship_chps %}
             <tr>
                 <td>{{ t_championship_chp.id }}</td>
-                <td>{{ t_championship_chp.name }}</td>
-                <td>{{ t_championship_chp.date ? t_championship_chp.date|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ t_championship_chp.Cmpame }}</td>
+                <td>{{ t_championship_chp.Cmpdate ? t_championship_chp.Cmpdate:|date('Y-m-d H:i:s') : '' }}</td>
                 <td>
                     <a href="{{ path('app_t_championship_chp_show', {'id': t_championship_chp.id}) }}">show</a>
                     <a href="{{ path('app_t_championship_chp_edit', {'id': t_championship_chp.id}) }}">edit</a>

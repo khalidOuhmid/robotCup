@@ -5,7 +5,7 @@ security:
     providers:
         app_user_provider:
             entity:
-                class: App\Entity\TUserUsr
+                class: App\Entity\User
                 property: email
 
     firewalls:
@@ -33,10 +33,11 @@ security:
             logout:
                 path: app_logout
                 target: app_login
-                
+            switch_user: { role: ROLE_ALLOWED_TO_SWITCH, parameter: _switch_user }      
 
 
     access_control:
+        - { path: ^/$, roles: PUBLIC_ACCESS }  # Permettre l'accès à la page d'accueil
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/logout, roles: PUBLIC_ACCESS }
@@ -45,5 +46,5 @@ security:
         - { path: ^/, roles: ROLE_USER }
 
     role_hierarchy:
-        ROLE_ADMIN: [ROLE_USER]
+        ROLE_ADMIN: [ROLE_USER, ROLE_ALLOWED_TO_SWITCH]
         ROLE_ORGA: [ROLE_USER]
