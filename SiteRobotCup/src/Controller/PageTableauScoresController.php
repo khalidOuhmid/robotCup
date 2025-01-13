@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Repository\TeamRepository;
 
 class PageTableauScoresController extends AbstractController
 {
@@ -46,10 +47,50 @@ class PageTableauScoresController extends AbstractController
             $offset
         );
 
+        $teams = $this->prepareTeamsData($teamRepository);
+
         return $this->render('page_tableau_scores/index.html.twig', [
             'teams' => $teams,
             'page' => $page,
             'totalPages' => $totalPages
         ]);
+    }
+
+    /**
+     * Transforms raw team data into display format.
+     *
+     * @param array $data Raw team data
+     * @param int $index Array index for ranking
+     * @return array Transformed team data
+     */
+    private function transformTeamData(array $data, int $index): array
+    {
+        return [
+            'rank' => $index + 1,
+            'name' => $data['team_name'],
+            'matches_played' => $data['total_matches'],
+            'matches_won' => $data['total_wins'],
+            'matches_drawn' => $data['total_draws'],
+            'matches_lost' => $data['total_losses'],
+            'goals' => $data['average_score'],
+            'points' => $data['total_points'],
+        ];
+    }
+
+    /**
+     * Prepares team data for display.
+     *
+     * @param TeamRepository $teamRepository
+     * @return array
+     */
+    private function prepareTeamsData(TeamRepository $teamRepository): array
+    {
+        $teamsData = $teamRepository->findByOrderedByScore();
+        
+        return array_map(
+            [$this, 'transformTeamData'],
+            $teamsData,
+            array_keys($teamsData)
+        );
     }
 }

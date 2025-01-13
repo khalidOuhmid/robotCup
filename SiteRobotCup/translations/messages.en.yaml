@@ -13,23 +13,25 @@ header:
   scores: "Scores"
   encounters:
     title: "Encounters"
-    manage: "Manage encounters"
+    manage_encounters: "Manage encounters"
   teams:
     title: "Teams"
     my_team: "My team"
     create_team: "Create a team"
+    manage_teams: "Manage teams"
   admin: "Admin"
   users:
     title: "Users"
     manage_accounts: "Manage accounts"
   time_slots:
     title: "Time slots"
-    manage: "Manage time slots"
+    manage_time_slots: "Manage time slots"
   enter_scores:
     title: "Enter scores"
     manage_results: "Manage results"
   fields:
     title: "Fields"
+    manage_fields: "Manage fields"
   logout: "Logout"
   login: "Login"
 
