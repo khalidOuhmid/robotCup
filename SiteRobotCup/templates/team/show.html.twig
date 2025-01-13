@@ -10,21 +10,24 @@
     
 		<!-- Formulaire de création d'équipe -->
 		{{ form_start(form) }}
-		<div class="flex items-center justify-between gap-4 bg-slate-200 px-4 p-4 rounded-b-lg">
-            <div class="flex flex-row gap-4">
-                {{ form_widget(form.name, { 'attr': { 'placeholder': 'Nom', 'class': 'bg-white w-5/12 py-2 p-3 rounded-lg' } }) }}
-                <input type="text" placeholder="Structure" class="bg-white w-5/12 py-2 p-3 text-gray-500 rounded-lg"/>
+		<div class="flex md:flex-row sm:w-full flex-col items-center justify-between gap-4 bg-slate-200 px-4 p-4 rounded-b-lg">
+            <div class="flex flex-col sm:flex-row items-center justify-around gap-4 w-full sm:w-10/12 md:w-8/12 lg:w-6/12 xl:w-5/12">
+                {{ form_widget(form.name, { 'attr': { 'placeholder': 'Nom', 'class': 'bg-white w-full py-2 p-3 text-gray-500 rounded-lg' } }) }}
+                {{ form_widget(form.structure, { 'attr': { 'placeholder': 'Structure', 'class': 'bg-white w-full py-2 p-3 text-gray-500 rounded-lg' } }) }}
+                {{ form_widget(form.competition, { 'attr': { 'class': 'bg-white w-full py-2 p-3 text-gray-500 rounded-lg' } }) }}
             </div>
-            <button type="submit" class="bg-green-400 p-3 hover:cursor-pointer focus:bg-green-500 px-4 py-2 rounded-lg">Créer une équipe</button>
+            <button type="submit" class="bg-green-400 py-2 px-4 w-full sm:w-8/12 md:w-6/12 lg:w-4/12 xl:w-2/12 max-w-md hover:cursor-pointer focus:bg-green-500 rounded-lg">Créer une équipe</button>
         </div>
     {{ form_end(form) }}
 
     <!-- Liste des équipes -->
-        <div class="mt-10">
+        <div class="mt-10 flex justify-center items-center">
             <table class="min-w-full table-auto bg-white shadow-lg rounded-lg overflow-hidden">
                 <thead>
                     <tr class="bg-sky-800 text-white">
                         <th class="p-2">Nom de l'équipe</th>
+                        <th class="p-2">Compétition</th>
+                        <th class="p-2">Structure</th>
                         <th class="p-2">Actions</th>
                     </tr>
                 </thead>
@@ -32,26 +35,32 @@
                     {% for team in teams %}
                         <tr class="bg-white hover:bg-gray-50 border-t border-gray-200 text-center">
                             <td class="p-2">{{ team.name }}</td>
+                            <td class="p-2">{{ team.competition.cmpName }}</td>
+                            <td class="p-2">{{ team.structure ?: 'Non spécifiée' }}</td>
                             <td class="p-2 space-y-2 flex flex-col items-center">
-                                <!-- Lien pour ajouter des membres -->
-                                <a href="#" class="text-blue-500 hover:underline">
-                                    Inscrire à un championnat
-                                </a>
-
-                                <!-- Lien pour ajouter des membres -->
-                                <a href="{{ path('app_team_add_member', { userId: user.id, teamId: team.id }) }}" class="text-blue-500 hover:underline">
-                                    Ajouter des membres
-                                </a>
-
-                                <!-- Lien pour afficher ou masquer les membres -->
-                                {% if teamToShow and teamToShow.id == team.id %}
-                                    <a href="{{ path('app_team_show', { id: user.id }) }}" class="text-red-500 hover:underline">
-                                        Masquer les membres
+                                {% if is_granted('ROLE_ADMIN') or team.user.id == app.user.id %}
+                                    <!-- Lien pour inscrire au championnat -->
+                                    <a href="{{ path('app_team_register_championship', {'teamId': team.id}) }}" class="text-blue-500 hover:underline">
+                                        Inscrire à un championnat
                                     </a>
+
+                                    <!-- Lien pour ajouter des membres -->
+                                    <a href="{{ path('app_team_add_member', { userId: app.user.id, teamId: team.id }) }}" class="text-blue-500 hover:underline">
+                                        Ajouter des membres
+                                    </a>
+
+                                    <!-- Lien pour afficher/masquer les membres -->
+                                    {% if teamToShow and teamToShow.id == team.id %}
+                                        <a href="{{ path('app_team_show', { id: user.id }) }}" class="text-red-500 hover:underline">
+                                            Masquer les membres
+                                        </a>
+                                    {% else %}
+                                        <a href="{{ path('app_team_show', { id: user.id, teamId: team.id }) }}" class="text-blue-500 hover:underline">
+                                            Voir les membres
+                                        </a>
+                                    {% endif %}
                                 {% else %}
-                                    <a href="{{ path('app_team_show', { id: user.id, teamId: team.id }) }}" class="text-blue-500 hover:underline">
-                                        Voir les membres
-                                    </a>
+                                    <span class="text-gray-400">Aucune action disponible</span>
                                 {% endif %}
                             </td>
                         </tr>
@@ -59,7 +68,7 @@
                         <!-- Liste des membres -->
                         {% if teamToShow and teamToShow.id == team.id %}
                             <tr class="bg-gray-50">
-                                <td colspan="2" class="p-2">
+                                <td colspan="4" class="p-2">
                                     <ul class="member-list space-y-2">
                                         {% for member in teamToShow.members %}
                                             <li class="bg-slate-200 p-2 rounded text-center">{{ member.name }}</li>
@@ -72,7 +81,7 @@
                         {% endif %}
                     {% else %}
                         <tr>
-                            <td colspan="2" class="border border-gray-300 p-2 text-center text-gray-500">
+                            <td colspan="4" class="border border-gray-300 p-2 text-center text-gray-500">
                                 Aucune équipe créée.
                             </td>
                         </tr>

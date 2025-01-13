@@ -1,37 +1,127 @@
-<header class="bg-sky-900 text-white">
-  <nav class="container mx-auto flex items-center justify-between p-4">
-    <!-- Logo -->
-    <a href="{{ path('app_default') }}" class="text-3xl font-bold hover:text-gray-400">
-      RoboCup
-    </a>
-
-    <!-- Desktop Navigation -->
-    <div class=" md:flex space-x-4">
-        <a href="{{ path('app_default') }}" class="text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">Accueil</a>
-        {# Afficher le lien "Scores" uniquement si l'utilisateur n'est pas connecté #}
-        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-            <a href="{{ path('app_page_tableau_scores') }}" class="text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">Scores</a>
-            <a href="{{ path('app_encounters') }}" class="text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">Rencontres</a>
-            <a href="{{ path('app_team_show', { id: app.user.id }) }}" class="text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">Equipes</a>
-        {% endif %}
-        {% if is_granted('ROLE_ADMIN') %}
-            <a href="{{ path('app_admin_users') }}" class="text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">
-                Administration
-            </a>
-            <a href="{{ path('app_panel_scores_admin') }}" class="text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">
-                Entrez les Scores
-            </a>
-        {% endif %}
-        <a href="{% if is_granted('IS_AUTHENTICATED_FULLY') %}{{ path('app_logout') }}{% else %}{{ path('app_login') }}{% endif %}" 
-           class="flex items-center text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">
-            {% if is_granted('IS_AUTHENTICATED_FULLY') %}Se déconnecter{% else %}Se connecter{% endif %}
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 ml-2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25" />
-            </svg>
+<header class="bg-sky-900 text-white sticky top-0 z-50 shadow-lg">
+  <nav class="container mx-auto">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+      <div class="flex items-center justify-between space-x-8">
+        
+        {# Logo avec bouton #}
+        <a href="{{ path('app_default') }}" 
+           class="flex items-center px-4 py-2 rounded-lg hover:bg-sky-800 transition-all duration-200">
+          <span class="text-2xl font-bold bg-gradient-to-r from-sky-400 to-sky-200 bg-clip-text text-transparent">
+            RoboCup
+          </span>
         </a>
-      
+
+        {# Menu burger pour mobile #}
+        <div class="md:hidden">
+          <button id="burgerMenuButton" class="text-white focus:outline-none">
+            <svg id="burgerIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path id="burgerPath" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+        </div>
+
+        {# Navigation principale pour les écrans large #}
+        <div class="hidden md:flex items-center space-x-4">
+          {% set navButtons = {
+            'app_default': {
+              'label': 'Accueil',
+              'icon': 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'
+            },
+            'app_page_tableau_scores': {
+              'label': 'Scores',
+              'icon': 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'
+            },
+            'app_encounters': {
+              'label': 'Rencontres',
+              'icon': 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'
+            }
+          } %}
+
+          {% for route, button in navButtons %}
+            <a href="{{ path(route) }}" 
+               class="flex items-center px-4 py-2 rounded-lg text-sm font-medium 
+                      {% if app.request.get('_route') == route %}
+                        bg-sky-800 text-white shadow-inner
+                      {% else %}
+                        text-sky-100 hover:bg-sky-800 hover:text-white
+                      {% endif %}
+                      transition-all duration-200">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ button.icon }}"/>
+              </svg>
+              {{ button.label }}
+            </a>
+          {% endfor %}
+        </div>
+
+        {# Menu mobile avec éléments cachés par défaut #}
+        <div id="mobileMenu" class="md:hidden absolute top-16 left-0 w-full bg-sky-900 text-white shadow-lg max-h-0 opacity-0 overflow-hidden transition-all duration-300 ease-out rounded-xl">
+          {% for route, button in navButtons %}
+            <a href="{{ path(route) }}" 
+               class="flex items-center justify-center px-4 py-2 text-sm font-medium text-sky-100 hover:bg-sky-800 hover:text-white transition-all duration-200"
+               onclick="closeMobileMenu()">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ button.icon }}"/>
+              </svg>
+              {{ button.label }}
+            </a>
+          {% endfor %}
+        </div>
+
+        {# Connexion/Déconnexion #}
+        <a href="{% if is_granted('IS_AUTHENTICATED_FULLY') %}{{ path('app_logout') }}{% else %}{{ path('app_login') }}{% endif %}" 
+           class="flex items-center px-4 py-2 rounded-lg text-sm font-medium text-sky-100 hover:bg-sky-800 hover:text-white transition-all duration-200">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+          </svg>
+          {% if is_granted('IS_AUTHENTICATED_FULLY') %}Se déconnecter{% else %}Se connecter{% endif %}
+        </a>
+      </div>
     </div>
   </nav>
-
-
 </header>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    resetMenu();
+});
+
+// Réinitialise le menu burger
+function resetMenu() {
+    const mobileMenu = document.getElementById('mobileMenu');
+    const burgerIcon = document.getElementById('burgerIcon');
+    const burgerPath = document.getElementById('burgerPath');
+
+    mobileMenu.classList.add('max-h-0', 'opacity-0');
+    mobileMenu.classList.remove('max-h-screen', 'opacity-100');
+
+    burgerPath.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
+    burgerIcon.classList.remove('animate-spin');
+}
+
+// Gestion du menu burger avec rotation
+document.getElementById('burgerMenuButton').addEventListener('click', function() {
+    const mobileMenu = document.getElementById('mobileMenu');
+    const burgerIcon = document.getElementById('burgerIcon');
+    const burgerPath = document.getElementById('burgerPath');
+
+    mobileMenu.classList.toggle('max-h-0');
+    mobileMenu.classList.toggle('opacity-0');
+    mobileMenu.classList.toggle('max-h-screen');
+    mobileMenu.classList.toggle('opacity-100');
+
+    // Passage de burger à croix avec rotation
+    if (burgerPath.getAttribute('d') === 'M4 6h16M4 12h16M4 18h16') {
+        burgerPath.setAttribute('d', 'M6 18L18 6M6 6l12 12');
+        burgerIcon.classList.add('animate-spin');
+
+        // Arrêter la rotation 
+        setTimeout(() => {
+            burgerIcon.classList.remove('animate-spin');
+        }, 300);
+    } else {
+        burgerPath.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
+    }
+});
+
+</script>
