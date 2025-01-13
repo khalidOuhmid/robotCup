@@ -107,6 +107,17 @@
             {{ 'header.login' | trans }}
           {% endif %}
         </a>
+        <!-- Bouton retour à l'interface admin lors d'une incarnation -->
+        {% if is_granted('IS_IMPERSONATOR') %}
+          <form action="{{ path('impersonation_exit') }}" method="post">
+              <button type="submit" class="bg-green-400 hover:bg-green-500 rounded p-4 m-4 font-semibold">
+                  Retour administration
+              </button>
+          </form>
+        {% endif %}
+
+
+        
 
         </div>
       </div>
