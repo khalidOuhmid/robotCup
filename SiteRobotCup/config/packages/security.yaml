@@ -1,34 +1,50 @@
 security:
-    # Configuration des hashers de mots de passe
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
-    # Configuration des providers d'utilisateurs
     providers:
         app_user_provider:
             entity:
-                class: App\Entity\TUserUsr  # Assure-toi que cette classe existe et est correcte
-                property: email  # Assure-toi que l'attribut email existe dans l'entité TUserUsr
+                class: App\Entity\User
+                property: email
 
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-
+        
         main:
+        
             lazy: true
             provider: app_user_provider
             custom_authenticator: App\Security\LoginAuthenticator
-            logout:
-                path: app_logout
-                
+            
+            entry_point: form_login
             form_login:
+                enable_csrf: true
+                csrf_parameter: _csrf_token
+                csrf_token_id: authenticate
                 login_path: app_login
                 check_path: app_login
-                default_target_path: app_page_tableau_scores
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /
+            logout:
+                path: app_logout
+                target: app_login
+            switch_user: { role: ROLE_ALLOWED_TO_SWITCH, parameter: _switch_user }      
 
-            entry_point: form_login
 
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/$, roles: PUBLIC_ACCESS }  # Permettre l'accès à la page d'accueil
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/logout, roles: PUBLIC_ACCESS }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/, roles: ROLE_USER }
+
+    role_hierarchy:
+        ROLE_ADMIN: [ROLE_USER, ROLE_ALLOWED_TO_SWITCH]
+        ROLE_ORGA: [ROLE_USER]

@@ -1,0 +1,159 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des utilisateurs{% endblock %}
+
+{% block body %}
+<div class="container mx-auto mt-8">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">Gestion des utilisateurs</h1>
+        <a href="{{ path('app_t_user_usr_new') }}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+            Ajouter un utilisateur
+        </a>
+    </div>
+
+    <div class="mb-6">
+        <div class="flex gap-4">
+            <input type="text" 
+                   id="searchInput" 
+                   placeholder="Rechercher un utilisateur..." 
+                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-6 py-3 text-left">Email</th>
+                    <th class="px-6 py-3 text-left">Type</th>
+                    <th class="px-6 py-3 text-left">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for user in users %}
+                    <tr>
+                        <td class="px-6 py-4">{{ user.email }}</td>
+                        <td class="px-6 py-4">{{ user.type }}</td>
+                        <td class="px-6 py-4">
+                            <a href="{{ path('app_default', { '_switch_user': user.email }) }}"class="underline mx-3">Incarner</a>
+
+                            <button onclick="openEditModal({{ user.id }}, '{{ user.email }}', '{{ user.type }}')" 
+                                    class="bg-blue-400 text-white px-3 py-1 rounded mr-2 hover:bg-blue-500">
+                                Modifier
+                            </button>
+                            
+                            <form method="post" action="{{ path('app_admin_user_delete', {id: user.id}) }}" 
+                                  class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                <button class="bg-red-400 text-white px-3 py-1 rounded hover:bg-red-500"">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3" class="px-6 py-4 text-center">Aucun utilisateur trouvé</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal d'édition -->
+<div id="editModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Modifier l'utilisateur</h3>
+            <form id="editForm" method="post" action="">
+                <input type="hidden" name="_token" id="editToken">
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
+                        Email
+                    </label>
+                    <input type="email" name="email" id="editEmail" 
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
+                        Nouveau mot de passe (laisser vide pour ne pas changer)
+                    </label>
+                    <input type="password" name="password" id="editPassword" 
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="type">
+                        Type
+                    </label>
+                    <select name="type" id="editType" 
+                            class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        {% for type in available_types %}
+                            <option value="{{ type }}">{{ type }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="button" onclick="closeEditModal()" 
+                            class="bg-gray-500 text-white px-4 py-2 rounded mr-2">
+                        Annuler
+                    </button>
+                    <button type="submit" 
+                            class="bg-blue-500 text-white px-4 py-2 rounded">
+                        Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function openEditModal(userId, email, type) {
+    document.getElementById('editModal').classList.remove('hidden');
+    document.getElementById('editForm').action = "{{ path('app_admin_user_edit', {id: 'USER_ID'}) }}".replace('USER_ID', userId);
+    document.getElementById('editEmail').value = email;
+    document.getElementById('editType').value = type;
+    document.getElementById('editPassword').value = '';
+
+    // Ajout d'un event listener pour le formulaire
+    document.getElementById('editForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        this.submit();
+    });
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').classList.add('hidden');
+}
+
+// Ajout de la fonction de recherche
+function filterTable() {
+    const searchInput = document.getElementById('searchInput');
+    const filter = searchInput.value.toLowerCase();
+    const table = document.querySelector('table');
+    const tr = table.getElementsByTagName('tr');
+
+    for (let i = 1; i < tr.length; i++) { // Start from 1 to skip header
+        const td = tr[i].getElementsByTagName('td');
+        let txtValue = '';
+        
+        // Concatenate all cell values
+        for (let j = 0; j < td.length - 1; j++) { // -1 to exclude actions column
+            txtValue += td[j].textContent || td[j].innerText;
+        }
+
+        if (txtValue.toLowerCase().indexOf(filter) > -1) {
+            tr[i].style.display = '';
+        } else {
+            tr[i].style.display = 'none';
+        }
+    }
+}
+
+// Add event listener for search input
+document.getElementById('searchInput').addEventListener('keyup', filterTable);
+</script>
+{% endblock %}
