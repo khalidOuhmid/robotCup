@@ -3,7 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Competition;
+use App\Entity\Tournament;
+use App\Entity\Championship;
 use App\Repository\UserRepository;
+use App\Form\CompetitionType;
+use App\Service\TournamentGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -209,5 +214,43 @@ class AdminController extends AbstractController
                 'type' => $user->getType(),
             ];
         }, $users);
+    }
+
+    #[Route('/admin/competition/new', name: 'app_admin_competition_new')]
+    public function new(
+        Request $request, 
+        EntityManagerInterface $entityManager,
+        TournamentGenerator $tournamentGenerator
+    ): Response {
+        $competition = new Competition();
+        $form = $this->createForm(CompetitionType::class, $competition);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Création du championnat
+            $championship = new Championship();
+            $championship->setCompetition($competition);
+            
+            $entityManager->persist($competition);
+            $entityManager->persist($championship);
+
+            // Si le tournoi est demandé
+            if ($form->get('includeTournament')->getData()) {
+                $tournament = new Tournament();
+                $tournament->setCompetition($competition);
+                $tournament->setIncludeThirdPlace($form->get('includeThirdPlace')->getData());
+                
+                $entityManager->persist($tournament);
+            }
+
+            $entityManager->flush();
+
+            $this->addFlash('success', 'La compétition a été créée avec succès.');
+            return $this->redirectToRoute('app_admin_competitions');
+        }
+
+        return $this->render('admin/competition/new.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 }

@@ -26,14 +26,14 @@ services:
             - '../src/Kernel.php'
 
     # Remove duplicate LoginAuthenticator definition and simplify to:
-    App\Security\LoginAuthenticator:
+    App\Security\LoginAuthenticator:    
         public: true
         arguments:
             $urlGenerator: '@router'
             
-    App\Service\ChampionshipPlanner:
+    App\Service\ChampionshipScheduler:
         arguments:
-            $db: '@doctrine.dbal.default_connection'
+            $entityManager: '@doctrine.orm.entity_manager'
 
     # Controllers are registered as services
     App\Controller\:

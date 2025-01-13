@@ -67,7 +67,7 @@ class PageTableScoresController extends AbstractController
             'matches_won' => $data['total_wins'],
             'matches_drawn' => $data['total_draws'],
             'matches_lost' => $data['total_losses'],
-            'goals' => $data['average_score'],  
+            'goals' => $data['average_score'],
             'points' => $data['total_points'],
         ];
     }
