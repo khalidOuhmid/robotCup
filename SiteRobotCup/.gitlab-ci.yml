@@ -1,0 +1,79 @@
+image: php:8.2
+
+variables:
+  COMPOSER_HOME: '.composer'
+  APP_ENV: 'test'
+  DATABASE_URL: 'sqlite:///%kernel.project_dir%/var/test.db'
+
+cache:
+  paths:
+    - vendor/
+    - .composer/
+    - node_modules/
+    - public/build/
+
+before_script:
+  - apt-get update && apt-get install -y git unzip nodejs npm
+  - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+  - composer install
+
+stages:
+  - setup
+  - test
+  - quality
+  - deploy
+
+install_dependencies:
+  stage: setup
+  script:
+    - php -v
+    - composer install --prefer-dist --no-ansi --no-interaction --no-progress
+    - npm install
+  artifacts:
+    paths:
+      - vendor/
+      - node_modules/
+    expire_in: 1 hour
+
+phpunit:
+  stage: test
+  dependencies:
+    - install_dependencies
+  script:
+    - ./vendor/bin/phpunit --configuration phpunit.xml.dist --coverage-text --colors=never
+
+php-cs-fixer:
+  stage: quality
+  dependencies:
+    - install_dependencies
+  script:
+    - ./vendor/bin/php-cs-fixer fix --diff --dry-run --using-cache=no
+
+phpstan:
+  stage: quality
+  dependencies:
+    - install_dependencies
+  script:
+    - ./vendor/bin/phpstan analyse src tests --level=5
+
+unit-test:
+  stage: test
+  dependencies:
+    - install_dependencies
+  script:
+    - ./vendor/bin/phpunit --configuration phpunit.xml.dist --coverage-text --colors=never
+
+php-cs:
+  stage: quality
+  dependencies:
+    - install_dependencies
+  script:
+    - ./vendor/bin/php-cs-fixer fix --diff --dry-run --using-cache=no
+
+doctrine-validate:
+  stage: test
+  dependencies:
+    - install_dependencies
+  script:
+    - php bin/console doctrine:schema:validate --skip-sync
+    - php bin/console doctrine:schema:update --force --env=test
