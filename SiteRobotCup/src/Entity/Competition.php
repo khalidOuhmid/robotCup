@@ -33,14 +33,12 @@ class Competition
     /**
      * @var \DateTimeInterface|null The start date of the competition
      */
-    #[Assert\NotNull(message: 'La date de début est requise')]
     #[ORM\Column(name: 'CMP_DATE_BEGIN', type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $cmpDateBegin = null;
 
     /**
      * @var \DateTimeInterface|null The end date of the competition
      */
-    #[Assert\NotNull(message: 'La date de fin est requise')]
     #[ORM\Column(name: 'CMP_DATE_END', type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $cmpDateEnd = null;
 
