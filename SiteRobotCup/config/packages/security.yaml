@@ -38,6 +38,7 @@ security:
 
     access_control:
         - { path: ^/$, roles: PUBLIC_ACCESS }  # Permettre l'accès à la page d'accueil
+        - { path: ^/set-language, roles: PUBLIC_ACCESS } # Permettre le changement de langue sans authentification
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/logout, roles: PUBLIC_ACCESS }

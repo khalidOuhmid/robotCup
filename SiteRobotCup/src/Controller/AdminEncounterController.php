@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class EncounterController extends AbstractController
+class AdminEncounterController extends AbstractController
 {
     #[Route('/admin/encounter/generateChampionship', name: 'app_admin_encounter_generate_championship')]
     public function generateChampionship(
