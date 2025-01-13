@@ -40,6 +40,17 @@
               {{ label }}
             </a>
           {% endfor %}
+
+          {# Lien Créer mon équipe pour utilisateurs connectés #}
+          {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            <a href="{{ path('app_team_new') }}" 
+               class="flex items-center px-4 py-2 rounded-lg text-sm font-medium text-sky-100 hover:bg-sky-800 hover:text-white transition-all duration-200">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+              </svg>
+              Créer mon équipe
+            </a>
+          {% endif %}
           
           {# Boutons Admin si utilisateur est ROLE_ADMIN #}
           {% if is_granted('ROLE_ADMIN') %}
@@ -96,6 +107,18 @@
             {{ label }}
           </a>
         {% endfor %}
+
+        {# Lien Créer mon équipe pour mobile #}
+        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+          <a href="{{ path('app_team_new') }}" 
+             class="flex justify-center text-center items-center px-4 py-2 text-sm font-medium text-sky-100 hover:bg-sky-800 transition-all duration-200"
+             onclick="closeMobileMenu()">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+            Créer mon équipe
+          </a>
+        {% endif %}
         
         {# Menu Admin pour mobile #}
         {% if is_granted('ROLE_ADMIN') %}
