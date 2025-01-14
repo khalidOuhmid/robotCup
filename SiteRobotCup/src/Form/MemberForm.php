@@ -17,10 +17,6 @@ class MemberForm extends AbstractType
             ->add('name')
             ->add('surname')
             ->add('email')
-            ->add('team', EntityType::class, [
-                'class' => Team::class,
-                'choice_label' => 'id',
-            ])
         ;
     }
 
