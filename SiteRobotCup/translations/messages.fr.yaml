@@ -47,7 +47,7 @@ home:
                     sur les aspects aussi bien matériels que logiciels, un axe spécifique du Symposium s’intéresse aux développements « ouverts » (open source)."
   ranking: 
     title: "Classement des équipes"
-    team: "Nom de l'équipe"
+    team_name: "Nom de l'équipe"
     encounters_played: "Rencontres jouée"
     encounters_won: "Rencontres gagnée"
     encounters_draw: "Rencontres nul"
