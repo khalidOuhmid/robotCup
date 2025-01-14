@@ -1,3 +1,7 @@
+# languages names
+fr: "French"
+en: "English"
+
 # global translations
 global:
   warning_window_size_table: "To see all columns, please switch to landscape mode or maximize the window on a computer."
@@ -55,8 +59,8 @@ home:
     points: "Points"
 
 login:
-  create_account: "Create an account"
+  create_an_account: "Create an account"
   no_account: "You don't have an account ?"
 
 register:
-  already_account: "You already have an account ?"
+  already_have_account: "You already have an account ?"
