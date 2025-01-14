@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Encounter;
 use App\Entity\Field;
 use App\Entity\Team;
+use App\Entity\TimeSlot;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -17,6 +18,10 @@ class EncounterForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('timeSlot', TimeSlotType::class, [
+                'label' => false,
+                'mapped' => true,
+            ])
             ->add('teamBlue', EntityType::class, [
                 'class' => Team::class,
                 'choice_label' => 'name',

@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: FieldRepository::class)]
 #[ORM\Table(name: 'T_FIELD_FLD')]
@@ -22,7 +23,7 @@ class Field
     #[ORM\JoinColumn(name: 'CMP_ID', referencedColumnName: 'CMP_ID', nullable: false)]
     private ?Competition $competition = null;
 
-    #[ORM\Column(name: 'FLD_NAME', type: 'string', length: 32)]
+    #[ORM\Column(name: 'FLD_NAME', type: Types::STRING, length: 32)]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'field', targetEntity: Encounter::class)]

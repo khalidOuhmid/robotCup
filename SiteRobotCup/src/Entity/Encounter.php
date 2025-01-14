@@ -99,14 +99,9 @@ class Encounter
         propertyPath: "dateEnd",
         message: "La date de début doit être antérieure à la date de fin"
     )]
-    #[ORM\Column(name: 'ENC_DATE_BEGIN', type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $dateBegin = null;
-
-    /**
-     * @var \DateTimeInterface|null The end date and time
-     */
-    #[ORM\Column(name: 'ENC_DATE_END', type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $dateEnd = null;
+    #[ORM\ManyToOne(targetEntity: TimeSlot::class)]
+    #[ORM\JoinColumn(name: 'SLT_ID', referencedColumnName: 'SLT_ID', nullable: false)]
+    private ?TimeSlot $timeSlot = null;
 
     /**
      * @var int|null The score of the blue team
@@ -119,6 +114,15 @@ class Encounter
      */
     #[ORM\Column(name: 'ENC_SCORE_GREEN', type: 'smallint', nullable: true)]
     private ?int $scoreGreen = null;
+
+    #[ORM\Column(name: 'ENC_PENALTY_BLUE', type: Types::BOOLEAN)]
+    private bool $penaltyBlue;
+
+    #[ORM\Column(name: 'ENC_PENALTY_GREEN', type: Types::BOOLEAN)]
+    private bool $penaltyGreen;
+
+    #[ORM\Column(name: 'ENC_COMMENT', type: Types::STRING, length: 255, nullable: true)]
+    private ?string $comment = null;
 
     /**
      * Gets the encounter ID.
@@ -269,7 +273,7 @@ class Encounter
      */
     public function getDateBegin(): ?\DateTimeInterface
     {
-        return $this->dateBegin;
+        return $this->timeSlot?->getDateBegin();
     }
 
     /**
@@ -291,7 +295,7 @@ class Encounter
      */
     public function getDateEnd(): ?\DateTimeInterface
     {
-        return $this->dateEnd;
+        return $this->timeSlot?->getDateEnd();
     }
 
     /**
@@ -347,6 +351,50 @@ class Encounter
     public function setScoreGreen(?int $scoreGreen): self
     {
         $this->scoreGreen = $scoreGreen;
+        return $this;
+    }
+
+    public function getPenaltyBlue(): bool
+    {
+        return $this->penaltyBlue;
+    }
+
+    public function setPenaltyBlue(bool $penaltyBlue): self
+    {
+        $this->penaltyBlue = $penaltyBlue;
+        return $this;
+    }
+
+    public function getPenaltyGreen(): bool
+    {
+        return $this->penaltyGreen;
+    }
+
+    public function setPenaltyGreen(bool $penaltyGreen): self
+    {
+        $this->penaltyGreen = $penaltyGreen;
+        return $this;
+    }
+
+    public function getComment(): ?string
+    {
+        return $this->comment;
+    }
+
+    public function setComment(?string $comment): self
+    {
+        $this->comment = $comment;
+        return $this;
+    }
+
+    public function getTimeSlot(): ?TimeSlot
+    {
+        return $this->timeSlot;
+    }
+
+    public function setTimeSlot(?TimeSlot $timeSlot): self
+    {
+        $this->timeSlot = $timeSlot;
         return $this;
     }
 }

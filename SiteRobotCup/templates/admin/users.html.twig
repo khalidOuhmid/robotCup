@@ -35,7 +35,15 @@
                         <td class="px-6 py-4">{{ user.email }}</td>
                         <td class="px-6 py-4">{{ user.type }}</td>
                         <td class="px-6 py-4">
-                            <a href="{{ path('app_default', { '_switch_user': user.email }) }}"class="underline mx-3">Incarner</a>
+                            {# Modifié le lien d'impersonation #}
+                            <a href="{{ path('app_admin_impersonate', {'_switch_user': user.email}) }}" 
+                               class="inline-flex items-center px-3 py-1 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors mr-2">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                                Incarner
+                            </a>
 
                             <button onclick="openEditModal({{ user.id }}, '{{ user.email }}', '{{ user.type }}')" 
                                     class="bg-blue-400 text-white px-3 py-1 rounded mr-2 hover:bg-blue-500">

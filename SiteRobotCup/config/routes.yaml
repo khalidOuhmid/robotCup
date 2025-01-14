@@ -8,6 +8,10 @@ import_scores:
     path: /import-scores
     controller: App\Controller\ScoreController::importScores
 
+app_admin_impersonate:
+    path: /admin/impersonate
+    controller: App\Controller\AdminController::impersonate
+
 _locale:
     path: /{_locale}/
     requirements:
