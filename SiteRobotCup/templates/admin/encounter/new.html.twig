@@ -1,0 +1,33 @@
+{# templates/admin/encounter/new.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6">Nouvelle rencontre</h1>
+
+        {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    {{ form_row(form.teamBlue, {'attr': {'class': 'w-full rounded border-gray-300'}}) }}
+                    {{ form_row(form.teamGreen, {'attr': {'class': 'w-full rounded border-gray-300'}}) }}
+                    {{ form_row(form.field, {'attr': {'class': 'w-full rounded border-gray-300'}}) }}
+                </div>
+                <div class="space-y-4">
+                    {{ form_row(form.dateBegin, {'attr': {'class': 'w-full rounded border-gray-300'}}) }}
+                    {{ form_row(form.dateEnd, {'attr': {'class': 'w-full rounded border-gray-300'}}) }}
+                    {{ form_row(form.state, {'attr': {'class': 'w-full rounded border-gray-300'}}) }}
+                </div>
+            </div>
+
+            <div class="flex gap-4 mt-6">
+                <button type="submit" class="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                    Créer
+                </button>
+                <a href="{{ path('app_admin_encounters') }}" 
+                   class="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                    Annuler
+                </a>
+            </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

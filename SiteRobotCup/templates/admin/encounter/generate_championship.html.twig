@@ -1,0 +1,107 @@
+{# templates/admin/encounter/generate_championship.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-6">Générer les rencontres du championnat</h1>
+
+    {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Informations générales</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                {{ form_row(form.championship, {
+                    'attr': {'class': 'w-full rounded border-gray-300'},
+                    'label': 'Sélectionner le championnat'
+                }) }}
+                {{ form_row(form.field, {
+                    'attr': {'class': 'w-full rounded border-gray-300'},
+                    'label': 'Sélectionner le terrain'
+                }) }}
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6" id="timeSlots">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Créneaux horaires</h2>
+                <button type="button" 
+                        onclick="addTimeSlot()"
+                        class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    Ajouter un créneau
+                </button>
+            </div>
+
+            <div id="timeSlotsContainer" class="space-y-4">
+                <div class="time-slot grid md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded">
+                    {{ form_row(form.timeSlots.vars.prototype.startTime, {
+                        'attr': {'class': 'w-full rounded border-gray-300'},
+                        'label': 'Heure de début'
+                    }) }}
+                    {{ form_row(form.timeSlots.vars.prototype.endTime, {
+                        'attr': {'class': 'w-full rounded border-gray-300'},
+                        'label': 'Heure de fin'
+                    }) }}
+                    {{ form_row(form.timeSlots.vars.prototype.matchCount, {
+                        'attr': {'class': 'w-full rounded border-gray-300'},
+                        'label': 'Nombre de rencontres'
+                    }) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="flex gap-4 mt-6">
+            <button type="submit" class="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+                Générer les rencontres
+            </button>
+            <a href="{{ path('app_admin_encounters') }}" 
+               class="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+                Annuler
+            </a>
+        </div>
+    {{ form_end(form) }}
+</div>
+
+<script>
+function addTimeSlot() {
+    const container = document.getElementById('timeSlotsContainer');
+    const prototype = container.querySelector('.time-slot').cloneNode(true);
+    
+    // Mise à jour des IDs et names des nouveaux champs
+    const newIndex = container.children.length;
+    const inputs = prototype.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        const oldName = input.getAttribute('name');
+        const oldId = input.getAttribute('id');
+        input.setAttribute('name', oldName.replace('[0]', '[' + newIndex + ']'));
+        input.setAttribute('id', oldId.replace('_0_', '_' + newIndex + '_'));
+        input.value = '';
+    });
+
+    // Ajouter un bouton de suppression
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.className = 'absolute top-2 right-2 text-red-500 hover:text-red-700';
+    deleteButton.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>`;
+    deleteButton.onclick = function() {
+        this.parentElement.remove();
+    };
+
+    // Ajouter une classe pour le positionnement relatif
+    prototype.className += ' relative';
+    prototype.appendChild(deleteButton);
+    
+    container.appendChild(prototype);
+}
+</script>
+{% endblock %}

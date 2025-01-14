@@ -1,37 +1,215 @@
-<header class="bg-sky-900 text-white">
-  <nav class="container mx-auto flex items-center justify-between p-4">
-    <!-- Logo -->
-    <a href="{{ path('app_default') }}" class="text-3xl font-bold hover:text-gray-400">
-      RoboCup
-    </a>
-
-    <!-- Desktop Navigation -->
-    <div class=" md:flex space-x-4">
-        <a href="{{ path('app_default') }}" class="text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">Accueil</a>
-        {# Afficher le lien "Scores" uniquement si l'utilisateur n'est pas connecté #}
-        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-            <a href="{{ path('app_page_tableau_scores') }}" class="text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">Scores</a>
-            <a href="{{ path('app_encounters') }}" class="text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">Rencontres</a>
-            <a href="{{ path('app_team_show', { id: app.user.id }) }}" class="text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">Equipes</a>
-        {% endif %}
-        {% if is_granted('ROLE_ADMIN') %}
-            <a href="{{ path('app_admin_users') }}" class="text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">
-                Administration
-            </a>
-            <a href="{{ path('app_panel_scores_admin') }}" class="text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">
-                Entrez les Scores
-            </a>
-        {% endif %}
-        <a href="{% if is_granted('IS_AUTHENTICATED_FULLY') %}{{ path('app_logout') }}{% else %}{{ path('app_login') }}{% endif %}" 
-           class="flex items-center text-2xl px-4 py-2 border border-gray-300 shadow-lg rounded hover:shadow-xl hover:border-sky-300 hover:text-sky-300 transition duration-300">
-            {% if is_granted('IS_AUTHENTICATED_FULLY') %}Se déconnecter{% else %}Se connecter{% endif %}
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 ml-2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25" />
-            </svg>
+<header class="bg-sky-900 text-white sticky top-0 z-50 shadow-lg">
+  <nav class="container mx-auto">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+      <div class="flex items-center justify-between space-x-8">
+        
+        {# Logo #}
+        <a href="{{ path('app_default') }}" 
+           class="flex items-center px-4 py-2 rounded-lg hover:bg-sky-800 transition-all duration-200">
+          <span class="text-2xl font-bold bg-gradient-to-r from-sky-400 to-sky-200 bg-clip-text text-transparent">
+            RoboCup
+          </span>
         </a>
-      
+
+        {# Bouton pour changer la langue #}
+        <form method="get" action="{{ path('app_set_language', { 'locale': 'fr' }) }}">
+          <select onchange="window.location.href = this.value;" class="bg-sky-800 shadow-lg rounded-lg flex items-center px-4 py-2 hover:bg-sky-50 text-white hover:text-sky-800">
+              <option value="{{ path('app_set_language', { 'locale': 'fr' }) }}" {{ app.request.cookies.get('locale') == 'fr' ? 'selected' : '' }}>{{ 'fr' | trans }}</option>
+              <option value="{{ path('app_set_language', { 'locale': 'en' }) }}" {{ app.request.cookies.get('locale') == 'en' ? 'selected' : '' }}>{{ 'en' | trans }}</option>
+          </select>
+        </form>
+
+        {# Menu burger pour mobile #}
+        <div class="md:hidden">
+          <button id="burgerMenuButton" class="text-white focus:outline-none">
+            <svg id="burgerIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path id="burgerPath" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+        </div>
+
+        {# Navigation principale pour les écrans larges #}
+        <div class="hidden md:flex items-center space-x-4">
+          {# Navigation classique #}
+          {% set navButtons = {
+            'app_default': 'header.home' | trans,
+            'app_page_tableau_scores': 'header.scores' | trans,
+            'app_encounters': 'header.encounters.title' | trans
+          } %}
+          {% for route, label in navButtons %}
+            <a href="{{ path(route) }}" 
+               class="flex items-center px-4 py-2 rounded-lg text-sm font-medium 
+                      {% if app.request.get('_route') == route %}
+                        bg-sky-800 text-white shadow-inner
+                      {% else %}
+                        text-sky-100 hover:bg-sky-800 hover:text-white
+                      {% endif %}
+                      transition-all duration-200">
+              {{ label }}
+            </a>
+          {% endfor %}
+
+          {# Lien Créer mon équipe pour utilisateurs connectés #}
+          {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            <a href="{{ path('app_team_new') }}" 
+               class="flex items-center px-4 py-2 rounded-lg text-sm font-medium text-sky-100 hover:bg-sky-800 hover:text-white transition-all duration-200">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+              </svg>
+              {{'header.teams.create_team' | trans }}
+            </a>
+          {% endif %}
+          
+          {# Boutons Admin si utilisateur est ROLE_ADMIN #}
+          {% if is_granted('ROLE_ADMIN') %}
+            <div x-data="{ open: false }" class="relative inline-block">
+              {# Bouton Admin #}
+              <button @click="open = !open" 
+                      type="button"
+                      class="flex items-center px-4 py-2 rounded-lg text-sm font-medium text-sky-100 hover:bg-sky-800 transition-all duration-200">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                {{ 'header.admin' | trans }}
+                <svg class="w-4 h-4 ml-2 transition-transform duration-200"
+                    :class="{'rotate-180': open}"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </button>
+
+              {# Menu déroulant #}
+              <div x-cloak
+                  x-show="open"
+                  @click.away="open = false"
+                  class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg overflow-hidden z-50">
+                <div class="py-1">
+                  <a href="{{ path('app_admin_encounters') }}" class="block px-4 py-2 text-gray-700 hover:bg-sky-50 hover:text-sky-700">{{ 'header.encounters.manage_encounters' | trans}}</a>
+                  <a href="{{ path('app_admin_users') }}" class="block px-4 py-2 text-gray-700 hover:bg-sky-50 hover:text-sky-700">{{ 'header.users.manage_accounts' | trans}}</a>
+                  <a href="{{ path('app_admin_teams') }}" class="block px-4 py-2 text-gray-700 hover:bg-sky-50 hover:text-sky-700">{{ 'header.teams.manage_teams' | trans}}</a>
+                  <a href="{{ path('app_admin_fields') }}" class="block px-4 py-2 text-gray-700 hover:bg-sky-50 hover:text-sky-700">{{ 'header.fields.manage_fields' | trans}}</a>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+
+          {# Connexion/Déconnexion #}
+        <a href="{% if is_granted('IS_AUTHENTICATED_FULLY') %}{{ path('app_logout') }}{% else %}{{ path('app_login') }}{% endif %}" 
+           class="flex items-center px-4 py-2 rounded-lg border border-white text-sm font-medium text-sky-100 hover:bg-sky-800 hover:text-white transition-all duration-200">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+          </svg>
+          {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            {{ 'header.logout' | trans }}
+            {{ app.user }} 
+          {% else %}
+            {{ 'header.login' | trans }}
+          {% endif %}
+        </a>
+        <!-- Bouton retour à l'interface admin lors d'une incarnation -->
+        {% if is_granted('IS_IMPERSONATOR') %}
+          <form action="{{ path('impersonation_exit') }}" method="post">
+              <button type="submit" class="bg-green-400 hover:bg-green-500 rounded p-4 m-4 font-semibold">
+                  Retour administration
+              </button>
+          </form>
+        {% endif %}
+
+
+        
+
+        </div>
+      </div>
+
+      {# Menu mobile caché par défaut (menu burger) #}
+      <div id="mobileMenu" class="md:hidden absolute top-16 left-0 w-full bg-sky-900 text-white shadow-lg max-h-0 opacity-0 overflow-hidden transition-all duration-300 ease-out rounded-xl">
+        {% for route, label in navButtons %}
+          <a href="{{ path(route) }}" 
+             class="flex text-center items-center justify-center px-4 py-2 text-sm font-medium text-sky-100 hover:bg-sky-800 transition-all duration-200"
+             onclick="closeMobileMenu()">
+            {{ label }}
+          </a>
+        {% endfor %}
+
+        {# Lien Créer mon équipe pour mobile #}
+        {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+          <a href="{{ path('app_team_new') }}" 
+             class="flex justify-center text-center items-center px-4 py-2 text-sm font-medium text-sky-100 hover:bg-sky-800 transition-all duration-200"
+             onclick="closeMobileMenu()">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+            {{'header.teams.create_team' | trans }}
+          </a>
+        {% endif %}
+        
+        {# Menu Admin pour mobile #}
+        {% if is_granted('ROLE_ADMIN') %}
+          <div class="py-2 text-center">
+            <a href="{{ path('app_admin_encounters') }}" class="block px-4 py-2 hover:bg-sky-800">{{ 'header.encounters.manage_encounters' | trans}}</a>
+            <a href="{{ path('app_admin_users') }}" class="block px-4 py-2 hover:bg-sky-800">{{ 'header.users.manage_accounts' | trans}}</a>
+            <a href="{{ path('app_admin_teams') }}" class="block px-4 py-2 hover:bg-sky-800">{{ 'header.teams.manage_teams' | trans}}</a>
+            <a href="{{ path('app_admin_fields') }}" class="block px-4 py-2 hover:bg-sky-800">{{ 'header.fields.manage_fields' | trans}}</a>
+          </div>
+        {% endif %}
+        
+        {# Connexion/Déconnexion #}
+        <a href="{% if is_granted('IS_AUTHENTICATED_FULLY') %}{{ path('app_logout') }}{% else %}{{ path('app_login') }}{% endif %}" 
+          class="flex justify-center text-center items-center px-4 py-2 rounded-lg text-sm font-medium text-sky-100 hover:bg-sky-800 hover:text-white transition-all duration-200">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+          </svg>
+          {% if is_granted('IS_AUTHENTICATED_FULLY') %}{{ 'header.logout' | trans }}{% else %}{{ 'header.login' | trans }}{% endif %}
+        </a>
+
+      </div>
     </div>
   </nav>
-
-
 </header>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    resetMenu();
+});
+
+// Réinitialise le menu burger
+function resetMenu() {
+    const mobileMenu = document.getElementById('mobileMenu');
+    const burgerIcon = document.getElementById('burgerIcon');
+    const burgerPath = document.getElementById('burgerPath');
+
+    mobileMenu.classList.add('max-h-0', 'opacity-0');
+    mobileMenu.classList.remove('max-h-screen', 'opacity-100');
+
+    burgerPath.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
+    burgerIcon.classList.remove('animate-spin');
+}
+
+// Gestion du menu burger avec rotation
+document.getElementById('burgerMenuButton').addEventListener('click', function() {
+    const mobileMenu = document.getElementById('mobileMenu');
+    const burgerIcon = document.getElementById('burgerIcon');
+    const burgerPath = document.getElementById('burgerPath');
+
+    mobileMenu.classList.toggle('max-h-0');
+    mobileMenu.classList.toggle('opacity-0');
+    mobileMenu.classList.toggle('max-h-screen');
+    mobileMenu.classList.toggle('opacity-100');
+
+    // Passage de burger à croix avec rotation
+    if (burgerPath.getAttribute('d') === 'M4 6h16M4 12h16M4 18h16') {
+        burgerPath.setAttribute('d', 'M6 18L18 6M6 6l12 12');
+        burgerIcon.classList.add('animate-spin');
+
+        // Arrêter la rotation 
+        setTimeout(() => {
+            burgerIcon.classList.remove('animate-spin');
+        }, 300);
+    } else {
+        burgerPath.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
+    }
+});
+
+</script>

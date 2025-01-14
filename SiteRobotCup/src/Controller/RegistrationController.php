@@ -1,56 +1,110 @@
 <?php
 
-
 namespace App\Controller;
 
-
-use App\Entity\TUserUsr;
-use App\Form\RegistrationFormType;
-use App\Security\LoginAuthenticator;
+use App\Entity\User;
+use App\Form\RegistrationForm;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Annotation\Route;  // Change this import
+use Symfony\Component\Routing\Annotation\Route;
 
-
+/**
+ * Controller handling user registration.
+ */
 class RegistrationController extends AbstractController
 {
-   #[Route('/register', name: 'register')]  // Changed from 'app_register' to 'register'
-   public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, Security $security, EntityManagerInterface $entityManager): Response
-   {
-       // Redirect if user is already logged in
-       if ($this->getUser()) {
-           return $this->redirectToRoute('app_page_tableau_scores');
-       }
+    private const DEFAULT_USER_TYPE = 'USER';
 
-       $user = new TUserUsr();
-       $form = $this->createForm(RegistrationFormType::class, $user);
-       $form->handleRequest($request);
+    /**
+     * Handles user registration process.
+     *
+     * @param Request $request
+     * @param UserPasswordHasherInterface $userPasswordHasher
+     * @param Security $security
+     * @param EntityManagerInterface $entityManager
+     * @return Response
+     */
+    #[Route('/register', name: 'register', methods: ['GET', 'POST'])]
+    public function register(
+        Request $request,
+        UserPasswordHasherInterface $userPasswordHasher,
+        Security $security,
+        EntityManagerInterface $entityManager
+    ): Response {
+        if ($this->isUserLoggedIn()) {
+            return $this->redirectToRoute('app_page_tableau_scores');
+        }
 
+        $user = new User();
+        $form = $this->createRegistrationForm($user);
+        $form->handleRequest($request);
 
-       if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->processUserRegistration(
+                $user,
+                $form,
+                $userPasswordHasher,
+                $entityManager
+            );
 
-           /** @var string $plainPassword */
-           $plainPassword = $form->get('plainPassword')->getData();
+            return $this->redirectToRoute('app_login');
+        }
 
-           $user->setType('USER'); // Set default type for new users
-           // encode the plain password
-           $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
+        return $this->render('registration/register.html.twig', [
+            'registrationForm' => $form,
+        ]);
+    }
 
+    /**
+     * Checks if a user is currently logged in.
+     *
+     * @return bool
+     */
+    private function isUserLoggedIn(): bool
+    {
+        return $this->getUser() !== null;
+    }
 
-           $entityManager->persist($user);
-           $entityManager->flush();
+    /**
+     * Creates the registration form.
+     *
+     * @param User $user
+     * @return \Symfony\Component\Form\FormInterface
+     */
+    private function createRegistrationForm(User $user): \Symfony\Component\Form\FormInterface
+    {
+        return $this->createForm(RegistrationForm::class, $user);
+    }
 
-           // Simplify by just redirecting to login
-           return $this->redirectToRoute('app_login');
-       }
+    /**
+     * Processes the user registration.
+     *
+     * @param User $user
+     * @param \Symfony\Component\Form\FormInterface $form
+     * @param UserPasswordHasherInterface $passwordHasher
+     * @param EntityManagerInterface $entityManager
+     * @return void
+     */
+    private function processUserRegistration(
+        User $user,
+        \Symfony\Component\Form\FormInterface $form,
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $entityManager
+    ): void {
+        /** @var string $plainPassword */
+        $plainPassword = $form->get('plainPassword')->getData();
 
+        $user->setType(self::DEFAULT_USER_TYPE);
+        $user->setPassword(
+            $passwordHasher->hashPassword($user, $plainPassword)
+        );
+        // Remove setCreationDate call since it's handled by database default
 
-       return $this->render('registration/register.html.twig', [
-           'registrationForm' => $form,
-       ]);
-   }
+        $entityManager->persist($user);
+        $entityManager->flush();
+    }
 }

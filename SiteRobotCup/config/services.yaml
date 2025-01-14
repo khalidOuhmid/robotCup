@@ -26,10 +26,22 @@ services:
             - '../src/Kernel.php'
 
     # Remove duplicate LoginAuthenticator definition and simplify to:
-    App\Security\LoginAuthenticator:
+    App\Security\LoginAuthenticator:    
         public: true
         arguments:
             $urlGenerator: '@router'
+            
+    App\Service\ChampionshipScheduler:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
 
+    # Controllers are registered as services
+    App\Controller\:
+        resource: '../src/Controller'
+        tags: ['controller.service_arguments']
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\EventSubscriber\LocaleSubscriber:
+        arguments:
+            $defaultLocale: 'fr'

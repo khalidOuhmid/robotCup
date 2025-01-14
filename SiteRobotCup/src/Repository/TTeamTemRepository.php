@@ -16,6 +16,33 @@ class TTeamTemRepository extends ServiceEntityRepository
         parent::__construct($registry, TTeamTem::class);
     }
 
+    public function findByOrderedByScore(): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = 'SELECT * FROM v_team_statistics ORDER BY total_points DESC, matches_won DESC, total_goals DESC';
+        
+        return $conn->executeQuery($sql)->fetchAllAssociative();
+    }
+
+    public function findWithStatistics(TTeamTem $team): ?TTeamTem
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = '
+            SELECT * FROM team_statistics 
+            WHERE team_id = :teamId
+        ';
+        
+        $result = $conn->executeQuery($sql, [
+            'teamId' => $team->getId()
+        ])->fetchAssociative();
+
+        if ($result) {
+            $team->setStatistics($result);
+        }
+
+        return $team;
+    }
+
     //    /**
     //     * @return TTeamTem[] Returns an array of TTeamTem objects
     //     */

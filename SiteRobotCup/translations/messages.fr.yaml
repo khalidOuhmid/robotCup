@@ -1,0 +1,67 @@
+# languages names
+fr: "Français"
+en: "Anglais"
+
+# global translations
+global:
+  warning_window_size_table: "Pour voir toutes les colonnes, veuillez passer en mode paysage ou agrandir la fenêtre sur un ordinateur."
+  no_team: "Aucune équipe disponible."
+  login: "Se connecter"
+  identification: "S'identifier"
+  register: "S'inscrire"
+  identifier: "Identifiant"
+  password: "Mot de passe"
+
+# translations
+header:
+  home: "Accueil"
+  scores: "Scores"
+  encounters:
+    title: "Rencontres"
+    manage_encounters: "Gestion des rencontres"
+  teams:
+    title: "Équipes"
+    my_team: "Mon équipe"
+    create_team: "Créer une équipe"
+    manage_teams: "Gestion des équipes"
+  admin: "Administration"
+  users:
+    title: "Utilisateurs"
+    manage_accounts: "Gestion des comptes"
+  time_slots:
+    title: "Créneaux horaires"
+    manage: "Gestion des créneaux horaires"
+  enter_scores:
+    title: "Entrez les Scores"
+    manage_results: "Gestion des résultats"
+  fields:
+    title: "Terrains"
+    manage_fields: "Gestion des terrains"
+  logout: "Se déconnecter"
+  login: "Se connecter"
+
+home:
+  title: "Accueil"
+  back_admin: "Retour administration"
+  welcome: "Bienvenue à la RoboCup"
+  presentation: "La RoboCup est une compétition, mais elle est avant tout une communauté, et les participants échangent tout au long de l'événement. 
+                    Nombre de technologies développées par les compétiteurs sont ouvertes.
+                    Chaque RoboCup est également l’occasion d’un Symposium International, haut lieu de présentation et de discussion de contributions scientifiques
+                    adressant un large éventail de domaines ayant trait à la recherche et la pédagogie en matière de robotique et d’intelligence artificielle. 
+                    Afin d’encourager le plus grand partage possible des connaissances
+                    sur les aspects aussi bien matériels que logiciels, un axe spécifique du Symposium s’intéresse aux développements « ouverts » (open source)."
+  ranking: 
+    title: "Classement des équipes"
+    team_name: "Nom de l'équipe"
+    encounters_played: "Rencontres jouée"
+    encounters_won: "Rencontres gagnée"
+    encounters_draw: "Rencontres nul"
+    encounters_lost: "Rencontres perdue"
+    points: "Points"
+
+login:
+  create_an_account: "Créer un compte"
+  no_account: "Vous n'avez pas de compte ?"
+
+register:
+  already_have_account: "Vous avez deja un compte ?"
