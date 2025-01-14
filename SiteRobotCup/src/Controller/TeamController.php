@@ -99,7 +99,11 @@ class TeamController extends AbstractController
             throw $this->createNotFoundException('Utilisateur non trouvé.');
         }
 
-        if (!$team || $team->getUser() !== $user) {
+        if (!$team) {
+            throw $this->createNotFoundException('Équipe non trouvée.');
+        }
+        
+        if (!$this->isGranted('ROLE_ADMIN') && $team->getUser() !== $user) {
             throw $this->createAccessDeniedException('Cette équipe ne vous appartient pas.');
         }
 
@@ -169,7 +173,7 @@ class TeamController extends AbstractController
                 // On s'assure qu'une competition est sélectionnée
                 if (!$team->getCompetition()) {
                     $this->addFlash('error', 'Vous devez sélectionner une compétition');
-                    return $this->render('team/new.html.twig', ['form' => $form->createView()]);
+                    return $this->render('admin/teams/index.html.twig', ['form' => $form->createView()]);
                 }
 
                 $team->setUser($this->getUser());
@@ -186,7 +190,7 @@ class TeamController extends AbstractController
             }
         }
 
-        return $this->render('team/new.html.twig', [
+        return $this->render('admin/teams/edit.html.twig', [
             'form' => $form->createView(),
         ]);
     }

@@ -1,0 +1,66 @@
+# languages names
+fr: "French"
+en: "English"
+
+# global translations
+global:
+  warning_window_size_table: "To see all columns, please switch to landscape mode or maximize the window on a computer."
+  no_team: "No team available."
+  login: "Login"
+  register: "Register"
+  identifier: "Identifier"  
+  password: "Password"
+
+# translations
+header:
+  home: "Home"
+  scores: "Scores"
+  encounters:
+    title: "Encounters"
+    manage_encounters: "Manage encounters"
+  teams:
+    title: "Teams"
+    my_team: "My team"
+    create_team: "Create a team"
+    manage_teams: "Manage teams"
+  admin: "Admin"
+  users:
+    title: "Users"
+    manage_accounts: "Manage accounts"
+  time_slots:
+    title: "Time slots"
+    manage_time_slots: "Manage time slots"
+  enter_scores:
+    title: "Enter scores"
+    manage_results: "Manage results"
+  fields:
+    title: "Fields"
+    manage_fields: "Manage fields"
+  logout: "Logout"
+  login: "Login"
+
+home:
+  title: "Home"
+  back_admin: "Back to admin"
+  welcome: "Welcome to the RoboCup"
+  presentation: "The RoboCup is a competition, but above all it is a community, and participants interact throughout the event. 
+                    Many technologies developed by competitors are open.
+                    Each RoboCup is also the occasion for an International Symposium, a major venue for the presentation and discussion of scientific contributions.
+                    addressing a wide range of areas relating to research and teaching in robotics and artificial intelligence. 
+                    To encourage the greatest possible sharing of knowledge
+                    on both hardware and software aspects, a specific axis of the Symposium focuses on “open” (open source) developments."
+  ranking: 
+    title: "Teams ranking"
+    team_name: "Team name"
+    encounters_played: "Encounters played"
+    encounters_won: "Encounters won"
+    encounters_draw: "Encounters draw"
+    encounters_lost: "Encounters lost"
+    points: "Points"
+
+login:
+  create_an_account: "Create an account"
+  no_account: "You don't have an account ?"
+
+register:
+  already_have_account: "You already have an account ?"

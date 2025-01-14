@@ -19,7 +19,7 @@ class TeamRepository extends ServiceEntityRepository
     public function findByOrderedByScore(): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = 'SELECT * FROM v_team_statistics ORDER BY total_points DESC, matches_won DESC, total_goals DESC';
+        $sql = 'SELECT * FROM team_stats_with_forfeit ORDER BY total_points DESC, total_wins DESC';
         
         return $conn->executeQuery($sql)->fetchAllAssociative();
     }
@@ -28,7 +28,7 @@ class TeamRepository extends ServiceEntityRepository
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = '
-            SELECT * FROM team_statistics 
+            SELECT * FROM team_stats_with_forfeit 
             WHERE team_id = :teamId
         ';
         

@@ -1,0 +1,77 @@
+{# templates/admin/competition/new.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-6">Nouvelle compétition</h1>
+    
+    {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    {{ form_row(form.cmpName, {
+                        'attr': {'class': 'w-full rounded border-gray-300'}
+                    }) }}
+                    {{ form_row(form.cmpAddress, {
+                        'attr': {'class': 'w-full rounded border-gray-300'}
+                    }) }}
+                    {{ form_row(form.cmpDesc, {
+                        'attr': {'class': 'w-full rounded border-gray-300'}
+                    }) }}
+                </div>
+                <div class="space-y-4">
+                    {{ form_row(form.cmpDateBegin, {
+                        'attr': {'class': 'w-full rounded border-gray-300'}
+                    }) }}
+                    {{ form_row(form.cmpDateEnd, {
+                        'attr': {'class': 'w-full rounded border-gray-300'}
+                    }) }}
+                    <div class="space-y-2">
+                        <div class="flex items-center">
+                            {{ form_widget(form.includeTournament, {
+                                'attr': {
+                                    'class': 'rounded border-gray-300 mr-2',
+                                    'data-tournament-checkbox': true
+                                }
+                            }) }}
+                            {{ form_label(form.includeTournament) }}
+                        </div>
+                        <div class="flex items-center">
+                            {{ form_widget(form.includeThirdPlace, {
+                                'attr': {
+                                    'class': 'rounded border-gray-300 mr-2',
+                                    'data-third-place-checkbox': true
+                                }
+                            }) }}
+                            {{ form_label(form.includeThirdPlace) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex gap-4">
+            <button type="submit" class="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                Créer
+            </button>
+            <a href="{{ path('app_default') }}" class="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                Annuler
+            </a>
+        </div>
+    {{ form_end(form) }}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tournamentCheckbox = document.querySelector('[data-tournament-checkbox]');
+    const thirdPlaceCheckbox = document.querySelector('[data-third-place-checkbox]');
+
+    tournamentCheckbox.addEventListener('change', function() {
+        thirdPlaceCheckbox.disabled = !this.checked;
+        if (!this.checked) {
+            thirdPlaceCheckbox.checked = false;
+        }
+    });
+});
+</script>
+{% endblock %}

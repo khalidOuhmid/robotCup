@@ -35,6 +35,9 @@ class Tournament
     #[ORM\OneToMany(mappedBy: 'tournament', targetEntity: Encounter::class)]
     private Collection $encounters;
 
+    private bool $includeThirdPlace = false;
+
+
     /**
      * Constructor initializes the encounters collection.
      */
@@ -128,5 +131,25 @@ class Tournament
             $this->getCompetition()?->getCmpName() ?? 'Unknown Competition',
             $this->getId() ?? 0
         );
+    }
+
+    public function isIncludeThirdPlace(): bool
+
+    {
+
+        return $this->includeThirdPlace;
+
+    }
+
+
+
+    public function setIncludeThirdPlace(bool $includeThirdPlace): self
+
+    {
+
+        $this->includeThirdPlace = $includeThirdPlace;
+
+        return $this;
+
     }
 }

@@ -1,43 +1,58 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello RegisterController!{% endblock %}
+{% block title %}{{ 'global.login' | trans }}{% endblock %}
+
 {% block body %}
 {% if app.user %}
-    <a href="/register" class="text-blue-500 hover:underline">Créer un compte</a>
+    <a href="/register" class="text-blue-500 hover:underline">{{ 'register.create_an_account' | trans }}</a>
 {% endif %}
-
 
 <div class="flex justify-center m-2">
     <img class="h-48 w-auto" src="https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=612x612&w=0&k=20&c=yBeyba0hUkh14_jgv1OKqIH0CCSWU_4ckRkAoy2p73o=" alt="icone utilisateur">
 </div>
-<h2 class="text-center text-2xl font-mono font-medium">S'identifier</h2>
+
+<h2 class="text-center text-2xl font-mono font-medium">{{ 'global.identification' | trans }}</h2>
+
 <div class="flex items-center justify-center m-8">
     <div class="flex flex-col justify-center items-center w-96">
         <form method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 ">
+            {% if error %}
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <strong class="font-bold">{{ 'global.error' | trans }}: </strong>
+                    <span class="block sm:inline">{{ error.messageKey | trans(error.messageData, 'security') }}</span>
+                </div>
+            {% endif %}
+
             <div class="mb-4">
                 <label class="block text-gray-700 text-xs font-bold mb-2" for="email">
-                    Identifiant
+                    {{ 'global.identifier' | trans }}
                 </label>
-                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" type="text" name="email" placeholder="Adresse mail">
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                       id="email" type="text" name="email" placeholder="Adresse mail">
             </div>
+
             <div class="mb-6">
                 <label class="block text-gray-700 text-xs font-bold mb-2" for="password">
-                    Mot de passe
+                    {{ 'global.password' | trans }}
                 </label>
-                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" name="password" placeholder="***********">
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                       id="password" type="password" name="password" placeholder="***********">
             </div>
+
             <input type="hidden" name="_csrf_token" value="{{ csrf_token('auth') }}">
+
             <div class="flex justify-end">
                 <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-                    Se connecter
+                    {{ 'global.login' | trans }}
                 </button>
             </div>
         </form>
 
         <p class="text-center text-gray-600 text-sm mt-4">
-            Vous n'avez pas de compte ? 
-            <a href="/register" class="text-blue-500 hover:underline">Créer un compte</a>
+            {{ 'login.no_account' | trans }}
+            <a href="/register" class="text-blue-500 hover:underline">{{ 'login.create_an_account' | trans }}</a>
         </p>
     </div>
 </div>
+
 {% endblock %}

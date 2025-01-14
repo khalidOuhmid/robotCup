@@ -62,12 +62,12 @@ class PageTableScoresController extends AbstractController
     {
         return [
             'rank' => $index + 1,
-            'name' => $data['TEM_NAME'],
-            'matches_played' => $data['matches_played'],
-            'matches_won' => $data['matches_won'],
-            'matches_drawn' => $data['matches_drawn'],
-            'matches_lost' => $data['matches_lost'],
-            'goals' => $data['total_goals'],
+            'name' => $data['team_name'],
+            'matches_played' => $data['total_matches'],
+            'matches_won' => $data['total_wins'],
+            'matches_drawn' => $data['total_draws'],
+            'matches_lost' => $data['total_losses'],
+            'goals' => $data['average_score'],
             'points' => $data['total_points'],
         ];
     }

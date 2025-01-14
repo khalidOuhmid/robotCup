@@ -14,7 +14,7 @@
 
 ----------------------------------------------------------------------------- */
 
--- Create T_CHAMPIONSHIP_CHP table
+-- Create T_TIMESLOT_SLT table
 create table T_TIMESLOT_SLT (
      SLT_ID smallint AUTO_INCREMENT,
      SLT_DATE_BEGIN datetime  not null ,
