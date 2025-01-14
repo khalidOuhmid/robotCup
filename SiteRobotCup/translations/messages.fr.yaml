@@ -24,7 +24,9 @@ global:
 # page translations
 header:
   home: "Accueil"
-  scores: "Scores"
+  scores: 
+    title: "Scores"
+    manage_scores: "Gestion des scores"
   encounters:
     title: "Rencontres"
     manage_encounters: "Gestion des rencontres"
