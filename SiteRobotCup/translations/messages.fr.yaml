@@ -1,8 +1,13 @@
+# languages names
+fr: "Français"
+en: "Anglais"
+
 # global translations
 global:
   warning_window_size_table: "Pour voir toutes les colonnes, veuillez passer en mode paysage ou agrandir la fenêtre sur un ordinateur."
   no_team: "Aucune équipe disponible."
   login: "Se connecter"
+  identification: "S'identifier"
   register: "S'inscrire"
   identifier: "Identifiant"
   password: "Mot de passe"
@@ -55,8 +60,8 @@ home:
     points: "Points"
 
 login:
-  create_account: "Créer un compte"
+  create_an_account: "Créer un compte"
   no_account: "Vous n'avez pas de compte ?"
 
 register:
-  already_account: "Vous avez deja un compte ?"
+  already_have_account: "Vous avez deja un compte ?"
