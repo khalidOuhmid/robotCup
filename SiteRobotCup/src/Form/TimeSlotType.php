@@ -2,31 +2,32 @@
 // src/Form/TimeSlotType.php
 namespace App\Form;
 
+use App\Entity\TimeSlot;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TimeSlotType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('startTime', DateTimeType::class, [
+            ->add('dateBegin', DateTimeType::class, [
                 'widget' => 'single_text',
-                'required' => true,
+                'label' => 'Date de début',
             ])
-            ->add('endTime', DateTimeType::class, [
+            ->add('dateEnd', DateTimeType::class, [
                 'widget' => 'single_text',
-                'required' => true,
-            ])
-            ->add('matchCount', IntegerType::class, [
-                'attr' => [
-                    'min' => 1,
-                    'max' => 10,
-                ],
-                'required' => true,
+                'label' => 'Date de fin',
             ])
         ;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => TimeSlot::class,
+        ]);
     }
 }

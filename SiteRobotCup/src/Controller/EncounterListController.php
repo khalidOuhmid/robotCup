@@ -95,13 +95,19 @@ class EncounterListController extends AbstractController
         $exportData = [];
         
         foreach ($encounters as $encounter) {
+            $timeSlot = $encounter->getTimeSlot();
             $exportData[] = [
-                'championshipId' => $encounter->getChampionship()->getId(),
+                'championshipId' => $encounter->getChampionship()?->getId(),
                 'teamBlue' => $encounter->getTeamBlue()->getName(),
                 'scoreBlue' => $encounter->getScoreBlue(),
-                'scoreGreen' => $encounter->getScoreGreen(),
+                'penaltyBlue' => $encounter->getPenaltyBlue(),
                 'teamGreen' => $encounter->getTeamGreen()->getName(),
+                'scoreGreen' => $encounter->getScoreGreen(),
+                'penaltyGreen' => $encounter->getPenaltyGreen(),
                 'state' => $encounter->getState(),
+                'comment' => $encounter->getComment(),
+                'dateBegin' => $timeSlot?->getDateBegin()->format('Y-m-d H:i:s'),
+                'dateEnd' => $timeSlot?->getDateEnd()->format('Y-m-d H:i:s'),
             ];
         }
 

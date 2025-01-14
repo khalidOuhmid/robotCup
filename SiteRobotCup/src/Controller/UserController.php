@@ -14,7 +14,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 /**
  * Controller for managing users.
  */
-#[Route('/t/user/usr')]
+#[Route('/admin/users')]
 final class UserController extends AbstractController
 {
     /**

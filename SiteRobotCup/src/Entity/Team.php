@@ -88,7 +88,7 @@ class Team
         $this->members = new ArrayCollection();
         $this->encountersAsBlue = new ArrayCollection();
         $this->encountersAsGreen = new ArrayCollection();
-        $this->creationDate = new \DateTime();
+        $this->creationDate = new \DateTime(); // Set the creation date to the current date and time
     }
 
     /**

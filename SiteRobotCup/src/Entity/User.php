@@ -73,6 +73,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->teams = new ArrayCollection();
+        $this->creationDate = new \DateTime(); // Set the creation date to the current date and time
     }
 
     /**

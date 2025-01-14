@@ -27,7 +27,7 @@ class Competition
     /**
      * @var string|null The address where the competition takes place
      */
-    #[ORM\Column(name: 'CMP_ADDRESS', type: 'string', length: 255, nullable: true)]
+    #[ORM\Column(name: 'CMP_ADDRESS', type: Types::STRING, length: 255, nullable: true)]
     private ?string $cmpAddress = null;
 
     /**
@@ -47,13 +47,13 @@ class Competition
      */
     #[Assert\NotNull(message: 'Le nom est requis')]
     #[Assert\Length(max: 32, maxMessage: 'Le nom ne peut pas dépasser {{ limit }} caractères')]
-    #[ORM\Column(name: 'CMP_NAME', type: 'string', length: 32)]
+    #[ORM\Column(name: 'CMP_NAME', type: Types::STRING, length: 32)]
     private ?string $cmpName = null;
 
     /**
      * @var string|null The description of the competition
      */
-    #[ORM\Column(name: 'CMP_DESC', type: 'string', length: 255, nullable: true)]
+    #[ORM\Column(name: 'CMP_DESC', type: Types::STRING, length: 255, nullable: true)]
     private ?string $cmpDesc = null;
 
     /**

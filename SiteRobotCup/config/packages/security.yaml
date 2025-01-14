@@ -17,6 +17,7 @@ security:
             lazy: true
             provider: app_user_provider
             custom_authenticator: App\Security\LoginAuthenticator
+            
 
             entry_point: form_login
             form_login:
@@ -32,27 +33,27 @@ security:
             logout:
                 path: app_logout
                 target: app_login
-            switch_user: 
-                role: ROLE_ALLOWED_TO_SWITCH
+            switch_user:
+                provider: app_user_provider
                 parameter: _switch_user
-                # Cette ligne permet de configurer l'incarnation d'un utilisateur
-                # Un administrateur pourra "incarner" un autre utilisateur s'il a le rôle ROLE_ALLOWED_TO_SWITCH.
+                role: ROLE_ADMIN
+                target_route: app_default
 
     access_control:
-        - { path: ^/$, roles: PUBLIC_ACCESS }  # Permettre l'accès à la page d'accueil
-        - { path: ^/set-language, roles: PUBLIC_ACCESS } # Permettre le changement de langue sans authentification
-        - { path: ^/login, roles: PUBLIC_ACCESS }
-        - { path: ^/register, roles: PUBLIC_ACCESS }
-        - { path: ^/logout, roles: PUBLIC_ACCESS }
+        # Public routes
+        - { path: ^/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/register$, roles: PUBLIC_ACCESS }
+        - { path: ^/logout$, roles: PUBLIC_ACCESS }
+        - { path: ^/set-language, roles: PUBLIC_ACCESS }
+        - { path: ^/$, roles: PUBLIC_ACCESS }
+        
+        # Admin routes
         - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/profile, roles: ROLE_USER }
-        - { path: ^/, roles: ROLE_USER }
-        - { path: ^/tableau-scores, roles: [ROLE_USER, ROLE_ADMIN] }
-        - { path: ^/score, roles: [ROLE_USER, ROLE_ADMIN] }
-        - { path: ^/impersonate, roles: ROLE_ADMIN }  # Vous pouvez définir une route pour l'impersonation ici si nécessaire.
-        - { path: ^/impersonate/exit, roles: ROLE_ADMIN }  # Limiter l'accès à la sortie d'incarnation aux administrateurs
-        - { path: ^/admin, roles: ROLE_ADMIN }  # Limiter l'accès à l'admin au rôle ROLE_ADMIN
+        - { path: ^/_switch_user, roles: ROLE_ALLOWED_TO_SWITCH }
+        
+        # Protected routes
+        - { path: ^/, roles: IS_AUTHENTICATED_REMEMBERED }
 
     role_hierarchy:
         ROLE_ADMIN: [ROLE_USER, ROLE_ALLOWED_TO_SWITCH]
-        ROLE_ORGA: [ROLE_USER]
+        ROLE_PREVIOUS_ADMIN: [ROLE_USER]

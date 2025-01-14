@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Encounter;
+use App\Entity\TimeSlot;
 use App\Form\EncounterForm;
 use App\Form\GenerateChampionshipMatchesType;
 use App\Service\ChampionshipScheduler;
@@ -27,7 +28,11 @@ class EncounterManagementController extends AbstractController
     {
         $encounters = $entityManager
             ->getRepository(Encounter::class)
-            ->findBy([], ['dateBegin' => 'ASC']);
+            ->createQueryBuilder('e')
+            ->leftJoin('e.timeSlot', 't')
+            ->orderBy('t.dateBegin', 'ASC')
+            ->getQuery()
+            ->getResult();
 
         return $this->render('admin/encounter/index.html.twig', [
             'encounters' => $encounters
@@ -41,11 +46,15 @@ class EncounterManagementController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $encounter = new Encounter();
+        $timeSlot = new TimeSlot();
+        $encounter->setTimeSlot($timeSlot);
+        
         $form = $this->createForm(EncounterForm::class, $encounter);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
+                $entityManager->persist($timeSlot);
                 $entityManager->persist($encounter);
                 $entityManager->flush();
                 
