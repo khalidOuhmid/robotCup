@@ -33,7 +33,7 @@
           {# Navigation classique #}
           {% set navButtons = {
             'app_default': 'header.home' | trans,
-            'app_page_tableau_scores': 'header.scores' | trans,
+            'app_page_tableau_scores': 'header.scores.title' | trans,
             'app_encounters': 'header.encounters.title' | trans
           } %}
           {% for route, label in navButtons %}
@@ -88,6 +88,7 @@
                   <a href="{{ path('app_admin_encounters') }}" class="block px-4 py-2 text-gray-700 hover:bg-sky-50 hover:text-sky-700">{{ 'header.encounters.manage_encounters' | trans}}</a>
                   <a href="{{ path('app_admin_users') }}" class="block px-4 py-2 text-gray-700 hover:bg-sky-50 hover:text-sky-700">{{ 'header.users.manage_accounts' | trans}}</a>
                   <a href="{{ path('app_admin_teams') }}" class="block px-4 py-2 text-gray-700 hover:bg-sky-50 hover:text-sky-700">{{ 'header.teams.manage_teams' | trans}}</a>
+                  <a href="{{ path('app_panel_scores_admin') }}" class="block px-4 py-2 text-gray-700 hover:bg-sky-50 hover:text-sky-700">{{ 'header.scores.manage_scores' | trans}}</a>
                   <a href="{{ path('app_admin_fields') }}" class="block px-4 py-2 text-gray-700 hover:bg-sky-50 hover:text-sky-700">{{ 'header.fields.manage_fields' | trans}}</a>
                 </div>
               </div>
