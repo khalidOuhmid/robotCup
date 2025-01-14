@@ -140,17 +140,17 @@
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
             </svg>
-            {{'header.create_team' | trans }}
+            {{'header.teams.create_team' | trans }}
           </a>
         {% endif %}
         
         {# Menu Admin pour mobile #}
         {% if is_granted('ROLE_ADMIN') %}
           <div class="py-2 text-center">
-            <a href="{{ path('app_admin_encounters') }}" class="block px-4 py-2 hover:bg-sky-800">{{ 'header.manage_encounters' | trans}}</a>
-            <a href="{{ path('app_admin_users') }}" class="block px-4 py-2 hover:bg-sky-800">{{ 'header.manage_accounts' | trans}}</a>
-            <a href="{{ path('app_admin_teams') }}" class="block px-4 py-2 hover:bg-sky-800">{{ 'header.manage_teams' | trans}}</a>
-            <a href="{{ path('app_admin_fields') }}" class="block px-4 py-2 hover:bg-sky-800">{{ 'header.manage_fields' | trans}}</a>
+            <a href="{{ path('app_admin_encounters') }}" class="block px-4 py-2 hover:bg-sky-800">{{ 'header.encounters.manage_encounters' | trans}}</a>
+            <a href="{{ path('app_admin_users') }}" class="block px-4 py-2 hover:bg-sky-800">{{ 'header.users.manage_accounts' | trans}}</a>
+            <a href="{{ path('app_admin_teams') }}" class="block px-4 py-2 hover:bg-sky-800">{{ 'header.teams.manage_teams' | trans}}</a>
+            <a href="{{ path('app_admin_fields') }}" class="block px-4 py-2 hover:bg-sky-800">{{ 'header.fields.manage_fields' | trans}}</a>
           </div>
         {% endif %}
         
