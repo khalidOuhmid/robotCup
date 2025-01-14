@@ -17,6 +17,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use App\Controller\Security;
+
 
 /**
  * Controller for admin operations.
@@ -252,5 +255,30 @@ class AdminController extends AbstractController
         return $this->render('admin/competition/new.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+    #[Route('/impersonate/exit', name: 'impersonation_exit')]
+    public function impersonationExit(Request $request, Security $security): RedirectResponse
+    {
+        // Vérifie si un utilisateur est incarné et nous souhaitons quitter
+        if ($this->getUser() && $this->isGranted('IS_IMPERSONATOR')) {
+            // Sauvegarde de l'URL précédente
+            $previousUrl = $request->headers->get('referer');  // Récupère l'URL précédente dans les headers
+    
+            // Si l'URL précédente est vide ou invalide, on redirige vers le dashboard admin par défaut
+            if (!$previousUrl) {
+                $previousUrl = $this->generateUrl('app_admin_dashboard');  // Remplacez avec le nom de votre page d'accueil admin
+            }
+    
+            // Réinitialisation du token de sécurité (sortir de l'incarnation)
+            $security->getTokenStorage()->setToken(null);  // Supprime l'incarnation
+    
+            // Ici, vous pouvez ajouter une redirection vers une page spécifique, comme la page d'accueil de l'admin
+            // pour éviter tout problème de redirection infinie.
+            return $this->redirect($previousUrl);
+        }
+    
+        // Si l'utilisateur n'est pas incarné, redirige vers la page d'administration par défaut
+        return $this->redirectToRoute('app_admin_dashboard');  // Remplacez avec le nom de votre page d'accueil admin
     }
 }
