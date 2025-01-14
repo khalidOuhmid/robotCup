@@ -39,11 +39,7 @@
                             <td class="p-2">{{ team.structure ?: 'Non spécifiée' }}</td>
                             <td class="p-2 space-y-2 flex flex-col items-center">
                                 {% if is_granted('ROLE_ADMIN') or team.user.id == app.user.id %}
-                                    <!-- Lien pour inscrire au championnat -->
-                                    <a href="{{ path('app_team_register_championship', {'teamId': team.id}) }}" class="text-blue-500 hover:underline">
-                                        Inscrire à un championnat
-                                    </a>
-
+                                
                                     <!-- Lien pour ajouter des membres -->
                                     <a href="{{ path('app_team_add_member', { userId: app.user.id, teamId: team.id }) }}" class="text-blue-500 hover:underline">
                                         Ajouter des membres

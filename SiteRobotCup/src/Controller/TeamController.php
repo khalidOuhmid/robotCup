@@ -99,8 +99,14 @@ class TeamController extends AbstractController
             throw $this->createNotFoundException('Utilisateur non trouvé.');
         }
 
-        if (!$team || $team->getUser() !== $user) {
-            throw $this->createAccessDeniedException('Cette équipe ne vous appartient pas.');
+        if ($this->isGranted('ROLE_ADMIN')) {
+            if (!$team) {
+                throw $this->createAccessDeniedException('Vous n\'avez pas les droits pour modifier cette équipe');
+            }
+        } else {
+            if (!$team || $team->getUser() !== $user) {
+                throw $this->createAccessDeniedException('Cette équipe ne vous appartient pas.');
+            }
         }
 
         $member = new Member();
