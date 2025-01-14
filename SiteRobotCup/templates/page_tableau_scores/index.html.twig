@@ -1,28 +1,28 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Tableau des scores{% endblock %}
+{% block title %}{{ 'scores.title' | trans }}{% endblock %}
 
 {% block body %}
 
 <section class="h-screen w-screen bg-blue-100">
     <div class="container mx-auto px-4">
-        <h1 class="text-3xl font-bold text-center mb-8 p-10">Classement des équipes</h1>
+        <h1 class="text-3xl font-bold text-center mb-8 p-10">{{ 'global.ranking.title' | trans }}</h1>
 
         <!-- Message d'avertissement pour les petits écrans -->
         <div class="text-center mb-4 text-red-600 sm:hidden">
-            <p>Pour voir toutes les colonnes, veuillez passer en mode paysage ou agrandir la fenêtre sur un ordinateur.</p>
+            <p>{{ 'scores.warning_window_size_table' | trans }}</p>
         </div>
 
         <div class="overflow-x-auto max-w-full">
             <table class="min-w-full table-auto bg-white shadow-lg rounded-lg overflow-hidden">
                 <thead>
                     <tr class="bg-sky-800 text-white">
-                        <th class="px-2 py-2 text-center text-sm sm:text-base">Rang</th>
-                        <th class="px-2 py-2 text-center text-sm sm:text-base">Nom équipe</th>
-                        <th class="px-2 py-2 text-center text-sm sm:text-base">Rencontre Joué</th>
-                        <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">Rencontre Gagné</th>
-                        <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">Rencontre Nul</th>
-                        <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">Points</th>
+                        <th class="px-2 py-2 text-center text-sm sm:text-base">{{ 'global.ranking.title' | trans }}</th>
+                        <th class="px-2 py-2 text-center text-sm sm:text-base">{{ 'global.ranking.team_name' | trans }}</th>
+                        <th class="px-2 py-2 text-center text-sm sm:text-base">{{ 'global.ranking.encounters_played' | trans }}</th>
+                        <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{'global.ranking.encounters_won' | trans}}</th>
+                        <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{ 'global.ranking.encounters_draw' | trans }}</th>
+                        <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{ 'global.ranking.points' | trans }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -37,7 +37,7 @@
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="6" class="px-4 py-2 text-center text-gray-500">Aucune équipe disponible.</td>
+                            <td colspan="6" class="px-4 py-2 text-center text-gray-500">{{ 'global.ranking.no_teams' | trans }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

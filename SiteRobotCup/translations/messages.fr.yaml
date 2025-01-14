@@ -1,18 +1,27 @@
-# languages names
+# languages names translations
 fr: "Français"
 en: "Anglais"
 
 # global translations
 global:
   warning_window_size_table: "Pour voir toutes les colonnes, veuillez passer en mode paysage ou agrandir la fenêtre sur un ordinateur."
-  no_team: "Aucune équipe disponible."
   login: "Se connecter"
   identification: "S'identifier"
   register: "S'inscrire"
   identifier: "Identifiant"
   password: "Mot de passe"
+  ranking: 
+    title: "Classement des équipes"
+    team_name: "Nom de l'équipe"
+    encounters_played: "Rencontres jouée"
+    encounters_won: "Rencontres gagnée"
+    encounters_draw: "Rencontres nul"
+    encounters_lost: "Rencontres perdue"
+    points: "Points"
+    no_team: "Aucune équipe disponible."
+  create_team: "Créer une équipe"
 
-# translations
+# page translations
 header:
   home: "Accueil"
   scores: "Scores"
@@ -50,14 +59,6 @@ home:
                     adressant un large éventail de domaines ayant trait à la recherche et la pédagogie en matière de robotique et d’intelligence artificielle. 
                     Afin d’encourager le plus grand partage possible des connaissances
                     sur les aspects aussi bien matériels que logiciels, un axe spécifique du Symposium s’intéresse aux développements « ouverts » (open source)."
-  ranking: 
-    title: "Classement des équipes"
-    team_name: "Nom de l'équipe"
-    encounters_played: "Rencontres jouée"
-    encounters_won: "Rencontres gagnée"
-    encounters_draw: "Rencontres nul"
-    encounters_lost: "Rencontres perdue"
-    points: "Points"
 
 login:
   create_an_account: "Créer un compte"
@@ -65,3 +66,41 @@ login:
 
 register:
   already_have_account: "Vous avez deja un compte ?"
+
+scores:
+  title: "Tableau des scores"
+
+encounters:
+  title: "Listes des Rencontres"
+  programmed_encounters: "Rencontres programmées"
+  number: "Numéro de rencontre"
+  team_blue: "Équipe Bleue"
+  team_green: "Équipe Verte"
+  score: "Score"
+  no_encounters: "Aucune rencontre n'est programmée pour le moment."
+  export_JSON: "Exporter en JSON"
+
+teams:
+  title: "Créer une équipe"
+  new_team: "Créer une nouvelle équipe"
+  team_name: "Nom de l'équipe"
+  team_structure: "Structure"
+  team_competition: "Compétition"
+  create_the_team: "Créer l'équipe"
+  manage_my_team: "Gestion de mon équipe"
+  manage_the_team: "Gestion de l'équipe"
+  team_actions: "Actions"
+  add_members: "Ajouter des membres"
+  add_member: "Ajouter un membre"
+  hide_members: "Masquer les membres"
+  show_members: "Voir les membres"
+  no_actions: "Aucune action disponible"
+  no_members: "Aucun membre pour cette équipe."
+  no_teams_created: "Aucune équipe créee."
+  my_team: "Mon équipe:"
+  no_members_added: "Aucun membre ajouté pour cette équipe."
+
+members:
+  name: "Nom"
+  surname: "Prénom"
+  email: "Email"

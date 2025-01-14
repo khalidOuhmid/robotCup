@@ -1,17 +1,27 @@
-# languages names
+# languages names translations
 fr: "French"
 en: "English"
 
 # global translations
 global:
   warning_window_size_table: "To see all columns, please switch to landscape mode or maximize the window on a computer."
-  no_team: "No team available."
   login: "Login"
+  identification: "Login"
   register: "Register"
-  identifier: "Identifier"  
+  identifier: "Identifier"
   password: "Password"
+  ranking:
+    title: "Teams ranking"
+    team_name: "Team name"
+    encounters_played: "Encounters played"
+    encounters_won: "Encounters won"
+    encounters_draw: "Encounters draw" 
+    encounters_lost: "Encounters lost" 
+    points: "Points"
+    no_team: "No team available."
+  create_team: "Create a team"
 
-# translations
+# page translations
 header:
   home: "Home"
   scores: "Scores"
@@ -49,14 +59,6 @@ home:
                     addressing a wide range of areas relating to research and teaching in robotics and artificial intelligence. 
                     To encourage the greatest possible sharing of knowledge
                     on both hardware and software aspects, a specific axis of the Symposium focuses on “open” (open source) developments."
-  ranking: 
-    title: "Teams ranking"
-    team_name: "Team name"
-    encounters_played: "Encounters played"
-    encounters_won: "Encounters won"
-    encounters_draw: "Encounters draw"
-    encounters_lost: "Encounters lost"
-    points: "Points"
 
 login:
   create_an_account: "Create an account"
@@ -64,3 +66,41 @@ login:
 
 register:
   already_have_account: "You already have an account ?"
+
+scores:
+  title: "Score table"
+
+encounters:
+  title: "Encounters list"
+  programmed_encounters: "Programmed encounters"
+  number: "Encounter number"
+  team_blue: "Team blue"
+  team_green: "Team green"
+  score: "Score"
+  no_encounters: "No encounters are programmed for the moment."
+  export_JSON: "Export to JSON"
+
+teams:
+  title: "Create a team"
+  new_team: "Create a new team"
+  team_name: "Team name"
+  team_structure: "Structure"
+  team_competition: "Competition"
+  create_the_team: "Create the team"
+  manage_my_team: "Manage my team"
+  manage_the_team: "Manage the team"
+  team_actions: "Actions"
+  add_members: "Add members"
+  add_member: "Add member"
+  hide_members: "Hide members"
+  show_members: "Show members"
+  no_actions: "No action available"
+  no_members: "No member for this team."
+  no_teams_created: "No team created."
+  my_team: "My team:"
+  no_members_added: "No member added for this team."
+
+members:
+  name: "Name"
+  surname: "Surname"
+  email: "Email"

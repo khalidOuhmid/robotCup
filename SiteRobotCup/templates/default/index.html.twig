@@ -35,7 +35,7 @@
 
         <!-- Classement des équipes -->
         <div class="container mx-auto mt-10 px-4">
-            <h1 class="text-3xl font-bold text-center mb-8">{{ 'home.ranking.title' | trans}}</h1>
+            <h1 class="text-3xl font-bold text-center mb-8">{{ 'global.ranking.title' | trans}}</h1>
 
             <!-- Message d'avertissement sur les petits écrans -->
             <div class="text-center mb-4 text-red-600 sm:hidden">
@@ -46,14 +46,14 @@
                 <table class="min-w-full table-auto bg-white shadow-lg rounded-lg overflow-hidden">
                     <thead>
                         <tr class="bg-sky-800 text-white">
-                            <th class="px-2 py-2 text-center text-sm sm:text-base">{{ 'home.ranking.title' | trans }}</th>
-                            <th class="px-2 py-2 text-center text-sm sm:text-base">{{ 'home.ranking.team_name' | trans }}</th>
-                            <th class="px-2 py-2 text-center text-sm sm:text-base">{{ 'home.ranking.encounters_played' | trans }}</th>
+                            <th class="px-2 py-2 text-center text-sm sm:text-base">{{ 'global.ranking.title' | trans }}</th>
+                            <th class="px-2 py-2 text-center text-sm sm:text-base">{{ 'global.ranking.team_name' | trans }}</th>
+                            <th class="px-2 py-2 text-center text-sm sm:text-base">{{ 'global.ranking.encounters_played' | trans }}</th>
                             <!-- Masquer ces colonnes sur petits écrans -->
-                            <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{ 'home.ranking.encounters_won' | trans }}</th>
-                            <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{ 'home.ranking.encounters_draw' | trans }}</th>
-                            <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{ 'home.ranking.encounters_lost' | trans }}</th>
-                            <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{ 'home.ranking.points' | trans }}</th>
+                            <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{ 'global.ranking.encounters_won' | trans }}</th>
+                            <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{ 'global.ranking.encounters_draw' | trans }}</th>
+                            <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{ 'global.ranking.encounters_lost' | trans }}</th>
+                            <th class="px-2 py-2 text-center text-sm sm:text-base hidden sm:table-cell">{{ 'global.ranking.points' | trans }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -71,7 +71,7 @@
                         {% else %}
                             <tr>
                                 <td colspan="7" class="px-4 py-2 text-center text-gray-500 text-sm sm:text-base">
-                                    {{ 'global.no_teams' | trans }}
+                                    {{ 'global.ranking.no_teams' | trans }}
                                 </td>
                             </tr>
                         {% endfor %}
