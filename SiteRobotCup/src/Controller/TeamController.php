@@ -229,12 +229,12 @@ class TeamController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $existingTeam = $entityManager->getRepository(Team::class)
-                ->findOneBy(['user' => $user, 'championship' => $team->getChampionship()]);
+                ->findOneBy(['user' => $user, 'championship' => $team->getChampionships()]);
 
             if ($existingTeam) {
                 $this->addFlash('danger', sprintf(
                     'Vous avez déjà une équipe pour le championnat "%s".',
-                    $team->getChampionship()->getName()
+                    $team->getChampionships()->getName()
                 ));
             } else {
                 $team->setUser($user);
