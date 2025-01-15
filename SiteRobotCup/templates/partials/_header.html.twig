@@ -4,18 +4,14 @@
       <div class="flex items-center justify-between space-x-8">
 
           {# Vérification de l'impersonation en utilisant token #}
-          {% if is_granted('ROLE_PREVIOUS_ADMIN') or app.user and app.user.token is defined and app.user.token.class == 'Symfony\\Component\\Security\\Core\\Authentication\\Token\\SwitchUserToken' %}
-            <a href="{{ path('app_default', {'_switch_user': '_exit'}) }}"
-               class="flex items-center px-4 py-2 rounded-lg text-sm font-medium 
+          {% if is_granted('IS_IMPERSONATOR') %}
+          <a href="{{ path('app_default', {'_switch_user': '_exit'}) }}"class="flex items-center px-4 py-2 rounded-lg text-sm font-medium 
                       bg-yellow-500 text-white hover:bg-yellow-600 
                       transition-all duration-200">
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z"/>
-              </svg>
-              Retour administration
-            </a>
+              </svg> >Retour administration</a>
           {% endif %}
-
         {# Logo #}
         <a href="{{ path('app_default') }}" 
            class="flex items-center px-4 py-2 rounded-lg hover:bg-sky-800 transition-all duration-200">
