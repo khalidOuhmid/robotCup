@@ -42,6 +42,7 @@
           {# Navigation classique #}
           {% set navButtons = {
             'app_default': 'header.home' | trans,
+            'app_tournament_index': 'Tournois',
             'app_page_tableau_scores': 'header.scores.title' | trans,
             'app_encounters': 'header.encounters.title' | trans
           } %}
@@ -54,6 +55,9 @@
                         text-sky-100 hover:bg-sky-800 hover:text-white
                       {% endif %}
                       transition-all duration-200">
+              {% if route == 'app_tournament_index' %}
+                <i class="fas fa-trophy mr-2"></i>
+              {% endif %}
               {{ label }}
             </a>
           {% endfor %}
@@ -112,6 +116,7 @@
                   <a href="{{ path('app_admin_teams') }}" class="block px-4 py-2 text-gray-700 hover:bg-sky-50 hover:text-sky-700">{{ 'header.teams.manage_teams' | trans}}</a>
                   <a href="{{ path('app_panel_scores_admin') }}" class="block px-4 py-2 text-gray-700 hover:bg-sky-50 hover:text-sky-700">{{ 'header.scores.manage_scores' | trans}}</a>
                   <a href="{{ path('app_admin_fields') }}" class="block px-4 py-2 text-gray-700 hover:bg-sky-50 hover:text-sky-700">{{ 'header.fields.manage_fields' | trans}}</a>
+                  <a href="{{ path('app_competition_index') }}" class="block px-4 py-2 text-gray-700 hover:bg-sky-50 hover:text-sky-700">{{ 'header.competition_manage' | trans}}</a>
                 </div>
               </div>
             </div>
@@ -196,6 +201,13 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
           </svg>
           {% if is_granted('IS_AUTHENTICATED_FULLY') %}{{ 'header.logout' | trans }}{% else %}{{ 'header.login' | trans }}{% endif %}
+        </a>
+
+        {# Ajout du lien Tournois dans le menu mobile #}
+        <a href="{{ path('app_tournament_index') }}" 
+           class="flex justify-center text-center items-center px-4 py-2 text-sm font-medium text-sky-100 hover:bg-sky-800 transition-all duration-200"
+           onclick="closeMobileMenu()">
+            <i class="fas fa-trophy mr-2"></i> Tournois
         </a>
 
       </div>

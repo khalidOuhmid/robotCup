@@ -14,6 +14,10 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'T_TOURNAMENT_TNM')]
 class Tournament
 {
+    public const TYPE_SWISS = 'SUISSE';
+    public const TYPE_DUTCH = 'HOLLANDAIS';
+    public const TYPE_NORMAL = 'NORMAL';
+
     /**
      * @var int|null The unique identifier of the tournament
      */
@@ -134,22 +138,18 @@ class Tournament
     }
 
     public function isIncludeThirdPlace(): bool
-
     {
-
         return $this->includeThirdPlace;
-
     }
 
-
-
     public function setIncludeThirdPlace(bool $includeThirdPlace): self
-
     {
-
         $this->includeThirdPlace = $includeThirdPlace;
-
         return $this;
+    }
 
+    public function getType(): ?string
+    {
+        return $this->getCompetition()?->getCmpRndSystem();
     }
 }

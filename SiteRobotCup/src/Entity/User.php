@@ -23,7 +23,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Available user types
      */
-    public const USER_TYPES = ['ADMIN', 'USER'];
+    public const USER_TYPES = ['ADMIN', 'USER', 'ADMINISTRATOR'];
     public const DEFAULT_TYPE = 'USER';
 
     /**
@@ -31,20 +31,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: "USR_ID", type: "smallint")]
+    #[ORM\Column(name: "USR_ID", type: Types::SMALLINT)]
     private ?int $id = null;
 
     /**
      * @var string|null The type of user (ADMIN or USER)
      */
-    #[ORM\Column(name: "USR_TYPE", type: "string", length: 255)]
-    #[Assert\Choice(choices: ['ADMIN', 'USER'], message: 'Type utilisateur invalide')]
+    #[ORM\Column(name: "USR_TYPE", type: Types::STRING, length: 255)]
+    #[Assert\Choice(choices: ['ADMIN', 'USER', 'ADMINISTRATOR'], message: 'Type utilisateur invalide')]
     private ?string $type = 'USER';
 
     /**
      * @var string|null The email address of the user
      */
-    #[ORM\Column(name: "USR_MAIL", type: "string", length: 255, unique: true)]
+    #[ORM\Column(name: "USR_MAIL", type: Types::STRING, length: 255, unique: true)]
     #[Assert\NotBlank(message: 'L\'email est requis')]
     #[Assert\Email(message: 'L\'adresse email {{ value }} n\'est pas valide')]
     private ?string $email = null;
@@ -52,7 +52,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string|null The hashed password
      */
-    #[ORM\Column(name: "USR_PASS", type: "string", length: 128)]
+    #[ORM\Column(name: "USR_PASS", type: Types::STRING, length: 128)]
     private ?string $password = null;
 
     /**

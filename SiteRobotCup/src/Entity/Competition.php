@@ -56,6 +56,12 @@ class Competition
     #[ORM\Column(name: 'CMP_DESC', type: Types::STRING, length: 255, nullable: true)]
     private ?string $cmpDesc = null;
 
+    #[ORM\Column(name: 'CMP_ROUNDS', type: Types::SMALLINT, nullable: true)]
+    private ?int $cmpRounds = null;
+
+    #[ORM\Column(name: 'CMP_RND_SYSTEM', type: Types::STRING, length: 32, nullable: true)]
+    private ?string $cmpRoundSystem = null;
+
     /**
      * @var Collection<int, Tournament> Collection of tournaments in this competition
      */
@@ -201,6 +207,31 @@ class Competition
     public function setCmpDesc(?string $cmpDesc): self
     {
         $this->cmpDesc = $cmpDesc;
+        return $this;
+    }
+
+    public function getCmpRounds(): ?int
+    {
+        return $this->cmpRounds;
+    }
+
+    public function setCmpRounds(?int $cmpRounds): self
+    {
+        $this->cmpRounds = $cmpRounds;
+        return $this;
+    }
+
+    public function getCmpRoundSystem(): ?string
+    {
+        return $this->cmpRoundSystem;
+    }
+
+    public function setCmpRoundSystem(?string $cmpRoundSystem): self
+    {
+        if ($cmpRoundSystem !== null && !in_array($cmpRoundSystem, ['HOLLANDAIS', 'MONRAD', 'SUISSE'])) {
+            throw new \InvalidArgumentException('Invalid round system');
+        }
+        $this->cmpRoundSystem = $cmpRoundSystem;
         return $this;
     }
 

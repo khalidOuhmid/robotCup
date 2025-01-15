@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Entity\Competition;
@@ -59,6 +59,7 @@ class AdminController extends AbstractController
             'available_types' => self::AVAILABLE_TYPES
         ]);
     }
+    
 
     /**
      * Edits a user.

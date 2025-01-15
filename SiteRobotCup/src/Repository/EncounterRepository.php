@@ -16,28 +16,42 @@ class EncounterRepository extends ServiceEntityRepository
         parent::__construct($registry, Encounter::class);
     }
 
-    //    /**
-    //     * @return Encounter[] Returns an array of Encounter objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('t.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findOverlappingEncounters(
+        int $fieldId,
+        \DateTimeInterface $startDate,
+        \DateTimeInterface $endDate,
+        ?int $excludeId = null
+    ): array {
+        $qb = $this->createQueryBuilder('e')
+            ->join('e.timeSlot', 'ts')
+            ->where('e.field = :fieldId')
+            ->andWhere('
+                (ts.dateBegin BETWEEN :start AND :end) OR
+                (ts.dateEnd BETWEEN :start AND :end) OR
+                (:start BETWEEN ts.dateBegin AND ts.dateEnd) OR
+                (:end BETWEEN ts.dateBegin AND ts.dateEnd)
+            ')
+            ->setParameters([
+                'fieldId' => $fieldId,
+                'start' => $startDate,
+                'end' => $endDate
+            ]);
 
-    //    public function findOneBySomeField($value): ?Encounter
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if ($excludeId !== null) {
+            $qb->andWhere('e.id != :excludeId')
+                ->setParameter('excludeId', $excludeId);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function countTournamentEncounters(int $tournamentId): int
+    {
+        return $this->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->where('e.tournament = :tournamentId')
+            ->setParameter('tournamentId', $tournamentId)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }
