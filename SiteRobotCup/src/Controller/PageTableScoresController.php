@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Entity\Team;
 
 /**
  * Controller for displaying team scores and rankings.
@@ -29,8 +30,19 @@ class PageTableScoresController extends AbstractController
         $teams = $this->prepareTeamsData($teamRepository);
         $template = $this->determineTemplate($request->getRequestUri());
 
+        // see the user's teams if logged in
+        $user = $this->getUser();
+
+        if ($user) {
+            $userTeams = $teamRepository->findBy(['user' => $user]);
+            $userTeamIds = array_map(fn(Team $team) => $team->getId(), $userTeams);
+        } else {
+            $userTeamIds = [];
+        }
+
         return $this->render($template, [
             'teams' => $teams,
+            'userTeamIds' => $userTeamIds,
         ]);
     }
 
@@ -61,6 +73,7 @@ class PageTableScoresController extends AbstractController
     private function transformTeamData(array $data, int $index): array
     {
         return [
+            'id' => $data['team_id'],
             'rank' => $index + 1,
             'name' => $data['team_name'],
             'matches_played' => $data['total_matches'],

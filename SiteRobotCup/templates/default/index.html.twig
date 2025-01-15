@@ -50,7 +50,8 @@
                     </thead>
                     <tbody>
                         {% for team in teams|slice(0,5) %}
-                            <tr class="border-t border-gray-200 hover:bg-gray-50">
+                            {% set highlight = team.id in userTeamIds %}
+                            <tr class="border-t border-gray-200 hover:bg-gray-50 {% if highlight %}bg-yellow-100 hover:bg-yellow-300{% endif %}">
                                 <td class="px-2 py-2 text-center text-sm sm:text-base">{{ team.rank }}</td>
                                 <td class="px-2 py-2 text-center text-sm sm:text-base">{{ team.name }}</td>
                                 <td class="px-2 py-2 text-center text-sm sm:text-base">{{ team.matches_played }}</td>

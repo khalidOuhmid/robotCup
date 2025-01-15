@@ -15,44 +15,52 @@ class PageTableauScoresController extends AbstractController
     #[Route('/tableau-scores', name: 'app_page_tableau_scores')]
     public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $user = $this->getUser();
+
+        // Handle user not logged in
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
         $limit = 10; // Teams per page
         $teamRepository = $entityManager->getRepository(Team::class);
-        
+
         // Get total teams count
         $totalTeams = $teamRepository->count([]);
-        
+
         // Handle empty database case
         if ($totalTeams === 0) {
             return $this->render('page_tableau_scores/index.html.twig', [
                 'teams' => [],
                 'page' => 1,
-                'totalPages' => 1
+                'totalPages' => 1,
+                'userTeamIds' => [],
             ]);
         }
-        
+
         $totalPages = max(1, ceil($totalTeams / $limit));
         $page = $request->query->getInt('page', 1);
         $page = max(1, min($page, $totalPages));
-        
+
         $offset = ($page - 1) * $limit;
         if ($offset >= $totalTeams) {
             $offset = 0;
             $page = 1;
         }
 
-        $teams = $teamRepository->findBy(
-            [], 
-            ['name' => 'ASC'],
-            $limit,
-            $offset
-        );
+        $teams = $teamRepository->findBy([], ['name' => 'ASC'], $limit, $offset);
 
         $teams = $this->prepareTeamsData($teamRepository);
+
+        // Fetch user teams
+        $userTeams = $teamRepository->findBy(['user' => $user]);
+        $userTeamIds = array_map(fn(Team $team) => $team->getId(), $userTeams);
 
         return $this->render('page_tableau_scores/index.html.twig', [
             'teams' => $teams,
             'page' => $page,
-            'totalPages' => $totalPages
+            'totalPages' => $totalPages,
+            'userTeamIds' => $userTeamIds,
         ]);
     }
 
@@ -66,6 +74,7 @@ class PageTableauScoresController extends AbstractController
     private function transformTeamData(array $data, int $index): array
     {
         return [
+            'id' => $data['team_id'],
             'rank' => $index + 1,
             'name' => $data['team_name'],
             'matches_played' => $data['total_matches'],
