@@ -3,8 +3,10 @@
 namespace App\Form;
 
 use App\Entity\Competition;
+use App\Entity\Tournament;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -44,6 +46,16 @@ class CompetitionType extends AbstractType
                 'label' => 'Inclure un tournoi',
                 'required' => false,
                 'mapped' => false,
+            ])
+            ->add('tournamentType', ChoiceType::class, [
+                'mapped' => false,
+                'required' => false,
+                'choices' => [
+                    'Normal' => 'NORMAL',
+                    'Système Suisse' => 'SUISSE',
+                    'Système Hollandais' => 'HOLLANDAIS',
+                ],
+                'label' => 'Type de tournoi'
             ])
             ->add('includeThirdPlace', CheckboxType::class, [
                 'label' => 'Inclure une petite finale',

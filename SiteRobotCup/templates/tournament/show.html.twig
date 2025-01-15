@@ -1,0 +1,146 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tournoi - {{ tournament.competition.cmpName }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .tournament-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .match-card {
+            transition: transform 0.2s;
+            margin-bottom: 1rem;
+        }
+
+        .match-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .match-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.875rem;
+        }
+
+        .status-PROGRAMMEE { background-color: #ffd700; }
+        .status-CONCLUE { background-color: #98FB98; }
+        .status-EN-COURS { background-color: #87CEEB; }
+        .status-FORFAIT { background-color: #FFB6C6; }
+        .status-ANNULEE { background-color: #A9A9A9; }
+
+        .tournament-stats {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .bracket-container {
+            overflow-x: auto;
+            margin: 2rem 0;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        {# Bouton retour #}
+        <div class="mb-4">
+            <a href="{{ path('app_tournament_index') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Retour à la liste des tournois
+            </a>
+        </div>
+
+        {# En-tête du tournoi #}
+        <div class="tournament-header">
+            <h1>{{ tournament.competition.cmpName }}</h1>
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <p><i class="fas fa-trophy"></i> Type: {{ tournament.type }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><i class="fas fa-calendar"></i> Date: {{ tournament.competition.cmpDateBegin|date('d/m/Y') }}</p>
+                </div>
+                <div class="col-md-4">
+                    <p><i class="fas fa-map-marker-alt"></i> Lieu: {{ tournament.competition.cmpAddress }}</p>
+                </div>
+            </div>
+        </div>
+
+        {# Statistiques du tournoi #}
+        <div class="tournament-stats">
+            <div class="row text-center">
+                <div class="col-md-3">
+                    <h4>{{ tournament.encounters|length }}</h4>
+                    <p>Matchs total</p>
+                </div>
+                <div class="col-md-3">
+                    <h4>{{ tournament.encounters|filter(e => e.encState == 'CONCLUE')|length }}</h4>
+                    <p>Matchs terminés</p>
+                </div>
+                <div class="col-md-3">
+                    <h4>{{ tournament.encounters|filter(e => e.encState == 'EN COURS')|length }}</h4>
+                    <p>Matchs en cours</p>
+                </div>
+                <div class="col-md-3">
+                    <h4>{{ tournament.encounters|filter(e => e.encState == 'PROGRAMMEE')|length }}</h4>
+                    <p>Matchs à venir</p>
+                </div>
+            </div>
+        </div>
+
+        {# Liste des matchs #}
+        {% if tournament.encounters is not empty %}
+            <div class="matches-container">
+                <h2 class="mb-4">Matchs du tournoi</h2>
+                <div class="row">
+                    {% for encounter in tournament.encounters %}
+                        <div class="col-md-6">
+                            <div class="card match-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="match-status status-{{ encounter.encState }}">
+                                            {{ encounter.encState }}
+                                        </span>
+                                        <small>Match #{{ encounter.id }}</small>
+                                    </div>
+                                    <div class="row mt-3 align-items-center text-center">
+                                        <div class="col">
+                                            <h5>{{ encounter.teamBlue.temName }}</h5>
+                                        </div>
+                                        <div class="col-4">
+                                            {% if encounter.encState == 'CONCLUE' %}
+                                                <h4>{{ encounter.encScoreBlue }} - {{ encounter.encScoreGreen }}</h4>
+                                            {% else %}
+                                                <h4>VS</h4>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col">
+                                            <h5>{{ encounter.teamGreen.temName }}</h5>
+                                        </div>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <a href="{{ path('app_t_encounter_enc_show', {'id': encounter.id}) }}" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            Détails du match
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Aucun match n'a encore été programmé pour ce tournoi.
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

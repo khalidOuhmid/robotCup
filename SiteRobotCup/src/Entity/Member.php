@@ -23,11 +23,11 @@ class Member
     /**
      * @var string|null The first name of the member
      */
-    #[ORM\Column(name: "MBR_NAME", type: "string", length: 255)]
+    #[ORM\Column(name: "MBR_NAME", type: "string", length: 32)]
     #[Assert\NotBlank(message: "Le prénom est requis")]
     #[Assert\Length(
         min: 2,
-        max: 255,
+        max: 32,
         minMessage: "Le prénom doit contenir au moins {{ limit }} caractères",
         maxMessage: "Le prénom ne peut pas dépasser {{ limit }} caractères"
     )]
@@ -36,11 +36,11 @@ class Member
     /**
      * @var string|null The last name of the member
      */
-    #[ORM\Column(name: "MBR_SURNAME", type: "string", length: 255)]
+    #[ORM\Column(name: "MBR_SURNAME", type: "string", length: 32)]
     #[Assert\NotBlank(message: "Le nom est requis")]
     #[Assert\Length(
         min: 2,
-        max: 255,
+        max: 32,
         minMessage: "Le nom doit contenir au moins {{ limit }} caractères",
         maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères"
     )]

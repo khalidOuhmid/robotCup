@@ -31,6 +31,7 @@ class Encounter
         'PROGRAMMEE',
         'CONCLUE',
         'EN COURS',
+        'FORFAIT',
         'ANNULEE'
     ];
 
@@ -82,6 +83,13 @@ class Encounter
     private ?Team $teamGreen = null;
 
     /**
+     * @var Team|null The referee team
+     */
+    #[ORM\ManyToOne(targetEntity: Team::class)]
+    #[ORM\JoinColumn(name: 'TEM_ID_REFEREE', referencedColumnName: 'TEM_ID', nullable: true)]
+    private ?Team $teamReferee = null;
+
+    /**
      * @var string|null The state of the encounter
      */
     #[Assert\Choice(choices: self::STATES)]
@@ -123,6 +131,9 @@ class Encounter
 
     #[ORM\Column(name: 'ENC_COMMENT', type: Types::STRING, length: 255, nullable: true)]
     private ?string $comment = null;
+
+    #[ORM\Column(name: 'ENC_FIXEDSCORE', type: Types::BOOLEAN)]
+    private bool $fixedScore = false;
 
     /**
      * Gets the encounter ID.
@@ -241,6 +252,28 @@ class Encounter
     public function setTeamGreen(?Team $teamGreen): self
     {
         $this->teamGreen = $teamGreen;
+        return $this;
+    }
+
+    /**
+     * Gets the referee team.
+     *
+     * @return Team|null
+     */
+    public function getTeamReferee(): ?Team
+    {
+        return $this->teamReferee;
+    }
+
+    /**
+     * Sets the referee team.
+     *
+     * @param Team|null $teamReferee
+     * @return self
+     */
+    public function setTeamReferee(?Team $teamReferee): self
+    {
+        $this->teamReferee = $teamReferee;
         return $this;
     }
 
@@ -395,6 +428,17 @@ class Encounter
     public function setTimeSlot(?TimeSlot $timeSlot): self
     {
         $this->timeSlot = $timeSlot;
+        return $this;
+    }
+
+    public function isFixedScore(): bool
+    {
+        return $this->fixedScore;
+    }
+
+    public function setFixedScore(bool $fixedScore): self
+    {
+        $this->fixedScore = $fixedScore;
         return $this;
     }
 }
