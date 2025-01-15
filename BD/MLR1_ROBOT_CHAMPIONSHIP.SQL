@@ -146,12 +146,15 @@ CREATE TABLE T_ENCOUNTER_ENC (
         (ENC_STATE <> 'CONCLUE')
     ),
     CONSTRAINT CHK_ENC_STATE_FORFAIT CHECK (
-        (ENC_STATE = 'FORFAIT' AND ENC_SCORE_BLUE IS NULL AND ENC_SCORE_GREEN IS NULL)
+        ((ENC_STATE = 'FORFAIT' AND ENC_SCORE_BLUE IS NULL AND ENC_SCORE_GREEN IS NULL)
         AND (ENC_PENALTY_BLUE IS TRUE OR ENC_PENALTY_GREEN IS TRUE)
+        OR (ENC_PENALTY_BLUE IS TRUE AND ENC_PENALTY_GREEN IS TRUE))
+        OR (ENC_STATE <> 'FORFAIT')
     ),
     CONSTRAINT CHK_ENC_STATE_NULL CHECK (
         (ENC_STATE = 'PROGRAMMEE' AND ENC_SCORE_BLUE IS NULL AND ENC_SCORE_GREEN IS NULL) OR
         (ENC_STATE = 'ANNULEE' AND ENC_SCORE_BLUE IS NULL AND ENC_SCORE_GREEN IS NULL)
+        OR (ENC_STATE <> 'PROGRAMMEE' AND ENC_STATE <> 'ANNULEE')
     ),
     CONSTRAINT CHK_ENC_TEAMS_DIFFERENT CHECK (
         TEM_ID_GREEN <> TEM_ID_REFEREE AND
@@ -250,34 +253,38 @@ BEGIN
     DECLARE field_overlap_count INT;
     DECLARE team_overlap_count INT;
 
-    -- Check for overlapping encounters in the same field
+    -- Check for overlapping encounters in the same field based on timeslots
     SELECT COUNT(*)
     INTO field_overlap_count
-    FROM T_ENCOUNTER_ENC
-    WHERE FLD_ID = NEW.FLD_ID
-      AND (NEW.ENC_DATE_BEGIN BETWEEN ENC_DATE_BEGIN AND ENC_DATE_END
-           OR NEW.ENC_DATE_END BETWEEN ENC_DATE_BEGIN AND ENC_DATE_END
-           OR ENC_DATE_BEGIN BETWEEN NEW.ENC_DATE_BEGIN AND NEW.ENC_DATE_END
-           OR ENC_DATE_END BETWEEN NEW.ENC_DATE_BEGIN AND NEW.ENC_DATE_END);
+    FROM T_ENCOUNTER_ENC E
+    JOIN T_TIMESLOT_SLT S1 ON E.SLT_ID = S1.SLT_ID
+    JOIN T_TIMESLOT_SLT S2 ON NEW.SLT_ID = S2.SLT_ID
+    WHERE E.FLD_ID = NEW.FLD_ID
+      AND (S2.SLT_DATE_BEGIN BETWEEN S1.SLT_DATE_BEGIN AND S1.SLT_DATE_END
+           OR S2.SLT_DATE_END BETWEEN S1.SLT_DATE_BEGIN AND S1.SLT_DATE_END
+           OR S1.SLT_DATE_BEGIN BETWEEN S2.SLT_DATE_BEGIN AND S2.SLT_DATE_END
+           OR S1.SLT_DATE_END BETWEEN S2.SLT_DATE_BEGIN AND S2.SLT_DATE_END);
 
-    -- Check for overlapping encounters with the same teams (either blue or green)
+    -- Check for overlapping encounters with the same teams (either green)
     SELECT COUNT(*)
     INTO team_overlap_count
-    FROM T_ENCOUNTER_ENC
-    WHERE (TEM_ID_BLUE = NEW.TEM_ID_BLUE OR TEM_ID_GREEN = NEW.TEM_ID_GREEN
-           OR TEM_ID_BLUE = NEW.TEM_ID_GREEN OR TEM_ID_GREEN = NEW.TEM_ID_BLUE)
-      AND (NEW.ENC_DATE_BEGIN BETWEEN ENC_DATE_BEGIN AND ENC_DATE_END
-           OR NEW.ENC_DATE_END BETWEEN ENC_DATE_BEGIN AND ENC_DATE_END
-           OR ENC_DATE_BEGIN BETWEEN NEW.ENC_DATE_BEGIN AND NEW.ENC_DATE_END
-           OR ENC_DATE_END BETWEEN NEW.ENC_DATE_BEGIN AND NEW.ENC_DATE_END);
+    FROM T_ENCOUNTER_ENC E
+    JOIN T_TIMESLOT_SLT S1 ON E.SLT_ID = S1.SLT_ID
+    JOIN T_TIMESLOT_SLT S2 ON NEW.SLT_ID = S2.SLT_ID
+    WHERE (E.TEM_ID_BLUE = NEW.TEM_ID_BLUE
+           OR E.TEM_ID_GREEN = NEW.TEM_ID_GREEN)
+      AND (S2.SLT_DATE_BEGIN BETWEEN S1.SLT_DATE_BEGIN AND S1.SLT_DATE_END
+           OR S2.SLT_DATE_END BETWEEN S1.SLT_DATE_BEGIN AND S1.SLT_DATE_END
+           OR S1.SLT_DATE_BEGIN BETWEEN S2.SLT_DATE_BEGIN AND S2.SLT_DATE_END
+           OR S1.SLT_DATE_END BETWEEN S2.SLT_DATE_BEGIN AND S2.SLT_DATE_END);
 
     -- If any overlap is detected, raise an error
     IF field_overlap_count > 0 THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Cannot insert encounter: overlapping dates in the same field.';
+        SET MESSAGE_TEXT = 'Cannot insert encounter: overlapping time slots in the same field.';
     ELSEIF team_overlap_count > 0 THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Cannot insert encounter: overlapping dates with the same teams.';
+        SET MESSAGE_TEXT = 'Cannot insert encounter: overlapping time slots with the same teams.';
     END IF;
 END;
 //
@@ -339,66 +346,112 @@ END;
 
 DELIMITER ;
 
-CREATE OR REPLACE VIEW team_stats_with_forfeit AS
+
+-- Create base stats view
+CREATE OR REPLACE VIEW team_stats_base AS 
+SELECT 
+    T.TEM_ID AS team_id,
+    T.TEM_NAME AS team_name,
+    COUNT(E.ENC_ID) AS total_matches,
+    SUM(
+        CASE 
+            WHEN (E.TEM_ID_BLUE = T.TEM_ID AND E.ENC_SCORE_BLUE > E.ENC_SCORE_GREEN) OR
+                 (E.TEM_ID_GREEN = T.TEM_ID AND E.ENC_SCORE_GREEN > E.ENC_SCORE_BLUE)
+            THEN 1 ELSE 0
+        END
+    ) AS total_wins,
+    SUM(
+        CASE 
+            WHEN E.ENC_SCORE_BLUE = E.ENC_SCORE_GREEN THEN 1 ELSE 0
+        END
+    ) AS total_draws,
+    SUM(
+        CASE 
+            WHEN (E.TEM_ID_BLUE = T.TEM_ID AND E.ENC_SCORE_BLUE < E.ENC_SCORE_GREEN) OR
+                 (E.TEM_ID_GREEN = T.TEM_ID AND E.ENC_SCORE_GREEN < E.ENC_SCORE_BLUE)
+            THEN 1 ELSE 0
+        END
+    ) AS total_losses,
+    SUM(
+        CASE 
+            WHEN E.ENC_STATE = 'CONCLUE' THEN
+                CASE 
+                    WHEN (E.TEM_ID_BLUE = T.TEM_ID AND E.ENC_SCORE_BLUE > E.ENC_SCORE_GREEN) OR
+                         (E.TEM_ID_GREEN = T.TEM_ID AND E.ENC_SCORE_GREEN > E.ENC_SCORE_BLUE)
+                    THEN 3
+                    WHEN E.ENC_SCORE_BLUE = E.ENC_SCORE_GREEN THEN 1
+                    ELSE 0
+                END
+            ELSE 0
+        END
+    ) AS total_points,
+    AVG(
+        CASE 
+            WHEN E.TEM_ID_BLUE = T.TEM_ID THEN E.ENC_SCORE_BLUE
+            WHEN E.TEM_ID_GREEN = T.TEM_ID THEN E.ENC_SCORE_GREEN
+            ELSE NULL
+        END
+    ) AS average_score
+FROM T_TEAM_TEM T
+LEFT JOIN T_ENCOUNTER_ENC E 
+    ON T.TEM_ID = E.TEM_ID_BLUE OR T.TEM_ID = E.TEM_ID_GREEN
+WHERE E.ENC_STATE IN ('CONCLUE', 'FORFAIT')
+GROUP BY T.TEM_ID, T.TEM_NAME;
+
+-- Create forfeit points calculation view
+CREATE OR REPLACE VIEW forfeit_points_calculation AS
+SELECT 
+    team_id,
+    ROUND(total_points * (total_matches + 1) / NULLIF(total_matches, 0)) AS forfeit_points
+FROM team_stats_base;
+
+-- Create final view
+CREATE OR REPLACE VIEW team_stats_with_forfeit AS 
 SELECT 
     base.team_id,
     base.team_name,
-    IFNULL(base.total_matches, 0) AS total_matches,
-    IFNULL(base.total_wins, 0) AS total_wins,
-    IFNULL(base.total_draws, 0) AS total_draws,
-    IFNULL(base.total_losses, 0) AS total_losses,
-    IFNULL(base.total_points, 0) AS total_points,
-    IFNULL(base.average_score, 0) AS average_score,
-    RANK() OVER (ORDER BY IFNULL(base.total_points, 0) DESC, IFNULL(base.average_score, 0) DESC) AS rank
-FROM 
-    (SELECT 
-        T.TEM_ID AS team_id,
-        T.TEM_NAME AS team_name,
-        COUNT(E.ENC_ID) AS total_matches,
-        SUM(
-            CASE 
-                WHEN (E.TEM_ID_BLUE = T.TEM_ID AND E.ENC_SCORE_BLUE > E.ENC_SCORE_GREEN) OR 
-                     (E.TEM_ID_GREEN = T.TEM_ID AND E.ENC_SCORE_GREEN > E.ENC_SCORE_BLUE) 
-                THEN 1 ELSE 0 
-            END
-        ) AS total_wins,
-        SUM(
-            CASE 
-                WHEN E.ENC_SCORE_BLUE = E.ENC_SCORE_GREEN THEN 1 ELSE 0 
-            END
-        ) AS total_draws,
-        SUM(
-            CASE 
-                WHEN (E.TEM_ID_BLUE = T.TEM_ID AND E.ENC_SCORE_BLUE < E.ENC_SCORE_GREEN) OR 
-                     (E.TEM_ID_GREEN = T.TEM_ID AND E.ENC_SCORE_GREEN < E.ENC_SCORE_BLUE) 
-                THEN 1 ELSE 0 
-            END
-        ) AS total_losses,
-        SUM(
-            CASE 
-                WHEN (E.TEM_ID_BLUE = T.TEM_ID AND E.ENC_SCORE_BLUE = -1) OR 
-                     (E.TEM_ID_GREEN = T.TEM_ID AND E.ENC_SCORE_GREEN = -1) 
+    base.total_matches,
+    base.total_wins,
+    base.total_draws,
+    base.total_losses,
+    base.total_points + 
+    COALESCE((
+        SELECT SUM(
+            CASE
+                WHEN (E.TEM_ID_BLUE = base.team_id AND E.ENC_PENALTY_BLUE = TRUE) OR
+                     (E.TEM_ID_GREEN = base.team_id AND E.ENC_PENALTY_GREEN = TRUE)
                 THEN -1
-                ELSE 
-                    CASE 
-                        WHEN (E.TEM_ID_BLUE = T.TEM_ID AND E.ENC_SCORE_BLUE > E.ENC_SCORE_GREEN) OR 
-                             (E.TEM_ID_GREEN = T.TEM_ID AND E.ENC_SCORE_GREEN > E.ENC_SCORE_BLUE) 
-                        THEN 3
-                        WHEN E.ENC_SCORE_BLUE = E.ENC_SCORE_GREEN THEN 1
+                WHEN (E.TEM_ID_BLUE = base.team_id AND E.ENC_PENALTY_BLUE = FALSE AND E.ENC_PENALTY_GREEN = TRUE) OR
+                     (E.TEM_ID_GREEN = base.team_id AND E.ENC_PENALTY_GREEN = FALSE AND E.ENC_PENALTY_BLUE = TRUE)
+                THEN fpc.forfeit_points
+                ELSE 0
+            END
+        )
+        FROM T_ENCOUNTER_ENC E
+        WHERE (E.TEM_ID_BLUE = base.team_id OR E.TEM_ID_GREEN = base.team_id)
+        AND E.ENC_STATE = 'FORFAIT'
+    ), 0) AS total_points,
+    base.average_score,
+    RANK() OVER (
+        ORDER BY 
+            (base.total_points + 
+            COALESCE((
+                SELECT SUM(
+                    CASE
+                        WHEN (E.TEM_ID_BLUE = base.team_id AND E.ENC_PENALTY_BLUE = TRUE) OR
+                             (E.TEM_ID_GREEN = base.team_id AND E.ENC_PENALTY_GREEN = TRUE)
+                        THEN -1
+                        WHEN (E.TEM_ID_BLUE = base.team_id AND E.ENC_PENALTY_BLUE = FALSE AND E.ENC_PENALTY_GREEN = TRUE) OR
+                             (E.TEM_ID_GREEN = base.team_id AND E.ENC_PENALTY_GREEN = FALSE AND E.ENC_PENALTY_BLUE = TRUE)
+                        THEN fpc.forfeit_points
                         ELSE 0
                     END
-            END
-        ) AS total_points,
-        AVG(
-            CASE 
-                WHEN E.TEM_ID_BLUE = T.TEM_ID THEN E.ENC_SCORE_BLUE
-                WHEN E.TEM_ID_GREEN = T.TEM_ID THEN E.ENC_SCORE_GREEN
-                ELSE NULL
-            END
-        ) AS average_score
-    FROM T_TEAM_TEM T
-    LEFT JOIN T_ENCOUNTER_ENC E 
-        ON T.TEM_ID = E.TEM_ID_BLUE OR T.TEM_ID = E.TEM_ID_GREEN
-    GROUP BY T.TEM_ID, T.TEM_NAME
-    ) AS base;
-
+                )
+                FROM T_ENCOUNTER_ENC E
+                WHERE (E.TEM_ID_BLUE = base.team_id OR E.TEM_ID_GREEN = base.team_id)
+                AND E.ENC_STATE = 'FORFAIT'
+            ), 0)) DESC,
+            base.average_score DESC
+    ) AS rank
+FROM team_stats_base base
+LEFT JOIN forfeit_points_calculation fpc ON base.team_id = fpc.team_id;
