@@ -30,10 +30,10 @@
 				<table class="min-w-full table-auto bg-white shadow-lg rounded-lg overflow-hidden">
 					<thead>
 						<tr class="bg-sky-800 text-white">
-							<th class="px-4 py-2 text-center">{{ 'encounters.number' | trans }}</th>
-							<th class="px-4 py-2 text-center">{{ 'encounters.team_blue' | trans }}</th>
-							<th class="px-4 py-2 text-center">{{ 'encounters.score' | trans }}</th>
-							<th class="px-4 py-2 text-center">{{ 'encounters.team_green' | trans }}</th>
+							<th class="px-4 py-2 text-center">{{ 'global.ranking.number' | trans }}</th>
+							<th class="px-4 py-2 text-center">{{ 'global.ranking.team_blue' | trans }}</th>
+							<th class="px-4 py-2 text-center">{{ 'global.ranking.score' | trans }}</th>
+							<th class="px-4 py-2 text-center">{{ 'global.ranking.team_green' | trans }}</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -51,7 +51,7 @@
 						{% else %}
 							<tr>
 								<td colspan="4" class="px-2 py-2 text-center text-gray-500">
-									{{ 'encounters.no_encounters' | trans }}
+									{{ 'global.ranking.no_encounters' | trans }}
 								</td>
 							</tr>
 						{% endfor %}

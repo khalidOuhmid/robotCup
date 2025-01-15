@@ -19,6 +19,11 @@ global:
     encounters_lost: "Rencontres perdue"
     points: "Points"
     no_team: "Aucune équipe disponible."
+    no_encounters: "Aucune rencontre n'est programmée pour le moment."
+    number: "Numéro"
+    team_blue: "Equipe bleu"
+    score: "Score"
+    team_green: "Equipe verte"
   create_team: "Créer une équipe"
 
 # page translations
@@ -79,7 +84,6 @@ encounters:
   team_blue: "Équipe Bleue"
   team_green: "Équipe Verte"
   score: "Score"
-  no_encounters: "Aucune rencontre n'est programmée pour le moment."
   export_JSON: "Exporter en JSON"
 
 teams:
