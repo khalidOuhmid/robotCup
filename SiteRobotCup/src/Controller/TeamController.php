@@ -199,70 +199,60 @@ class TeamController extends AbstractController
     /**
      * Affiche les équipes avec des droits différents selon le rôle
      */
-    #[Route('/team/{id}/{teamId?}', name: 'app_team_show')]
+    #[Route('/team/{teamId?}', name: 'app_team_show')]
     public function show(
         Request $request,
         EntityManagerInterface $entityManager,
-        ?string $id = null
+        ?string $teamId = null
     ): Response {
         $user = $this->getUser();
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
-    
-        // Récupérer les équipes de l'utilisateur ou toutes les équipes si admin
-        if ($this->isGranted('ROLE_ADMIN')) {
-            $teams = $entityManager->getRepository(Team::class)->findAll();
-        } else {
-            $teams = $user->getTeams();
+
+        // Gestion des équipes affichées
+        $teams = $this->isGranted('ROLE_ADMIN') ? 
+            $entityManager->getRepository(Team::class)->findAll() : 
+            $user->getTeams();
+
+        $teamToShow = $teamId ? $entityManager->getRepository(Team::class)->find((int) $teamId) : null;
+
+        // Vérifier l'accès à l'équipe
+        if ($teamToShow && !$this->isGranted('ROLE_ADMIN') && $teamToShow->getUser() !== $user) {
+            throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette équipe.');
         }
-    
-        // Initialisation de l'équipe pour le formulaire
+
+        // Formulaire de création d'équipe
         $team = new Team();
         $form = $this->createForm(TeamType::class, $team);
         $form->handleRequest($request);
-    
+
         if ($form->isSubmitted() && $form->isValid()) {
-            $selectedCompetition = $team->getCompetition();
-    
-            // Vérifier si l'utilisateur a déjà une équipe pour ce championnat
             $existingTeam = $entityManager->getRepository(Team::class)
-                ->findOneBy(['user' => $user, 'competition' => $selectedCompetition]);
-    
+                ->findOneBy(['user' => $user, 'championship' => $team->getChampionship()]);
+
             if ($existingTeam) {
                 $this->addFlash('danger', sprintf(
                     'Vous avez déjà une équipe pour le championnat "%s".',
-                    $selectedCompetition->getCmpName()
+                    $team->getChampionship()->getName()
                 ));
             } else {
-                // Associer l'équipe à l'utilisateur et persister
                 $team->setUser($user);
                 $entityManager->persist($team);
                 $entityManager->flush();
-    
+
                 $this->addFlash('success', 'Équipe créée avec succès !');
-                return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
+                return $this->redirectToRoute('app_team_show', ['teamId' => $team->getId()]);
             }
         }
-    
-        // Si un ID est fourni, chercher l'équipe correspondante
-        $teamToShow = $id ? $entityManager->getRepository(Team::class)->find((int)$id) : null;
-    
-        // Vérifier l'accès si l'utilisateur n'est pas admin
-        if ($teamToShow && !$this->isGranted('ROLE_ADMIN') && $teamToShow->getUser() !== $user) {
-            throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette équipe');
-        }
-    
-        $competition = $entityManager->getRepository(Competition::class)->findAll();
-    
+
         return $this->render('team/show.html.twig', [
             'form' => $form->createView(),
             'team' => $team,
             'teams' => $teams,
             'teamToShow' => $teamToShow,
             'user' => $user,
-            'competition' => $competition,
-            'isAdmin' => $this->isGranted('ROLE_ADMIN'),
+            'isAdmin' => $this->isGranted('ROLE_ADMIN')
         ]);
     }
 
