@@ -47,11 +47,11 @@
 
                                     <!-- Lien pour afficher/masquer les membres -->
                                     {% if teamToShow and teamToShow.id == team.id %}
-                                        <a href="{{ path('app_team_show', { id: user.id }) }}" class="text-red-500 hover:underline">
+                                        <a href="{{ path('app_team_show') }}" class="text-red-500 hover:underline">
                                             {{ 'teams.hide_members' | trans }}
                                         </a>
                                     {% else %}
-                                        <a href="{{ path('app_team_show', { id: user.id, teamId: team.id }) }}" class="text-blue-500 hover:underline">
+                                        <a href="{{ path('app_team_show', { teamId: team.id }) }}" class="text-blue-500 hover:underline">
                                             {{ 'teams.show_members' | trans }}
                                         </a>
                                     {% endif %}
