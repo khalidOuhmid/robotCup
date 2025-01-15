@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Calendrier des rencontres</h1>
+
+    <div class="flex justify-between mb-4">
+        <a href="{{ path('app_encounter_calendar', {year: previousWeek|date('Y'), week: previousWeek|date('W')}) }}" class="btn btn-primary">&lt; Semaine précédente</a>
+        <h2 class="text-2xl font-bold">Semaine {{ startDate|date('W') }} - {{ startDate|date('Y') }}</h2>
+        <a href="{{ path('app_encounter_calendar', {year: nextWeek|date('Y'), week: nextWeek|date('W')}) }}" class="btn btn-primary">Semaine suivante &gt;</a>
+    </div>
+
+    <a href="{{ path('app_calendar_export_ical') }}" class="btn btn-secondary mb-4">Exporter en .ical</a>
+
+    <div class="grid grid-cols-7 gap-4">
+        {% for i in 0..6 %}
+            {% set currentDate = startDate|date_modify('+' ~ i ~ ' days') %}
+            <div class="border rounded-lg p-2">
+                <div class="font-bold mb-2">{{ currentDate|date('l d/m')|trans({}, 'dates') }}</div>
+                {% set dateKey = currentDate|date('Y-m-d') %}
+                <div class="relative" style="height: 840px;">
+                    {% for hour in 8..21 %}
+                        <div class="absolute w-full border-t pt-1" style="top: {{ (hour - 8) * 60 }}px;">
+                            <div class="text-xs text-gray-500">{{ hour|format('%02d') }}:00</div>
+                        </div>
+                    {% endfor %}
+                    {% if calendar[dateKey] is defined %}
+                        {% for time, encounters in calendar[dateKey] %}
+                            {% set startMinutes = (time|slice(0, 2)|number_format * 60 + time|slice(3, 2)|number_format) - (8 * 60) %}
+                            {% for encounter in encounters %}
+                                {% set duration = (encounter.getDateEnd().diff(encounter.getDateBegin()).i + encounter.getDateEnd().diff(encounter.getDateBegin()).h * 60) %}
+                                <div class="absolute bg-blue-100 rounded p-2 text-xs" style="top: {{ startMinutes }}px; height: {{ duration }}px; left: 20px; right: 0;">
+                                    <div>{{ encounter.getTeamBlue().getName() }} vs {{ encounter.getTeamGreen().getName() }}</div>
+                                    <div>Terrain : {{ encounter.getField().getName() }}</div>
+                                    <div>{{ encounter.getDateBegin()|date('H:i') }} - {{ encounter.getDateEnd()|date('H:i') }}</div>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
