@@ -80,6 +80,8 @@ class Team
     #[ORM\JoinColumn(name: 'CMP_ID', referencedColumnName: 'CMP_ID', nullable: false)]
     private ?Competition $competition = null;
 
+    private ?string $type = null;
+
     /**
      * Constructor initializes collections and sets creation date.
      */
@@ -250,6 +252,60 @@ class Team
         return $this->encountersAsGreen;
     }
 
+    public function getEncountersBlue(): Collection
+    {
+        return $this->encountersAsBlue;
+    }
+
+    public function getEncountersGreen(): Collection
+    {
+        return $this->encountersAsGreen;
+    }
+
+    public function addEncounterBlue(Encounter $encounter): self
+    {
+        if (!$this->encountersAsBlue->contains($encounter)) {
+            $this->encountersAsBlue[] = $encounter;
+            $encounter->setTeamBlue($this);
+        }
+
+        return $this;
+    }
+
+    public function addEncounterGreen(Encounter $encounter): self
+    {
+        if (!$this->encountersAsGreen->contains($encounter)) {
+            $this->encountersAsGreen[] = $encounter;
+            $encounter->setTeamGreen($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEncounterBlue(Encounter $encounter): self
+    {
+        if ($this->encountersAsBlue->removeElement($encounter)) {
+            // set the owning side to null (unless already changed)
+            if ($encounter->getTeamBlue() === $this) {
+                $encounter->setTeamBlue(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function removeEncounterGreen(Encounter $encounter): self
+    {
+        if ($this->encountersAsGreen->removeElement($encounter)) {
+            // set the owning side to null (unless already changed)
+            if ($encounter->getTeamGreen() === $this) {
+                $encounter->setTeamGreen(null);
+            }
+        }
+
+        return $this;
+    }
+
     /**
      * Sets team statistics from database view.
      *
@@ -315,5 +371,10 @@ class Team
     {
         $this->competition = $competition;
         return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
     }
 }

@@ -26,6 +26,27 @@
                     {{ form_row(form.cmpDateEnd, {
                         'attr': {'class': 'w-full rounded border-gray-300'}
                     }) }}
+                    {{ form_row(form.cmpRoundSystem, {
+                        'attr': {
+                            'class': 'w-full rounded border-gray-300 focus:border-blue-500 focus:ring-blue-500',
+                            'data-round-system': true
+                        },
+                        'label_attr': {'class': 'block text-sm font-medium text-gray-700 mb-1'}
+                    }) }}
+                    
+                    <div id="rounds-field" class="border-l-4 border-blue-500 pl-4" style="display: none;">
+                        {{ form_row(form.cmpRounds, {
+                            'attr': {
+                                'class': 'w-full rounded border-gray-300 focus:border-blue-500 focus:ring-blue-500',
+                                'min': 1,
+                                'max': 16,
+                                'data-rounds-input': true
+                            },
+                            'label_attr': {'class': 'block text-sm font-medium text-gray-700 mb-1'},
+                            'help': 'Maximum 16 rencontres possibles par championnat'
+                        }) }}
+                    </div>
+
                     <div class="space-y-2">
                         <div class="flex items-center">
                             {{ form_widget(form.includeTournament, {
@@ -37,27 +58,6 @@
                             {{ form_label(form.includeTournament) }}
                         </div>
                         <div id="tournamentOptions" class="ml-4 space-y-4 bg-gray-50 p-4 rounded-lg" style="display: none;">
-                            {{ form_row(form.cmpRoundSystem, {
-                                'attr': {
-                                    'class': 'w-full rounded border-gray-300 focus:border-blue-500 focus:ring-blue-500',
-                                    'data-tournament-system': true
-                                },
-                                'label_attr': {'class': 'block text-sm font-medium text-gray-700 mb-1'}
-                            }) }}
-                            
-                            <div id="rounds-field" class="border-l-4 border-blue-500 pl-4" style="display: none;">
-                                {{ form_row(form.cmpRounds, {
-                                    'attr': {
-                                        'class': 'w-full rounded border-gray-300 focus:border-blue-500 focus:ring-blue-500',
-                                        'min': 1,
-                                        'max': 16,
-                                        'data-rounds-input': true
-                                    },
-                                    'label_attr': {'class': 'block text-sm font-medium text-gray-700 mb-1'},
-                                    'help': 'Maximum 16 rencontres possibles par tournoi'
-                                }) }}
-                            </div>
-
                             <div class="flex items-center space-x-2 pt-2 border-t border-gray-200">
                                 {{ form_widget(form.includeThirdPlace, {
                                     'attr': {
@@ -68,14 +68,6 @@
                                 {{ form_label(form.includeThirdPlace, null, {
                                     'label_attr': {'class': 'text-sm text-gray-700'}
                                 }) }}
-                            </div>
-
-                            <div class="mt-2 text-sm text-gray-600">
-                                <ul class="list-disc pl-5 space-y-1">
-                                    <li>Ronde Suisse : Appariement basé sur les points avec nombre de rondes spécifié</li>
-                                    <li>Ronde Hollandaise : Appariement basé sur le classement</li>
-                                    <li>Système Monrad : Appariement similaire au système suisse</li>
-                                </ul>
                             </div>
                         </div>
                     </div>
@@ -96,32 +88,29 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const roundSystem = document.querySelector('[data-round-system]');
+    const roundsField = document.getElementById('rounds-field');
     const tournamentCheckbox = document.querySelector('[data-tournament-checkbox]');
     const tournamentOptions = document.getElementById('tournamentOptions');
-    const thirdPlaceCheckbox = document.querySelector('[data-third-place-checkbox]');
-    const tournamentSystem = document.querySelector('[data-tournament-system]');
-    const roundsField = document.getElementById('rounds-field');
 
     function updateDisplay() {
-        const isTournamentChecked = tournamentCheckbox.checked;
-        const selectedSystem = tournamentSystem.value;
-
-        tournamentOptions.style.display = isTournamentChecked ? 'block' : 'none';
-        tournamentSystem.disabled = !isTournamentChecked;
-        thirdPlaceCheckbox.disabled = !isTournamentChecked;
+        const selectedSystem = roundSystem.value;
         
         // Afficher le champ nombre de rondes uniquement pour le système Suisse
-        roundsField.style.display = (isTournamentChecked && selectedSystem === 'SUISSE') ? 'block' : 'none';
+        roundsField.style.display = (selectedSystem === 'SUISSE') ? 'block' : 'none';
         
         // Rendre le champ obligatoire si système Suisse sélectionné
         const roundsInput = document.querySelector('[data-rounds-input]');
         if (roundsInput) {
-            roundsInput.required = (isTournamentChecked && selectedSystem === 'SUISSE');
+            roundsInput.required = (selectedSystem === 'SUISSE');
         }
+
+        // Afficher les options de tournoi si la case est cochée
+        tournamentOptions.style.display = tournamentCheckbox.checked ? 'block' : 'none';
     }
 
+    roundSystem.addEventListener('change', updateDisplay);
     tournamentCheckbox.addEventListener('change', updateDisplay);
-    tournamentSystem.addEventListener('change', updateDisplay);
 
     // État initial
     updateDisplay();

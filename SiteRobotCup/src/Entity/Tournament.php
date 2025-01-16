@@ -101,9 +101,10 @@ class Tournament
     public function addEncounter(Encounter $encounter): self
     {
         if (!$this->encounters->contains($encounter)) {
-            $this->encounters->add($encounter);
+            $this->encounters[] = $encounter;
             $encounter->setTournament($this);
         }
+
         return $this;
     }
 
@@ -116,10 +117,12 @@ class Tournament
     public function removeEncounter(Encounter $encounter): self
     {
         if ($this->encounters->removeElement($encounter)) {
+            // set the owning side to null (unless already changed)
             if ($encounter->getTournament() === $this) {
                 $encounter->setTournament(null);
             }
         }
+
         return $this;
     }
 
@@ -151,5 +154,10 @@ class Tournament
     public function getType(): ?string
     {
         return $this->competition?->getCmpRoundSystem();
+    }
+
+    public function getName(): string
+    {
+        return $this->getCompetition()?->getCmpName() ?? 'Tournament without name';
     }
 }

@@ -15,7 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
@@ -113,7 +113,7 @@ class TeamController extends AbstractController
         $form->handleRequest($request);
 
         if (!$team) {
-            $this->addFlash('danger', 'Vous devez avoir une equipe pour ajouter des membres');
+            $this->addFlash('danger', 'Vous devez avoir une équipe pour ajouter des membres');
             return $this->redirectToRoute('app_team_show', ['id' => $team->getId()]);
         }
 
@@ -147,7 +147,7 @@ class TeamController extends AbstractController
     }
 
     /**
-     * Affiche et gère la création d'équipe (modifié pour la limite d'une équipe par utilisateur)
+     * Affiche et gère la création d'équipe (modifié pour la limite d'une équipe par utilisateur par compétition)
      */
     #[Route('/team/new', name: 'app_team_new')]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -155,12 +155,6 @@ class TeamController extends AbstractController
         $user = $this->getUser();
         if (!$user) {
             return $this->redirectToRoute('app_login');
-        }
-        
-        // Vérifie si l'utilisateur a déjà une équipe (sauf pour les admins)
-        if (!$this->isGranted('ROLE_ADMIN') && count($user->getTeams()) > 0) {
-            $this->addFlash('error', 'Vous ne pouvez créer qu\'une seule équipe');
-            return $this->redirectToRoute('app_team_show', ['id' => $user->getId()]);
         }
 
         $team = new Team();
@@ -171,10 +165,19 @@ class TeamController extends AbstractController
             try {
                 $entityManager->beginTransaction();
                 
-                // On s'assure qu'une competition est sélectionnée
+                // On s'assure qu'une compétition est sélectionnée
                 if (!$team->getCompetition()) {
                     $this->addFlash('error', 'Vous devez sélectionner une compétition');
                     return $this->render('admin/teams/index.html.twig', ['form' => $form->createView()]);
+                }
+
+                // Vérifie si l'utilisateur a déjà une équipe pour cette compétition
+                $existingTeam = $entityManager->getRepository(Team::class)
+                    ->findOneBy(['user' => $user, 'competition' => $team->getCompetition()]);
+
+                if ($existingTeam) {
+                    $this->addFlash('error', 'Vous avez déjà une équipe pour cette compétition');
+                    return $this->redirectToRoute('app_team_show', ['id' => $user->getId()]);
                 }
 
                 $team->setUser($this->getUser());
@@ -229,12 +232,12 @@ class TeamController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $existingTeam = $entityManager->getRepository(Team::class)
-                ->findOneBy(['user' => $user, 'championship' => $team->getChampionships()]);
+                ->findOneBy(['user' => $user, 'competition' => $team->getCompetition()]);
 
             if ($existingTeam) {
                 $this->addFlash('danger', sprintf(
-                    'Vous avez déjà une équipe pour le championnat "%s".',
-                    $team->getChampionships()->getName()
+                    'Vous avez déjà une équipe pour la compétition "%s".',
+                    $team->getCompetition()->getCmpName()
                 ));
             } else {
                 $team->setUser($user);
@@ -255,7 +258,6 @@ class TeamController extends AbstractController
             'isAdmin' => $this->isGranted('ROLE_ADMIN')
         ]);
     }
-
 
     /**
      * Registers a team for a championship.

@@ -21,7 +21,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     fields: ['dateBegin', 'dateEnd', 'field'],
     message: 'Ce terrain est déjà occupé pour ces dates'
 )]
-
 class Encounter
 {
     /**
@@ -205,7 +204,7 @@ class Encounter
      * @param Field|null $field
      * @return self
      */
-    public function setField(?Field $field): self
+    public function setField(Field $field): self
     {
         $this->field = $field;
         return $this;
@@ -227,7 +226,7 @@ class Encounter
      * @param Team|null $teamBlue
      * @return self
      */
-    public function setTeamBlue(?Team $teamBlue): self
+    public function setTeamBlue(Team $teamBlue): self
     {
         $this->teamBlue = $teamBlue;
         return $this;
@@ -249,7 +248,7 @@ class Encounter
      * @param Team|null $teamGreen
      * @return self
      */
-    public function setTeamGreen(?Team $teamGreen): self
+    public function setTeamGreen(Team $teamGreen): self
     {
         $this->teamGreen = $teamGreen;
         return $this;

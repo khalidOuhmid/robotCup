@@ -161,28 +161,16 @@
 
     <div class="container">
         {% if tournaments is empty %}
-            <div class="alert alert-info text-center">
-                <i class="fas fa-info-circle"></i> Aucun tournoi n'est disponible pour le moment.
-            </div>
+            <p>Aucun tournoi disponible.</p>
         {% else %}
             <div class="tournament-grid">
                 {% for tournament in tournaments %}
                     <div class="tournament-card">
                         <div class="tournament-header">
-                            <h3>{{ tournament.competition.cmpName }}</h3>
-                            {% set now = "now"|date("Y-m-d") %}
-                            {% set startDate = tournament.competition.cmpDateBegin|date("Y-m-d") %}
-                            {% set endDate = tournament.competition.cmpDateEnd|date("Y-m-d") %}
-                            
-                            {% if startDate > now %}
-                                <span class="status-badge status-upcoming">À venir</span>
-                            {% elseif endDate < now %}
-                                <span class="status-badge status-completed">Terminé</span>
-                            {% else %}
-                                <span class="status-badge status-ongoing">En cours</span>
-                            {% endif %}
+                            <h2>{{ tournament.name }}</h2>
                         </div>
                         <div class="tournament-body">
+                            <p>Type: {{ tournament.type }}</p>
                             <p>
                                 <i class="fas fa-map-marker-alt"></i> {{ tournament.competition.cmpAddress|default('Lieu non défini') }}
                             </p>
@@ -190,26 +178,14 @@
                                 <i class="fas fa-calendar"></i> Du {{ tournament.competition.cmpDateBegin|date('d/m/Y') }} 
                                 au {{ tournament.competition.cmpDateEnd|date('d/m/Y') }}
                             </p>
-                            <p>
-                                <i class="fas fa-trophy"></i> Type: 
-                                {% set type = tournament.competition.cmpRoundSystem %}
-                                {% if type == 'SUISSE' %}
-                                    Ronde Suisse
-                                {% elseif type == 'HOLLANDAIS' %}
-                                    Ronde Hollandaise
-                                {% elseif type == 'MONRAD' %}
-                                    Système Monrad
-                                {% else %}
-                                    Non défini
-                                {% endif %}
-                            </p>
+                            
                             <div class="tournament-stats">
                                 <div class="stat-item">
                                     <div class="stat-value">{{ tournament.encounters|length }}</div>
                                     <div class="stat-label">Matchs</div>
                                 </div>
                                 <div class="stat-item">
-                                    <div class="stat-value">{{ tournament.encounters|filter(e => e.encState == 'CONCLUE')|length }}</div>
+                                    <div class="stat-value">{{ tournament.encounters|filter(e => e.getState() == 'CONCLUE')|length }}</div>
                                     <div class="stat-label">Terminés</div>
                                 </div>
                             </div>

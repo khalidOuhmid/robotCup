@@ -3,7 +3,6 @@
 namespace App\Form;
 
 use App\Entity\Competition;
-use App\Entity\Tournament;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -12,8 +11,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Range;
 
@@ -41,26 +38,19 @@ class CompetitionType extends AbstractType
                 'label' => 'Date de fin',
                 'widget' => 'single_text'
             ])
-            ->add('includeTournament', CheckboxType::class, [
-                'label' => 'Inclure un tournoi',
-                'mapped' => false,
-                'required' => false
-            ])
             ->add('cmpRoundSystem', ChoiceType::class, [
-                'label' => 'Type de tournoi',
+                'label' => 'Système de rondes',
                 'choices' => [
-                    'Ronde Suisse' => 'SUISSE',
-                    'Ronde Hollandaise' => 'HOLLANDAIS',
-                    'Système Monrad' => 'MONRAD'
+                    'Suisse' => 'SUISSE',
+                    'Hollandais' => 'HOLLANDAIS',
+                    'Normal' => 'NORMAL',
                 ],
-                'placeholder' => 'Choisir un type de tournoi',
-                'required' => false,
-                'mapped' => true,
+                'placeholder' => 'Choisir un type de championnat',
+                'required' => true,
             ])
             ->add('cmpRounds', IntegerType::class, [
                 'label' => 'Nombre de rondes',
                 'required' => false,
-                'mapped' => true,
                 'attr' => [
                     'min' => 1,
                     'max' => 16
@@ -69,8 +59,13 @@ class CompetitionType extends AbstractType
                     new Range(['min' => 1, 'max' => 16])
                 ]
             ])
+            ->add('includeTournament', CheckboxType::class, [
+                'label' => 'Inclure un tournoi',
+                'mapped' => false,
+                'required' => false
+            ])
             ->add('includeThirdPlace', CheckboxType::class, [
-                'label' => 'Match pour la 3ème place',
+                'label' => 'Inclure une petite finale',
                 'mapped' => false,
                 'required' => false
             ])

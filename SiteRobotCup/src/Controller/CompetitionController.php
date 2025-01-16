@@ -7,6 +7,7 @@ use App\Entity\Championship;
 use App\Entity\Tournament;
 use App\Form\CompetitionType;
 use App\Service\TournamentGenerator;
+use App\Service\ChampionshipScheduler;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,8 +20,7 @@ class CompetitionController extends AbstractController
     #[Route('/admin/competition/new', name: 'app_admin_competition_new')]
     public function new(
         Request $request, 
-        EntityManagerInterface $entityManager,
-        TournamentGenerator $tournamentGenerator
+        EntityManagerInterface $entityManager
     ): Response {
         $competition = new Competition();
         $form = $this->createForm(CompetitionType::class, $competition);
@@ -58,28 +58,14 @@ class CompetitionController extends AbstractController
                     if ($form->get('includeTournament')->getData()) {
                         $tournament = new Tournament();
                         $tournament->setCompetition($competition);
-                        $tournament->setIncludeThirdPlace($form->get('includeThirdPlace')->getData());
                         
-                        $roundSystem = $form->get('cmpRoundSystem')->getData();
-                        if (!$roundSystem) {
-                            throw new \Exception('Le type de tournoi est requis');
-                        }
-                        $competition->setCmpRoundSystem($roundSystem);
-                        
-                        if ($roundSystem === 'SUISSE') {
-                            $rounds = $form->get('cmpRounds')->getData();
-                            if (!$rounds || $rounds < 1 || $rounds > 16) {
-                                throw new \Exception('Le nombre de rondes doit être entre 1 et 16');
-                            }
-                            $competition->setCmpRounds($rounds);
-                        }
+                        $includeThirdPlace = $form->get('includeThirdPlace')->getData();
+                        $tournament->setIncludeThirdPlace($includeThirdPlace);
                         
                         $entityManager->persist($tournament);
-                        $entityManager->flush();
-                        
-                        $tournamentGenerator->generateTournament($tournament);
                     }
 
+                    $entityManager->flush();
                     $entityManager->commit();
                     $this->addFlash('success', 'La compétition a été créée avec succès.');
                     return $this->redirectToRoute('app_default');

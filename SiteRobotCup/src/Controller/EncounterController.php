@@ -82,3 +82,5 @@ final class EncounterController extends AbstractController
         return $this->redirectToRoute('app_t_encounter_enc_index', [], Response::HTTP_SEE_OTHER);
     }
 }
+
+

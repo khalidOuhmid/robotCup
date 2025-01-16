@@ -15,6 +15,10 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'T_CHAMPIONSHIP_CHP')]
 class Championship
 {
+    public const TYPE_SWISS = 'SUISSE';
+    public const TYPE_DUTCH = 'HOLLANDAIS';
+    public const TYPE_NORMAL = 'NORMAL';
+
     /**
      * @var int|null The unique identifier of the championship
      */
@@ -35,6 +39,11 @@ class Championship
      */
     #[ORM\OneToMany(mappedBy: 'championship', targetEntity: Encounter::class)]
     private Collection $encounters;
+
+    /**
+     * @var string|null The type of the championship
+     */
+    private ?string $type = null;
 
     /**
      * Constructor initializes the encounters collection.
@@ -114,6 +123,28 @@ class Championship
                 $encounter->setChampionship(null);
             }
         }
+        return $this;
+    }
+
+    /**
+     * Gets the type of the championship.
+     *
+     * @return string|null
+     */
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    /**
+     * Sets the type of the championship.
+     *
+     * @param string|null $type
+     * @return $this
+     */
+    public function setType(?string $type): self
+    {
+        $this->type = $type;
         return $this;
     }
 

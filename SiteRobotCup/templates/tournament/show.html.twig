@@ -45,6 +45,53 @@
             overflow-x: auto;
             margin: 2rem 0;
         }
+
+        .tournament-bracket {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            padding: 20px;
+            overflow-x: auto;
+            min-width: 100%;
+        }
+
+        .bracket-round {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            min-width: 300px;
+            margin: 0 40px;
+            position: relative;
+        }
+
+        .bracket-match {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .connector-line {
+            position: absolute;
+            right: -40px;
+            width: 40px;
+            border-top: 2px solid #1e3c72;
+        }
+
+        .connector-vertical {
+            position: absolute;
+            right: -40px;
+            border-right: 2px solid #1e3c72;
+        }
+
+        /* Ajustements pour l'espacement des rounds */
+        .bracket-round:not(:last-child) .bracket-match:nth-child(odd) .connector-vertical {
+            height: 100%;
+            top: 50%;
+        }
+
+        .bracket-round:not(:last-child) .bracket-match:nth-child(even) .connector-vertical {
+            height: 100%;
+            bottom: 50%;
+        }
     </style>
 {% endblock %}
 
@@ -73,6 +120,15 @@
             </div>
         </div>
 
+        {# Bouton pour générer les rencontres #}
+        {% if is_granted('ROLE_ADMIN') %}
+            <div class="mb-4">
+                <form action="{{ path('app_tournament_generate', {'id': tournament.id}) }}" method="post">
+                    <button type="submit" class="btn btn-primary">Générer les rencontres</button>
+                </form>
+            </div>
+        {% endif %}
+
         {# Statistiques du tournoi #}
         <div class="tournament-stats">
             <div class="row text-center">
@@ -81,15 +137,15 @@
                     <p>Matchs total</p>
                 </div>
                 <div class="col-md-3">
-                    <h4>{{ tournament.encounters|filter(e => e.encState == 'CONCLUE')|length }}</h4>
+                    <h4>{{ tournament.encounters|filter(e => e.getState() == 'CONCLUE')|length }}</h4>
                     <p>Matchs terminés</p>
                 </div>
                 <div class="col-md-3">
-                    <h4>{{ tournament.encounters|filter(e => e.encState == 'EN COURS')|length }}</h4>
+                    <h4>{{ tournament.encounters|filter(e => e.getState() == 'EN COURS')|length }}</h4>
                     <p>Matchs en cours</p>
                 </div>
                 <div class="col-md-3">
-                    <h4>{{ tournament.encounters|filter(e => e.encState == 'PROGRAMMEE')|length }}</h4>
+                    <h4>{{ tournament.encounters|filter(e => e.getState() == 'PROGRAMMEE')|length }}</h4>
                     <p>Matchs à venir</p>
                 </div>
             </div>
@@ -98,43 +154,152 @@
         {# Liste des matchs #}
         {% if tournament.encounters is not empty %}
             <div class="matches-container">
-                <h2 class="mb-4">Matchs du tournoi</h2>
-                <div class="row">
-                    {% for encounter in tournament.encounters %}
-                        <div class="col-md-6">
-                            <div class="card match-card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="match-status status-{{ encounter.encState }}">
-                                            {{ encounter.encState }}
-                                        </span>
-                                        <small>Match #{{ encounter.id }}</small>
+                <h2 class="mb-4">Arbre du tournoi</h2>
+                <div class="tournament-bracket">
+                    {# Grouper les rencontres par phases #}
+                    {% set quarterFinals = tournament.encounters|slice(0, 4) %}
+                    {% set semiFinals = tournament.encounters|slice(4, 2) %}
+                    {% set final = tournament.encounters|slice(6, 1) %}
+
+                    {# Quarts de finale #}
+                    {% if quarterFinals is not empty %}
+                        <div class="bracket-round">
+                            <h3>Quarts de finale</h3>
+                            {% for encounter in quarterFinals %}
+                                <div class="bracket-match">
+                                    <div class="match-card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="match-status status-{{ encounter.getState() }}">
+                                                    {{ encounter.getState() }}
+                                                </span>
+                                                <small>Match #{{ encounter.getId() }}</small>
+                                            </div>
+                                            <div class="row mt-3 align-items-center text-center">
+                                                <div class="col">
+                                                    <h5>{{ encounter.getTeamBlue().getName() }}</h5>
+                                                </div>
+                                                <div class="col-4">
+                                                    {% if encounter.getState() == 'CONCLUE' %}
+                                                        <h4>{{ encounter.getScoreBlue() }} - {{ encounter.getScoreGreen() }}</h4>
+                                                    {% else %}
+                                                        <h4>VS</h4>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="col">
+                                                    <h5>{{ encounter.getTeamGreen().getName() }}</h5>
+                                                </div>
+                                            </div>
+                                            <div class="text-center mt-3">
+                                                <span class="badge bg-primary">
+                                                    {{ encounter.getTimeSlot().getDateBegin()|date('d/m/Y H:i') }}
+                                                </span>
+                                                <span class="badge bg-secondary">
+                                                    {{ encounter.getField().getName() }}
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="row mt-3 align-items-center text-center">
-                                        <div class="col">
-                                            <h5>{{ encounter.teamBlue.temName }}</h5>
-                                        </div>
-                                        <div class="col-4">
-                                            {% if encounter.encState == 'CONCLUE' %}
-                                                <h4>{{ encounter.encScoreBlue }} - {{ encounter.encScoreGreen }}</h4>
-                                            {% else %}
-                                                <h4>VS</h4>
-                                            {% endif %}
-                                        </div>
-                                        <div class="col">
-                                            <h5>{{ encounter.teamGreen.temName }}</h5>
+                                    {% if not loop.last %}
+                                        <div class="connector-line"></div>
+                                        <div class="connector-vertical"></div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {# Demi-finales #}
+                    {% if semiFinals is not empty %}
+                        <div class="bracket-round">
+                            <h3>Demi-finales</h3>
+                            {% for encounter in semiFinals %}
+                                <div class="bracket-match">
+                                    <div class="match-card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="match-status status-{{ encounter.getState() }}">
+                                                    {{ encounter.getState() }}
+                                                </span>
+                                                <small>Match #{{ encounter.getId() }}</small>
+                                            </div>
+                                            <div class="row mt-3 align-items-center text-center">
+                                                <div class="col">
+                                                    <h5>{{ encounter.getTeamBlue().getName() }}</h5>
+                                                </div>
+                                                <div class="col-4">
+                                                    {% if encounter.getState() == 'CONCLUE' %}
+                                                        <h4>{{ encounter.getScoreBlue() }} - {{ encounter.getScoreGreen() }}</h4>
+                                                    {% else %}
+                                                        <h4>VS</h4>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="col">
+                                                    <h5>{{ encounter.getTeamGreen().getName() }}</h5>
+                                                </div>
+                                            </div>
+                                            <div class="text-center mt-3">
+                                                <span class="badge bg-primary">
+                                                    {{ encounter.getTimeSlot().getDateBegin()|date('d/m/Y H:i') }}
+                                                </span>
+                                                <span class="badge bg-secondary">
+                                                    {{ encounter.getField().getName() }}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="text-center mt-3">
-                                        <a href="{{ path('app_t_encounter_enc_show', {'id': encounter.id}) }}" 
-                                           class="btn btn-outline-primary btn-sm">
-                                            Détails du match
-                                        </a>
+                                    {% if not loop.last %}
+                                        <div class="connector-line"></div>
+                                        <div class="connector-vertical"></div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    {# Finale #}
+                    {% if final is not empty %}
+                        <div class="bracket-round">
+                            <h3>Finale</h3>
+                            {% for encounter in final %}
+                                <div class="bracket-match">
+                                    <div class="match-card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="match-status status-{{ encounter.getState() }}">
+                                                    {{ encounter.getState() }}
+                                                </span>
+                                                <small>Match #{{ encounter.getId() }}</small>
+                                            </div>
+                                            <div class="row mt-3 align-items-center text-center">
+                                                <div class="col">
+                                                    <h5>{{ encounter.getTeamBlue().getName() }}</h5>
+                                                </div>
+                                                <div class="col-4">
+                                                    {% if encounter.getState() == 'CONCLUE' %}
+                                                        <h4>{{ encounter.getScoreBlue() }} - {{ encounter.getScoreGreen() }}</h4>
+                                                    {% else %}
+                                                        <h4>VS</h4>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="col">
+                                                    <h5>{{ encounter.getTeamGreen().getName() }}</h5>
+                                                </div>
+                                            </div>
+                                            <div class="text-center mt-3">
+                                                <span class="badge bg-primary">
+                                                    {{ encounter.getTimeSlot().getDateBegin()|date('d/m/Y H:i') }}
+                                                </span>
+                                                <span class="badge bg-secondary">
+                                                    {{ encounter.getField().getName() }}
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            {% endfor %}
                         </div>
-                    {% endfor %}
+                    {% endif %}
                 </div>
             </div>
         {% else %}

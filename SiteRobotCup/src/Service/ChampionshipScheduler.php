@@ -5,16 +5,24 @@ namespace App\Service;
 use PDO;
 use Exception;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Championship;
+use Psr\Log\LoggerInterface;
+use App\Entity\Team;
+use App\Entity\Encounter;
+use App\Entity\TimeSlot;
+use App\Entity\Field;
 
 class ChampionshipScheduler {
     
     private EntityManagerInterface $entityManager;
     private PDO $pdo;
+    private $logger;
     
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, LoggerInterface $logger)
     {
         $this->entityManager = $entityManager;
         $this->pdo = $entityManager->getConnection()->getNativeConnection();
+        $this->logger = $logger;
     }
     
     /**
@@ -189,5 +197,239 @@ class ChampionshipScheduler {
                 throw $e;
             }
         }
+    }
+
+    public function generateChampionship(Championship $championship): void
+    {
+        $this->logger->info('Generating championship encounters', ['championship_id' => $championship->getId()]);
+
+        switch ($championship->getType()) {
+            case 'SUISSE':
+                $this->generateSwissChampionship($championship, $championship->getCompetition()->getCmpRounds());
+                break;
+            case 'HOLLANDAIS':
+                $this->generateDutchChampionship($championship);
+                break;
+            default:
+                $this->generateNormalChampionship($championship);
+        }
+    }
+
+    private function generateSwissChampionship(Championship $championship, int $rounds): void
+    {
+        $teams = $this->getTopTeams($championship->getCompetition());
+        $teamsCount = count($teams);
+        $fields = $this->getFields($championship->getCompetition());
+
+        if ($teamsCount < 2) {
+            $this->logger->error("Not enough teams to generate a championship", ['teams_count' => $teamsCount]);
+            throw new \Exception("Pas assez d'équipes pour générer un championnat");
+        }
+
+        if (empty($fields)) {
+            throw new \Exception("Aucun terrain n'est disponible pour cette compétition");
+        }
+
+        $maxRounds = min($rounds, floor(16 / $teamsCount));
+        $timeSlots = $this->generateTimeSlots($championship, $maxRounds);
+        $timeSlotIndex = 0;
+
+        for ($round = 0; $round < $maxRounds; $round++) {
+            $teamsCopy = $teams;
+            shuffle($teamsCopy);
+
+            for ($i = 0; $i < floor(count($teamsCopy) / 2); $i++) {
+                if ($timeSlotIndex >= count($timeSlots)) break;
+
+                $teamBlue = array_shift($teamsCopy);
+                $teamGreen = array_shift($teamsCopy);
+
+                if (!$teamBlue || !$teamGreen) break;
+
+                $encounter = $this->generateEncounter(
+                    $championship,
+                    $teamBlue,
+                    $teamGreen,
+                    $timeSlots[$timeSlotIndex],
+                    $fields[$i % count($fields)]
+                );
+
+                $this->entityManager->persist($encounter);
+                $this->logger->info('Encounter created', [
+                    'encounter' => [
+                        'team_blue' => $encounter->getTeamBlue()->getName(),
+                        'team_green' => $encounter->getTeamGreen()->getName(),
+                        'time_slot' => $encounter->getTimeSlot()->getDateBegin()->format('Y-m-d H:i:s'),
+                        'field' => $encounter->getField()->getName()
+                    ]
+                ]);
+                $timeSlotIndex++;
+            }
+        }
+
+        $this->entityManager->flush();
+        $this->logger->info('Championship encounters generated successfully', ['championship_id' => $championship->getId()]);
+    }
+
+    private function generateDutchChampionship(Championship $championship): void
+    {
+        $teams = $this->getTopTeams($championship->getCompetition());
+        $teamsCount = count($teams);
+
+        if ($teamsCount < 2) {
+            throw new \Exception("Pas assez d'équipes pour générer un championnat");
+        }
+
+        $timeSlots = $this->generateTimeSlots($championship, floor($teamsCount / 2));
+
+        for ($i = 0; $i < floor($teamsCount / 2); $i++) {
+            if ($i >= count($timeSlots)) break;
+
+            $encounter = $this->generateEncounter(
+                $championship,
+                $teams[$i],
+                $teams[$teamsCount - 1 - $i],
+                $timeSlots[$i],
+                $this->getFields($championship->getCompetition())[$i % count($this->getFields($championship->getCompetition()))]
+            );
+
+            $this->entityManager->persist($encounter);
+        }
+
+        $this->entityManager->flush();
+    }
+
+    private function generateNormalChampionship(Championship $championship): void
+    {
+        $teams = $this->getTopTeams($championship->getCompetition());
+        $teamsCount = count($teams);
+
+        if ($teamsCount < 4) {
+            throw new \Exception("Il faut au moins 4 équipes pour générer un championnat éliminatoire");
+        }
+
+        $existingEncounters = $this->entityManager->getRepository(Encounter::class)
+            ->findBy(['championship' => $championship]);
+        if (!empty($existingEncounters)) {
+            throw new \Exception("Ce championnat a déjà des rencontres programmées");
+        }
+
+        $numberOfRounds = ceil(log($teamsCount, 2));
+        $totalTeamsNeeded = pow(2, $numberOfRounds);
+
+        shuffle($teams);
+        $teams = array_slice($teams, 0, min($teamsCount, $totalTeamsNeeded));
+
+        $fields = $this->getFields($championship->getCompetition());
+        if (empty($fields)) {
+            throw new \Exception("Aucun terrain n'est disponible pour cette compétition");
+        }
+
+        $pairs = [];
+        $usedTeams = [];
+        for ($i = 0; $i < count($teams); $i += 2) {
+            if ($i + 1 >= count($teams)) break;
+
+            $teamBlue = $teams[$i];
+            $teamGreen = $teams[$i + 1];
+
+            $key = min($teamBlue->getId(), $teamGreen->getId()) . '_' . max($teamBlue->getId(), $teamGreen->getId());
+            if (isset($usedTeams[$key])) {
+                continue;
+            }
+
+            $pairs[] = [$teamBlue, $teamGreen];
+            $usedTeams[$key] = true;
+        }
+
+        $timeSlots = $this->generateTimeSlots($championship, count($pairs));
+
+        foreach ($pairs as $index => $pair) {
+            if (!isset($timeSlots[$index])) break;
+
+            $encounter = $this->generateEncounter(
+                $championship,
+                $pair[0],
+                $pair[1],
+                $timeSlots[$index],
+                $fields[$index % count($fields)]
+            );
+
+            $this->entityManager->persist($encounter);
+            $this->logger->info('Encounter created', [
+                'teams' => [$pair[0]->getName(), $pair[1]->getName()],
+                'time' => $timeSlots[$index]->getDateBegin()->format('Y-m-d H:i')
+            ]);
+        }
+
+        $this->entityManager->flush();
+    }
+
+    private function generateTimeSlots(Championship $championship, int $numberOfSlots): array
+    {
+        $startDate = $championship->getCompetition()->getCmpDateBegin();
+        $endDate = $championship->getCompetition()->getCmpDateEnd();
+        $duration = 30;
+        $break = 10;
+
+        $timeSlots = [];
+        $currentTime = clone $startDate;
+
+        for ($i = 0; $i < $numberOfSlots; $i++) {
+            $slotEnd = (clone $currentTime)->modify("+{$duration} minutes");
+            if ($slotEnd > $endDate) {
+                break;
+            }
+
+            $timeSlot = new TimeSlot();
+            $timeSlot->setDateBegin($currentTime)
+                ->setDateEnd($slotEnd);
+
+            $existingTimeSlot = $this->entityManager->getRepository(TimeSlot::class)
+                ->findOneBy([
+                    'dateBegin' => $currentTime,
+                    'dateEnd' => $slotEnd
+                ]);
+
+            if ($existingTimeSlot) {
+                $timeSlots[] = $existingTimeSlot;
+            } else {
+                $this->entityManager->persist($timeSlot);
+                $timeSlots[] = $timeSlot;
+            }
+
+            $currentTime = (clone $slotEnd)->modify("+{$break} minutes");
+        }
+
+        $this->entityManager->flush();
+        return $timeSlots;
+    }
+
+    private function getFields($competition): array
+    {
+        return $this->entityManager->getRepository(Field::class)
+            ->findBy(['competition' => $competition]);
+    }
+
+    private function getTopTeams($competition, $limit = 32): array
+    {
+        return $this->entityManager->getRepository(Team::class)
+            ->findBy(['competition' => $competition], ['id' => 'ASC'], $limit);
+    }
+
+    private function generateEncounter(Championship $championship, Team $teamBlue, Team $teamGreen, TimeSlot $timeSlot, Field $field): Encounter
+    {
+        $encounter = new Encounter();
+        $encounter->setChampionship($championship)
+            ->setTimeSlot($timeSlot)
+            ->setField($field)
+            ->setTeamBlue($teamBlue)
+            ->setTeamGreen($teamGreen)
+            ->setState('PROGRAMMEE')
+            ->setPenaltyBlue(false)
+            ->setPenaltyGreen(false)
+            ->setFixedScore(false);
+
+        return $encounter;
     }
 }
