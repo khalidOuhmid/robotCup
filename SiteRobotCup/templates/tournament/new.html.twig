@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'tournament.create_new' | trans }}{% endblock %}
+
+{% block body %}
+<div class="flex flex-col w-full p-20">
+    <div class="shadow-lg bg-sky-800 size-full p-2 rounded-t-lg">
+        <h1 class="text-white font-bold p-2">{{ 'tournament.create_new' | trans }}</h1>
+    </div>
+
+    <div class="bg-slate-200 p-4 rounded-b-lg">
+        {% if teams_count < 32 %}
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                {{ 'tournament.not_enough_teams' | trans }}
+            </div>
+        {% else %}
+            <form method="post" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">
+                                {{ 'tournament.type' | trans }}
+                            </label>
+                            <select name="type" class="w-full p-2 border rounded">
+                                {% for key, label in tournament_types %}
+                                    <option value="{{ key }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" name="include_third_place" class="form-checkbox">
+                                <span class="text-gray-700">{{ 'tournament.include_third_place' | trans }}</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="p-4 bg-white rounded shadow">
+                            <h3 class="font-semibold mb-2">{{ 'tournament.resources' | trans }}</h3>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li>{{ 'tournament.available_teams'|trans }}: {{ teams_count }}</li>
+                                <li>{{ 'tournament.available_time_slots'|trans }}: {{ time_slots_count }}</li>
+                                <li>{{ 'tournament.available_fields'|trans }}: {{ fields_count }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                        {{ 'tournament.create' | trans }}
+                    </button>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

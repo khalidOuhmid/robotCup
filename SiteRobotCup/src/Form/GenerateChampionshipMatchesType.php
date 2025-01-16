@@ -6,7 +6,8 @@ use App\Entity\Championship;
 use App\Entity\Field;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -26,13 +27,27 @@ class GenerateChampionshipMatchesType extends AbstractType
                 'class' => Field::class,
                 'choice_label' => 'name',
                 'required' => true,
+                'label' => 'Terrain'
             ])
-            ->add('timeSlots', CollectionType::class, [
-                'entry_type' => TimeSlotType::class,
-                'allow_add' => true,
-                'allow_delete' => true,
-                'prototype' => true,
-                'by_reference' => false,
+            ->add('startTime', DateTimeType::class, [
+                'widget' => 'single_text',
+                'required' => true,
+                'label' => 'Début du créneau'
+            ])
+            ->add('endTime', DateTimeType::class, [
+                'widget' => 'single_text',
+                'required' => true,
+                'label' => 'Fin du créneau'
+            ])
+            ->add('matchDuration', IntegerType::class, [
+                'required' => true,
+                'label' => 'Durée d\'un match (en minutes)',
+                'attr' => ['min' => 5],
+            ])
+            ->add('maxMatches', IntegerType::class, [
+                'required' => true,
+                'label' => 'Nombre maximum de matchs',
+                'attr' => ['min' => 1],
             ])
         ;
     }

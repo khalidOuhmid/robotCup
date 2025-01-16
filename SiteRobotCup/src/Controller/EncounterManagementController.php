@@ -123,7 +123,8 @@ class EncounterManagementController extends AbstractController
     #[Route('/admin/encounter/generateChampionship', name: 'app_admin_encounter_generate_championship')]
     public function generateChampionship(
         Request $request, 
-        ChampionshipScheduler $scheduler
+        ChampionshipScheduler $scheduler,
+        EntityManagerInterface $entityManager
     ): Response {
         $form = $this->createForm(GenerateChampionshipMatchesType::class);
         $form->handleRequest($request);
@@ -131,25 +132,87 @@ class EncounterManagementController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
             
-            // Transformer les données du formulaire en format attendu par le scheduler
-            $timeSlots = array_map(function($timeSlot) {
-                return [
-                    'start' => $timeSlot['startTime'],
-                    'end' => $timeSlot['endTime'],
-                    'count' => $timeSlot['matchCount']
-                ];
-            }, $data['timeSlots']);
+            $startTime = $data['startTime'];
+            $endTime = $data['endTime'];
+            $matchDuration = $data['matchDuration'];
+            $maxMatches = $data['maxMatches'];
 
             try {
+                // Utiliser directement l'ID du terrain
+                $fieldId = $data['field']->getId();
+                error_log("Terrain sélectionné: " . $fieldId);
+
+                // Récupérer le nombre d'équipes du championnat avec la bonne structure SQL
+                $teamsCount = $entityManager->getConnection()
+                    ->executeQuery(
+                        'SELECT COUNT(DISTINCT t.TEM_ID) 
+                         FROM T_TEAM_TEM t
+                         JOIN T_COMPETITION_CMP c ON t.CMP_ID = c.CMP_ID
+                         JOIN T_CHAMPIONSHIP_CHP ch ON ch.CMP_ID = c.CMP_ID
+                         WHERE ch.CHP_ID = :championshipId',
+                        ['championshipId' => $data['championship']->getId()]
+                    )
+                    ->fetchOne();
+
+                error_log("Nombre d'équipes trouvées: " . $teamsCount);
+                
+                if ($teamsCount < 2) {
+                    throw new \Exception("Il faut au moins 2 équipes dans le championnat pour générer des rencontres");
+                }
+
+                $totalMatchesNeeded = ($teamsCount * ($teamsCount - 1)) / 2; // Formule pour le nombre total de matchs
+                error_log("Nombre total de matchs nécessaires: $totalMatchesNeeded");
+
+                // Calculer combien de créneaux on peut avoir dans la plage horaire donnée
+                $timeSlotDuration = ($endTime->getTimestamp() - $startTime->getTimestamp()) / 60; // en minutes
+                $possibleSlots = floor($timeSlotDuration / $matchDuration);
+                
+                // Prendre le minimum entre le nombre de matchs nécessaires et le maximum spécifié
+                $matchesToSchedule = min($totalMatchesNeeded, $maxMatches, $possibleSlots);
+                error_log("Nombre de matchs à programmer: $matchesToSchedule");
+
+                $timeSlots = [];
+                $currentStart = clone $startTime;
+
+                for ($i = 0; $i < $matchesToSchedule; $i++) {
+                    // S'assurer que le match ne dépasse pas la fin du créneau global
+                    $currentEnd = clone $currentStart;
+                    $currentEnd->modify('+' . $matchDuration . ' minutes');
+
+                    if ($currentEnd > $endTime) {
+                        break;
+                    }
+
+                    $timeSlots[] = [
+                        'start' => clone $currentStart,
+                        'end' => clone $currentEnd,
+                        'count' => 1
+                    ];
+
+                    // Avancer au prochain créneau
+                    $currentStart = clone $currentEnd;
+                }
+
+                error_log("Nombre de créneaux créés: " . count($timeSlots));
+                error_log("Premier créneau: " . $timeSlots[0]['start']->format('Y-m-d H:i:s') . " - " . $timeSlots[0]['end']->format('Y-m-d H:i:s'));
+                if (count($timeSlots) > 1) {
+                    error_log("Dernier créneau: " . end($timeSlots)['start']->format('Y-m-d H:i:s') . " - " . end($timeSlots)['end']->format('Y-m-d H:i:s'));
+                }
+
                 $scheduler->generateMatches(
                     $data['championship']->getId(),
                     $timeSlots,
-                    $data['field']->getId()
+                    $fieldId  // Passer directement l'ID du terrain
                 );
 
-                $this->addFlash('success', 'Les rencontres ont été générées avec succès.');
+                $entityManager->flush();
+                $this->addFlash('success', sprintf('%d rencontres sur %d ont été générées avec succès.', 
+                    count($timeSlots), 
+                    $totalMatchesNeeded
+                ));
                 return $this->redirectToRoute('app_admin_encounters');
             } catch (\Exception $e) {
+                error_log("Erreur: " . $e->getMessage());
                 $this->addFlash('error', 'Erreur lors de la génération des rencontres : ' . $e->getMessage());
             }
         }

@@ -41,6 +41,9 @@ class CompetitionController extends AbstractController
                 $tournament->setCompetition($competition);
                 $tournament->setIncludeThirdPlace($form->get('includeThirdPlace')->getData());
                 
+                // Set the tournament system from the form
+                $competition->setCmpRoundSystem($form->get('cmpRoundSystem')->getData());
+                
                 $entityManager->persist($tournament);
             }
 

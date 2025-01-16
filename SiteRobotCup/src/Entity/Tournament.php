@@ -150,6 +150,6 @@ class Tournament
 
     public function getType(): ?string
     {
-        return $this->getCompetition()?->getCmpRndSystem();
+        return $this->competition?->getCmpRoundSystem();
     }
 }

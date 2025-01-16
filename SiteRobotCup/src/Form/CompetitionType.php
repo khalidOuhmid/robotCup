@@ -17,54 +17,48 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CompetitionType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('cmpName', TextType::class, [
-                'label' => 'Nom de la compétition',
-                'required' => true,
+                'label' => 'Nom'
+            ])
+            ->add('cmpAddress', TextType::class, [
+                'label' => 'Lieu',
+                'required' => false
             ])
             ->add('cmpDesc', TextareaType::class, [
                 'label' => 'Description',
-                'required' => false,
-            ])
-            ->add('cmpAddress', TextType::class, [
-                'label' => 'Adresse',
-                'required' => false,
+                'required' => false
             ])
             ->add('cmpDateBegin', DateTimeType::class, [
                 'label' => 'Date de début',
-                'widget' => 'single_text',
-                'required' => true,
+                'widget' => 'single_text'
             ])
             ->add('cmpDateEnd', DateTimeType::class, [
                 'label' => 'Date de fin',
-                'widget' => 'single_text',
-                'required' => true,
+                'widget' => 'single_text'
             ])
             ->add('includeTournament', CheckboxType::class, [
                 'label' => 'Inclure un tournoi',
-                'required' => false,
                 'mapped' => false,
+                'required' => false
             ])
-            ->add('tournamentType', ChoiceType::class, [
-                'mapped' => false,
-                'required' => false,
+            ->add('cmpRoundSystem', ChoiceType::class, [
+                'label' => 'Type de tournoi',
                 'choices' => [
-                    'Normal' => 'NORMAL',
-                    'Système Suisse' => 'SUISSE',
-                    'Système Hollandais' => 'HOLLANDAIS',
+                    'Ronde Suisse' => 'SUISSE',
+                    'Ronde Hollandaise' => 'HOLLANDAIS',
+                    'Système Monrad' => 'MONRAD'
                 ],
-                'label' => 'Type de tournoi'
+                'placeholder' => 'Choisir un type de tournoi',
+                'required' => true,
+                'attr' => ['class' => 'form-select']
             ])
             ->add('includeThirdPlace', CheckboxType::class, [
-                'label' => 'Inclure une petite finale',
-                'required' => false,
+                'label' => 'Match pour la 3ème place',
                 'mapped' => false,
-                'attr' => [
-                    'disabled' => true,
-                    'class' => 'third-place-checkbox'
-                ]
+                'required' => false
             ])
         ;
     }

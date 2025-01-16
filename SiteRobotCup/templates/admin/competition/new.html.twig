@@ -36,14 +36,23 @@
                             }) }}
                             {{ form_label(form.includeTournament) }}
                         </div>
-                        <div class="flex items-center">
-                            {{ form_widget(form.includeThirdPlace, {
+                        <div id="tournamentOptions" class="ml-4 space-y-2" style="display: none;">
+                            {{ form_row(form.cmpRoundSystem, {
                                 'attr': {
-                                    'class': 'rounded border-gray-300 mr-2',
-                                    'data-third-place-checkbox': true
+                                    'class': 'w-full rounded border-gray-300',
+                                    'data-tournament-system': true
                                 }
                             }) }}
-                            {{ form_label(form.includeThirdPlace) }}
+                            <div class="flex items-center">
+                                {{ form_widget(form.includeThirdPlace, {
+                                    'attr': {
+                                        'class': 'rounded border-gray-300 mr-2',
+                                        'data-third-place-checkbox': true,
+                                        'disabled': true
+                                    }
+                                }) }}
+                                {{ form_label(form.includeThirdPlace) }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -64,12 +73,22 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const tournamentCheckbox = document.querySelector('[data-tournament-checkbox]');
+    const tournamentOptions = document.getElementById('tournamentOptions');
     const thirdPlaceCheckbox = document.querySelector('[data-third-place-checkbox]');
+    const tournamentSystem = document.querySelector('[data-tournament-system]');
+
+    // Initial state
+    tournamentSystem.disabled = !tournamentCheckbox.checked;
+    thirdPlaceCheckbox.disabled = !tournamentCheckbox.checked;
+    tournamentOptions.style.display = tournamentCheckbox.checked ? 'block' : 'none';
 
     tournamentCheckbox.addEventListener('change', function() {
+        tournamentOptions.style.display = this.checked ? 'block' : 'none';
         thirdPlaceCheckbox.disabled = !this.checked;
+        tournamentSystem.disabled = !this.checked;
         if (!this.checked) {
             thirdPlaceCheckbox.checked = false;
+            tournamentSystem.value = '';
         }
     });
 });
