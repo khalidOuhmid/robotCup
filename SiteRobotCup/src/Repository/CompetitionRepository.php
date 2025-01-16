@@ -13,22 +13,14 @@ class CompetitionRepository extends ServiceEntityRepository
         parent::__construct($registry, Competition::class);
     }
 
-    public function findOverlappingCompetitions(\DateTimeInterface $startDate, \DateTimeInterface $endDate, ?int $excludeId = null): array
+    public function findOverlappingCompetitions(\DateTimeInterface $startDate, \DateTimeInterface $endDate): array
     {
         $qb = $this->createQueryBuilder('c')
             ->where('
-                (c.cmpDateBegin BETWEEN :start AND :end) OR
-                (c.cmpDateEnd BETWEEN :start AND :end) OR
-                (:start BETWEEN c.cmpDateBegin AND c.cmpDateEnd) OR
-                (:end BETWEEN c.cmpDateBegin AND c.cmpDateEnd)
+                (c.cmpDateBegin <= :end AND c.cmpDateEnd >= :start)
             ')
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate);
-
-        if ($excludeId !== null) {
-            $qb->andWhere('c.id != :excludeId')
-                ->setParameter('excludeId', $excludeId);
-        }
 
         return $qb->getQuery()->getResult();
     }

@@ -27,30 +27,70 @@ class CompetitionController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Création du championnat
-            $championship = new Championship();
-            $championship->setCompetition($competition);
-            
-            
-            $entityManager->persist($competition);
-            $entityManager->persist($championship);
+            try {
+                // Vérifier d'abord que la date de début est avant la date de fin
+                if ($competition->getCmpDateBegin() >= $competition->getCmpDateEnd()) {
+                    throw new \Exception('La date de début doit être antérieure à la date de fin');
+                }
 
-            // Si le tournoi est demandé
-            if ($form->get('includeTournament')->getData()) {
-                $tournament = new Tournament();
-                $tournament->setCompetition($competition);
-                $tournament->setIncludeThirdPlace($form->get('includeThirdPlace')->getData());
+                // Vérifier le chevauchement des dates
+                $overlappingCompetitions = $entityManager->getRepository(Competition::class)
+                    ->findOverlappingCompetitions(
+                        $competition->getCmpDateBegin(),
+                        $competition->getCmpDateEnd()
+                    );
+
+                if (!empty($overlappingCompetitions)) {
+                    throw new \Exception('Une autre compétition existe déjà sur cette période');
+                }
+
+                $entityManager->beginTransaction();
                 
-                // Set the tournament system from the form
-                $competition->setCmpRoundSystem($form->get('cmpRoundSystem')->getData());
-                
-                $entityManager->persist($tournament);
+                try {
+                    // Création du championnat
+                    $championship = new Championship();
+                    $championship->setCompetition($competition);
+                    
+                    $entityManager->persist($competition);
+                    $entityManager->persist($championship);
+
+                    // Si le tournoi est demandé
+                    if ($form->get('includeTournament')->getData()) {
+                        $tournament = new Tournament();
+                        $tournament->setCompetition($competition);
+                        $tournament->setIncludeThirdPlace($form->get('includeThirdPlace')->getData());
+                        
+                        $roundSystem = $form->get('cmpRoundSystem')->getData();
+                        if (!$roundSystem) {
+                            throw new \Exception('Le type de tournoi est requis');
+                        }
+                        $competition->setCmpRoundSystem($roundSystem);
+                        
+                        if ($roundSystem === 'SUISSE') {
+                            $rounds = $form->get('cmpRounds')->getData();
+                            if (!$rounds || $rounds < 1 || $rounds > 16) {
+                                throw new \Exception('Le nombre de rondes doit être entre 1 et 16');
+                            }
+                            $competition->setCmpRounds($rounds);
+                        }
+                        
+                        $entityManager->persist($tournament);
+                        $entityManager->flush();
+                        
+                        $tournamentGenerator->generateTournament($tournament);
+                    }
+
+                    $entityManager->commit();
+                    $this->addFlash('success', 'La compétition a été créée avec succès.');
+                    return $this->redirectToRoute('app_default');
+                    
+                } catch (\Exception $e) {
+                    $entityManager->rollback();
+                    throw $e;
+                }
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
             }
-
-            $entityManager->flush();
-
-            $this->addFlash('success', 'La compétition a été créée avec succès.');
-            return $this->redirectToRoute('app_default');
         }
 
         return $this->render('admin/competition/new.html.twig', [

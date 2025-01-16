@@ -10,10 +10,12 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Range;
 
 class CompetitionType extends AbstractType
 {
@@ -52,8 +54,20 @@ class CompetitionType extends AbstractType
                     'Système Monrad' => 'MONRAD'
                 ],
                 'placeholder' => 'Choisir un type de tournoi',
-                'required' => true,
-                'attr' => ['class' => 'form-select']
+                'required' => false,
+                'mapped' => true,
+            ])
+            ->add('cmpRounds', IntegerType::class, [
+                'label' => 'Nombre de rondes',
+                'required' => false,
+                'mapped' => true,
+                'attr' => [
+                    'min' => 1,
+                    'max' => 16
+                ],
+                'constraints' => [
+                    new Range(['min' => 1, 'max' => 16])
+                ]
             ])
             ->add('includeThirdPlace', CheckboxType::class, [
                 'label' => 'Match pour la 3ème place',
