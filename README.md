@@ -1,4 +1,4 @@
-# SAE3.01_SiteRobot
+#  SiteRobot
 
 
 # The Project
@@ -8,6 +8,14 @@ This application covers the entire process: from team registration to publishing
 
 <hr>
 
+## Contributors
+
+- [@khalidOuhmid](https://github.com/khalidOuhmid)
+- [@isadorabezie](https://github.com/isadorabezie)
+- [@saydopsV2](https://github.com/saydopsV2)
+- [@xArckh](https://github.com/xArckh)
+- [@nabe](https://gitlab-ce.iut.u-bordeaux.fr/nabe)
+- [@nlaubal](https://gitlab-ce.iut.u-bordeaux.fr/nlaubal)
 
 # Table of Contents 
 
@@ -200,13 +208,6 @@ Go to log in/login in the top right-hand corner and enter your email address as 
 
 <hr>
 
-## Members list:
-- ABE Naoki
-- BENONY Clément
-- BEZIE Isadora
-- DEBAILLEUL François
-- LAUBAL Noah
-- OUHMID Khalid
 
 
 
